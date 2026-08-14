@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask Carnivore Ai — Coming Soon</title>
+<meta name="description" content="Ask Carnivore Ai — no app, no sign-up, just ask. Launching soon.">
+<meta name="theme-color" content="#4a1024">
+<meta property="og:title" content="Ask Carnivore Ai">
+<meta property="og:description" content="No app. No sign-up. Just Ask.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://askcarnivore.com">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%A9%3C/text%3E%3C/svg%3E">
+<style>
+  /* ------------------------------------------------------------------
+     Pulse ring adapted from "Heartbeating Ring Preloader" by Jon Kantner
+     https://codepen.io/jkantner/pen/RNKyWKd  — SCSS compiled to plain CSS,
+     retimed to a calmer breathing pulse.
+     ------------------------------------------------------------------ */
+
+  *, *::before, *::after {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    /* Deepened from the original hsl(… 90% 50%) so white text clears WCAG AA
+       on every phase of the cycle (8.5:1 / 5.6:1 / 9.8:1). */
+    --c1: hsl(343 72% 34%);   /* wine    */
+    --c2: hsl(33 85% 32%);    /* sear    */
+    --c3: hsl(223 65% 34%);   /* indigo  */
+
+    --fg:       hsl(20 20% 97%);
+    --fg-soft:  hsl(20 18% 97% / .82);
+
+    --pulse-dur: 2.6s;        /* one breath  (was 1s — a fast heartbeat) */
+    --shift-dur: 27s;         /* full colour cycle (was 3s) */
+
+    --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+            Helvetica, Arial, sans-serif;
+
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.2rem);
+  }
+
+  body {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 2rem 1.5rem;
+    background-color: var(--c1);
+    animation: shift-color var(--shift-dur) linear infinite;
+    color: var(--fg);
+    font-family: var(--font);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow: hidden;
+  }
+
+  /* Vignette — adds depth and keeps the edges from flattening out. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse 75% 65% at 50% 45%,
+                                transparent 35%, hsl(0 0% 0% / .38) 100%);
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 30rem;
+    text-align: center;
+    animation: rise 1s cubic-bezier(.16, 1, .3, 1) both;
+  }
+
+  /* ---- the pulse ---- */
+
+  .pl {
+    display: block;
+    width: clamp(5.5rem, 22vw, 7.5rem);
+    height: auto;
+    margin: 0 auto 2.5rem;
+    filter: drop-shadow(0 0 1.75rem hsl(0 0% 0% / .3));
+  }
+
+  .pl__ring-inner,
+  .pl__ring-outer {
+    animation-duration: var(--pulse-dur);
+    animation-iteration-count: infinite;
+  }
+
+  .pl__ring-inner {
+    animation-name: scale-in;
+    animation-timing-function: cubic-bezier(.65, 0, .35, 1);
+  }
+
+  .pl__ring-outer {
+    animation-name: stroke-out-in;
+  }
+
+  /* ---- type ---- */
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 3.1rem);
+    font-weight: 700;
+    letter-spacing: -.035em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  .tagline {
+    margin-top: .9rem;
+    font-size: clamp(1rem, 3.6vw, 1.2rem);
+    font-weight: 500;
+    letter-spacing: .01em;
+    color: var(--fg-soft);
+    text-wrap: balance;
+  }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    margin-top: 2rem;
+    padding: .5rem 1.05rem;
+    border: 1px solid hsl(0 0% 100% / .16);
+    border-radius: 999px;
+    /* Dark chip keeps this legible through every background phase. */
+    background: hsl(0 0% 0% / .28);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .status::before {
+    content: "";
+    width: .4rem;
+    height: .4rem;
+    border-radius: 50%;
+    background: currentcolor;
+    opacity: .85;
+    animation: blink var(--pulse-dur) ease-in-out infinite;
+  }
+
+  /* ---- animations ---- */
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* Original: scale 0 → 1 between 15% and 71.667%. Widened the rest phase so
+     the ring settles before the next breath. */
+  @keyframes scale-in {
+    0%, 12%     { transform: scale(0); }
+    62%, 100%   { transform: scale(1); }
+  }
+
+  /* Original swelled to r50 / stroke 15 with a snappy ease-in/ease-out pair.
+     Softer amplitude and symmetric easing turn the beat into a breath. */
+  @keyframes stroke-out-in {
+    0%, 48%, 100% {
+      animation-timing-function: cubic-bezier(.37, 0, .63, 1);
+      r: 45px;
+      stroke-width: 10px;
+      opacity: 1;
+    }
+    74% {
+      animation-timing-function: cubic-bezier(.37, 0, .63, 1);
+      r: 48px;
+      stroke-width: 13px;
+      opacity: .72;
+    }
+  }
+
+  @keyframes blink {
+    0%, 48%, 100% { opacity: .85; }
+    74%           { opacity: .35; }
+  }
+
+  /* Percentages below are the compiled form of the original SCSS
+     interpolations (31/180, 60/180, 91/180, 120/180, 151/180). */
+  @keyframes shift-color {
+    0%, 17.222%, 100%   { background-color: var(--c1); }
+    33.333%, 50.556%    { background-color: var(--c2); }
+    66.667%, 83.889%    { background-color: var(--c3); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    body { background-color: var(--c1); }
+  }
+</style>
+</head>
+<body>
+  <main>
+    <svg class="pl" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+      <g fill="none" stroke="currentcolor" stroke-width="10" transform="translate(60,60)">
+        <circle class="pl__ring-outer" r="45" />
+        <circle class="pl__ring-inner" r="45" />
+      </g>
+    </svg>
+
+    <h1>Ask Carnivore Ai</h1>
+
+    <p class="tagline">No app. No sign-up. Just Ask.</p>
+
+    <p class="status">Under Construction · Coming Soon</p>
+  </main>
+</body>
+</html>
