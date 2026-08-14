@@ -1,17 +1,33 @@
 # AskCarnivore AI
 
-## Τι είναι
+## Το οικοσύστημα
 
-Bot / AI assistant που δίνει πληροφορίες σχετικά με την **carnivore διατροφή**.
+Δύο ιστοσελίδες, ξεχωριστός ρόλος η καθεμία, αλληλοϋποστηριζόμενες.
+
+| | **askcarnivore.com** (ενικός) | **askcarnivores.com** (πληθυντικός) |
+|---|---|---|
+| **Τι είναι** | AI assistant για την carnivore διατροφή | Portal κοινότητας |
+| **Ρωτάς** | τη μηχανή | τους ανθρώπους |
+| **Σχέση** | 1 προς 1, ανώνυμα | μέλος προς μέλος, με ταυτότητα |
+| **Περιεχόμενο** | απαντήσεις κατά παραγγελία | testimonials, συζήτηση, προφίλ |
+| **Πρόσβαση** | χωρίς λογαριασμό | με λογαριασμό |
+| **Στάδιο** | Under Construction — **live** | δεν έχει ξεκινήσει |
+
+Το ζευγάρι ενικός/πληθυντικός λειτουργεί υπέρ μας: το `askcarnivore` ρωτάει *τον*
+carnivore (τη μηχανή), το `askcarnivores` ρωτάει *τους* carnivores (την κοινότητα).
+Η διάκριση πρέπει να είναι ρητή και συνεπής παντού — αλλιώς τα δύο domains θα
+μοιάζουν με typo το ένα του άλλου.
 
 ## Στοιχεία project
 
 | | |
 |---|---|
-| **Domain** | `askcarnivore.com` (αγορασμένο στη Cloudflare) |
+| **Domains** | `askcarnivore.com`, `askcarnivores.com` (και τα δύο στη Cloudflare, ίδια λήξη) |
 | **Repo** | https://github.com/noustelos/askCarnivore-Ai |
 | **Local path** | `/Users/nikoskaradimas/Desktop/ASK CARNIVORE AI` |
-| **Στάδιο** | Under Construction — landing page μόνο, **live** |
+
+> Τα παρακάτω (Τρέχουσα κατάσταση, Visual identity, Deployment, Δομή) αφορούν
+> **μόνο** το `askcarnivore.com`. Το `askcarnivores.com` δεν έχει ακόμα repo/κώδικα.
 
 ## Τρέχουσα κατάσταση
 
@@ -91,7 +107,52 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 
 ## Concept
 
-*(Θα συμπληρωθεί — ο χρήστης θα δώσει το πρώτο concept.)*
+### askcarnivore.com — ο βοηθός
+
+*(Εκκρεμεί το αναλυτικό concept από τον χρήστη.)*
+
+### askcarnivores.com — η κοινότητα
+
+**Δοσμένο 14/08/2026.** Portal επικοινωνίας με άλλους ανθρώπους της carnivore
+κοινότητας, με έμφαση στην **ανάδειξη testimonials**. Τα δύο sites αλληλοϋποστηρίζονται.
+
+Πυλώνες:
+
+1. **Επικοινωνία μελών** — να βρίσκουν και να μιλούν μεταξύ τους οι carnivore.
+2. **Testimonials** — προσωπικές ιστορίες/εμπειρίες, σε πρώτο πλάνο.
+3. **Cross-support** — κάθε site τροφοδοτεί το άλλο.
+
+### Πώς αλληλοϋποστηρίζονται
+
+Η ροή που βγάζει νόημα και προς τις δύο κατευθύνσεις:
+
+- **AI → κοινότητα:** μετά από μια απάντηση, «δες τι λένε άνθρωποι που το έζησαν» →
+  σχετικά testimonials. Δίνει κοινωνική απόδειξη εκεί που η μηχανή δίνει μόνο πληροφορία.
+- **Κοινότητα → AI:** μέσα σε μια συζήτηση, «ρώτα το AI» για γρήγορη, ουδέτερη
+  απάντηση σε factual ερώτηση, χωρίς να περιμένεις απάντηση μέλους.
+- Κοινή οπτική ταυτότητα (η παλέτα του landing) ώστε να διαβάζονται ως αδέλφια.
+- Κοινό SSO όταν υπάρξουν λογαριασμοί — ένα login και για τα δύο.
+
+### Ένταση που πρέπει να λυθεί συνειδητά
+
+Το tagline του `askcarnivore.com` είναι **«No app. No sign-up. Just Ask.»**
+Το `askcarnivores.com` απαιτεί εξ ορισμού λογαριασμούς. Δεν είναι αντίφαση αν
+παρουσιαστεί σωστά — *«ο βοηθός δεν σου ζητάει τίποτα· η κοινότητα σε ξέρει με
+το όνομά σου»* — αλλά πρέπει να είναι επιλογή, όχι ατύχημα. Το «no sign-up»
+να μην εμφανίζεται ποτέ στο site της κοινότητας.
+
+### Ρίσκα που έρχονται μαζί με τα testimonials
+
+Δεν είναι λόγος να μη γίνει, είναι λόγος να σχεδιαστεί σωστά από την αρχή:
+
+- **Ισχυρισμοί υγείας.** Testimonial τύπου «θεράπευσα το Χ με carnivore» είναι
+  ιατρικός ισχυρισμός. Χρειάζεται σαφές disclaimer δίπλα στο περιεχόμενο (όχι μόνο
+  στο footer) και κανόνες για το τι επιτρέπεται να δημοσιευτεί.
+- **User-generated content.** Θέλει moderation, αναφορά περιεχομένου, όρους χρήσης.
+- **Προσωπικά δεδομένα.** Ιστορίες υγείας = ειδική κατηγορία δεδομένων κατά GDPR.
+  Απαιτεί ρητή συγκατάθεση, δυνατότητα διαγραφής, και σαφή privacy policy.
+- **Αυθεντικότητα.** Τα ψεύτικα testimonials σκοτώνουν την αξιοπιστία ενός τέτοιου
+  site πιο γρήγορα από οτιδήποτε άλλο. Θέλει τρόπο επιβεβαίωσης, έστω ελαφρύ.
 
 ---
 
@@ -103,9 +164,6 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       αντί να κάνει redirect στο apex — δύο hostnames με ίδιο content, το οποίο
       διασπά το SEO signal. Θέλει Bulk Redirect ή Redirect Rule: `www` → apex (301).
       Καλύτερα τώρα, πριν μαζέψει links.
-- [ ] **`askcarnivores.com`** (με `s`) — υπάρχει επίσης στο account, ίδια ημερομηνία
-      λήξης. Αν είναι defensive registration, να μπει 301 προς το `askcarnivore.com`.
-      Αν ήταν κατά λάθος, να αποφασιστεί τι γίνεται στην ανανέωση.
 - [ ] Απόφαση tech stack για το bot (LLM provider, backend, chat UI)
 - [ ] Πηγές γνώσης / knowledge base για carnivore περιεχόμενο
 - [ ] Email capture στο coming soon (χρειάζεται backend/service — δεν υπάρχει ακόμα)
@@ -116,6 +174,22 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       το μπλε είναι το μόνο off-brand χρώμα της τριάδας
 - [ ] OG image (`og:image`) για σωστό preview σε social shares
 
+### askcarnivores.com (κοινότητα)
+
+- [ ] **Ξεχωριστό repo + Pages project** — να επιβεβαιωθεί ότι πάει χωριστά, όχι
+      στο ίδιο repo (διαφορετικό stack: το ένα στατικό, το άλλο θέλει backend)
+- [ ] Coming-soon landing, αδελφό του `askcarnivore.com` αλλά με δικό του μήνυμα
+      (**χωρίς** το "No sign-up" — βλ. Concept)
+- [ ] Tech stack: auth, database, moderation. Το Cloudflare stack (Workers + D1 +
+      KV/R2) καλύπτει και τα δύο sites αν θέλουμε να μείνουμε σε έναν πάροχο
+- [ ] Δομή testimonial: τι πεδία, τι επιβεβαίωση, ποια moderation ροή πριν δημοσιευτεί
+- [ ] Κανόνες περιεχομένου — τι ισχυρισμοί υγείας επιτρέπονται και τι όχι
+- [ ] Legal για UGC: terms, privacy policy με GDPR ειδική κατηγορία δεδομένων, δικαίωμα διαγραφής
+- [ ] Σχεδιασμός των cross-links AI ↔ κοινότητα (πού ακριβώς εμφανίζονται, τι λένε)
+- [ ] Απόφαση για κοινό SSO ανάμεσα στα δύο sites
+- [ ] Seed strategy: μια κοινότητα χωρίς μέλη είναι νεκρή στην εκκίνηση — πώς μαζεύονται
+      τα πρώτα testimonials πριν ανοίξει;
+
 ---
 
 ## Changelog
@@ -123,3 +197,5 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 - **2026-08-14** — Αρχικό setup: CLAUDE.md + Under Construction landing page.
 - **2026-08-14** — Landing ξαναχτίστηκε πάνω στο pulse-ring concept (βλ. Visual identity).
 - **2026-08-14** — Live στο `askcarnivore.com` μέσω Cloudflare Pages.
+- **2026-08-14** — Το `askcarnivores.com` απέκτησε ρόλο: portal κοινότητας με
+  testimonials, αλληλοϋποστηριζόμενο με τον AI βοηθό. Το project έγινε δύο sites.
