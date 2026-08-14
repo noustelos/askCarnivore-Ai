@@ -11,7 +11,7 @@ Bot / AI assistant που δίνει πληροφορίες σχετικά με 
 | **Domain** | `askcarnivore.com` (αγορασμένο στη Cloudflare) |
 | **Repo** | https://github.com/noustelos/askCarnivore-Ai |
 | **Local path** | `/Users/nikoskaradimas/Desktop/ASK CARNIVORE AI` |
-| **Στάδιο** | Under Construction — landing page μόνο |
+| **Στάδιο** | Under Construction — landing page μόνο, **live** |
 
 ## Τρέχουσα κατάσταση
 
@@ -50,13 +50,26 @@ Full-bleed background που κυλάει αργά ανάμεσα σε τρία 
 
 ## Deployment
 
-Cloudflare Pages, συνδεδεμένο στο GitHub repo:
+**Live από 14/08/2026.** Cloudflare Pages, project `askcarnivore`, συνδεδεμένο στο
+GitHub repo. Κάθε push στο `main` κάνει auto-deploy.
 
-- Build command: *(κανένα)*
-- Build output directory: `/` (root)
-- Custom domain: `askcarnivore.com` + `www.askcarnivore.com`
+| | |
+|---|---|
+| Production branch | `main` |
+| Framework preset | None |
+| Build command | *(κενό)* |
+| Build output directory | `/` |
+| Env vars | καμία |
+| Pages URL | `askcarnivore.pages.dev` |
+| Custom domains | `askcarnivore.com`, `www.askcarnivore.com` — και τα δύο Active με SSL |
 
-Κάθε push στο `main` κάνει auto-deploy.
+DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχει πειραχτεί
+τίποτα άλλο στο zone.
+
+**Προσοχή στο setup:** το τρέχον Cloudflare dashboard σπρώχνει ένα ενοποιημένο
+"Create application" flow που κάνει deploy μέσω `npx wrangler deploy` — αυτό απαιτεί
+`wrangler.toml`, που δεν έχουμε (και δεν χρειαζόμαστε για στατικό site). Το σωστό
+μονοπάτι είναι το κλασικό Pages setup στο `/pages/new/provider/github`.
 
 ## Δομή
 
@@ -85,7 +98,14 @@ Cloudflare Pages, συνδεδεμένο στο GitHub repo:
 ## Pending / Εκκρεμότητες
 
 - [ ] Να δοθεί το **concept** του bot (κοινό, tone, τι ακριβώς απαντάει, γλώσσα/ες)
-- [ ] Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`
+- [x] ~~Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`~~ ✅ 14/08/2026
+- [ ] **Canonical domain.** Το `www.askcarnivore.com` σερβίρει το ίδιο περιεχόμενο
+      αντί να κάνει redirect στο apex — δύο hostnames με ίδιο content, το οποίο
+      διασπά το SEO signal. Θέλει Bulk Redirect ή Redirect Rule: `www` → apex (301).
+      Καλύτερα τώρα, πριν μαζέψει links.
+- [ ] **`askcarnivores.com`** (με `s`) — υπάρχει επίσης στο account, ίδια ημερομηνία
+      λήξης. Αν είναι defensive registration, να μπει 301 προς το `askcarnivore.com`.
+      Αν ήταν κατά λάθος, να αποφασιστεί τι γίνεται στην ανανέωση.
 - [ ] Απόφαση tech stack για το bot (LLM provider, backend, chat UI)
 - [ ] Πηγές γνώσης / knowledge base για carnivore περιεχόμενο
 - [ ] Email capture στο coming soon (χρειάζεται backend/service — δεν υπάρχει ακόμα)
@@ -102,3 +122,4 @@ Cloudflare Pages, συνδεδεμένο στο GitHub repo:
 
 - **2026-08-14** — Αρχικό setup: CLAUDE.md + Under Construction landing page.
 - **2026-08-14** — Landing ξαναχτίστηκε πάνω στο pulse-ring concept (βλ. Visual identity).
+- **2026-08-14** — Live στο `askcarnivore.com` μέσω Cloudflare Pages.
