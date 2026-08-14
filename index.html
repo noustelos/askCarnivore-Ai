@@ -54,6 +54,9 @@
   body {
     min-height: 100svh;
     display: grid;
+    /* Two rows so the credit sits at the foot without overlapping the mark
+       on a short landscape viewport — main stays centred in what is left. */
+    grid-template-rows: 1fr auto;
     place-items: center;
     padding: 2rem 1.5rem;
     background-color: var(--c1);
@@ -130,6 +133,55 @@
     font-weight: 600;
     letter-spacing: .14em;
     text-transform: uppercase;
+  }
+
+  /* ---- footer credit ---- */
+
+  footer {
+    position: relative;
+    z-index: 1;
+    margin-top: 2.5rem;
+    animation: rise 1s cubic-bezier(.16, 1, .3, 1) .25s both;
+  }
+
+  .by {
+    display: inline-block;
+    padding: .4rem .3rem;
+    color: var(--fg-soft);
+    font-size: clamp(.6rem, 2.3vw, .7rem);
+    font-weight: 600;
+    letter-spacing: .07em;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    opacity: .68;
+    transition: opacity .25s ease;
+  }
+
+  .by:hover,
+  .by:focus-visible { opacity: 1; }
+
+  .by:focus-visible {
+    border-radius: .35rem;
+    outline: 2px solid hsl(0 0% 100% / .75);
+    outline-offset: 2px;
+  }
+
+  .by__name { font-weight: 700; color: var(--fg); }
+
+  /* The studio's own mark, kept to its proportions: 0.74em, weight 600,
+     letter-spacing .03em, lifted .32em off the baseline, and set apart by
+     the same .18em gap. Only the colour differs — the site's #6f665b would
+     disappear against these backgrounds, so the mark keeps its *role*
+     (a quieter companion to the wordmark) rather than its exact value. */
+  .by__mark {
+    display: inline-block;
+    margin-left: .18em;
+    color: hsl(20 18% 97% / .58);
+    font-size: .74em;
+    font-weight: 600;
+    letter-spacing: .03em;
+    transform: translateY(-.32em);
   }
 
   .status::before {
@@ -271,6 +323,12 @@
 
     <p class="status">Under Construction · Coming Soon</p>
   </main>
+
+  <footer>
+    <!-- The "/>" is the studio's mark, not punctuation — decorative here,
+         so it stays out of the accessible name ("A NOUSTELOS_STUDIO PROJECT"). -->
+    <a class="by" href="https://noustelos.gr/" target="_blank" rel="noopener">A <span class="by__name">NOUSTELOS_STUDIO</span> PROJECT<span class="by__mark" aria-hidden="true">/&gt;</span></a>
+  </footer>
 
 <script>
   /* SMIL does not honour the reduced-motion media query the way CSS does,

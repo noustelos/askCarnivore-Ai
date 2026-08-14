@@ -229,7 +229,36 @@ spec (RAG/router, Mistral integration, rate limit) — που χτίζεται �
 dependencies, χωρίς external assets — όλα inline ώστε να ανεβαίνει όπως είναι.
 
 **Περιεχόμενο σελίδας:** morphing mark → `Ask Carnivore Ai` → `No app. No sign-up. Just Ask.`
-→ `Under Construction · Coming Soon`.
+→ `Under Construction · Coming Soon`, και στο footer το studio credit.
+
+### Studio credit (footer)
+
+`A NOUSTELOS_STUDIO PROJECT />` με link στο https://noustelos.gr/.
+
+Το **`/>` είναι το σήμα του studio, όχι στίξη** — μην το «διορθώσεις» ποτέ σε σκέτο
+κείμενο και μην το αφαιρέσεις. Στο noustelos.gr έχει δικό του treatment, το οποίο
+αντιγράφηκε εδώ αυτούσιο (`.footer-brand-mark`):
+
+| Ιδιότητα | Τιμή | |
+|---|---|---|
+| `font-size` | `0.74em` | μικρότερο από τον wordmark |
+| `font-weight` | `600` | ελαφρύτερο (ο wordmark είναι 700) |
+| `letter-spacing` | `0.03em` | πιο σφιχτό από το `.07em` του wordmark |
+| `transform` | `translateY(-0.32em)` | **σηκωμένο πάνω από τη γραμμή** |
+| gap πριν το mark | `0.18em` | |
+
+Δύο συνειδητές αποκλίσεις από το πρωτότυπο:
+
+- **Χρώμα.** Το studio το βάφει `#6f665b` — πάνω στα σκούρα μας backgrounds θα
+  εξαφανιζόταν. Κρατήθηκε ο *ρόλος* (πιο σβηστό από τον wordmark) με
+  `hsl(20 18% 97% / .58)`, όχι η ακριβής τιμή.
+- **Γραμματοσειρά.** Το studio χρησιμοποιεί Space Grotesk· εδώ μένει το system stack,
+  γιατί ο κανόνας self-contained (χωρίς CDN/Google Fonts) βαραίνει περισσότερο σε ένα
+  landing μιας σελίδας. Αν κάποτε μπει σωστή brand γραμματοσειρά, εδώ είναι το σημείο.
+
+Το `/>` είναι `aria-hidden` — το accessible name του link μένει
+«A NOUSTELOS_STUDIO PROJECT». Το footer είναι επίσης η θέση όπου θα μπει αργότερα το
+buy-me-a-coffee (§3) — **ποτέ μέσα στη ροή ερώτησης/απάντησης.**
 
 ### Visual identity (landing)
 
@@ -351,6 +380,7 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       vocabulary του τελικού UI.
 - [ ] Intro screen με disclaimer (πριν την πρώτη ερώτηση)
 - [ ] Buy-me-a-coffee στο footer — **ποτέ** μέσα στη ροή ερώτησης/απάντησης
+      (το footer υπάρχει ήδη, με το studio credit)
 - [x] ~~Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`~~ ✅ 14/08/2026
 
 ### Portal (`askcarnivores.com`) — v1, στατικό
@@ -415,6 +445,9 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
   switchboard positioning· ο κύκλος παραμένει η θέση ηρεμίας. Ρητά **χωρίς** αναφορά σε
   PlayStation (σήμα Sony + λάθος coding για health). Εκκρεμεί: να γίνει λειτουργικό
   σήμα idle/thinking όταν ζήσει το bot.
+- **2026-08-14** — Προστέθηκε footer με το studio credit
+  `A NOUSTELOS_STUDIO PROJECT />` → noustelos.gr, με το `/>` στο ακριβές treatment
+  του studio (μικρότερο, ελαφρύτερο, σηκωμένο από τη γραμμή).
 
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
 > έγιναν μέσα σε **μία νύχτα** (13→14/08/2026).
