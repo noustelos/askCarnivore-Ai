@@ -13,9 +13,14 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%A9%3C/text%3E%3C/svg%3E">
 <style>
   /* ------------------------------------------------------------------
-     Pulse ring adapted from "Heartbeating Ring Preloader" by Jon Kantner
-     https://codepen.io/jkantner/pen/RNKyWKd  — SCSS compiled to plain CSS,
-     retimed to a calmer breathing pulse.
+     Morphing ring: circle → triangle → square → circle, breathing
+     throughout. The breath descends from "Heartbeating Ring Preloader"
+     by Jon Kantner (https://codepen.io/jkantner/pen/RNKyWKd) — SCSS
+     compiled to plain CSS, retimed to a calm exhale.
+
+     The shape cycle itself runs on SMIL in the markup below (the `d`
+     property is not animatable via CSS in Firefox), so its timings live
+     there, not here: 2.7s hold + 0.9s morph per shape = 10.8s a lap.
      ------------------------------------------------------------------ */
 
   *, *::before, *::after {
@@ -35,7 +40,9 @@
     --fg:       hsl(20 20% 97%);
     --fg-soft:  hsl(20 18% 97% / .82);
 
-    --pulse-dur: 2.6s;        /* one breath  (was 1s — a fast heartbeat) */
+    /* 2.7s, not 2.6s, so 10.8 / 2.7 = 4 — exactly four breaths per shape
+       lap, keeping the two rhythms from drifting against each other. */
+    --pulse-dur: 2.7s;        /* one breath  (was 1s — a fast heartbeat) */
     --shift-dur: 27s;         /* full colour cycle (was 3s) */
 
     --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
@@ -78,7 +85,7 @@
     animation: rise 1s cubic-bezier(.16, 1, .3, 1) both;
   }
 
-  /* ---- the pulse ---- */
+  /* ---- the mark ---- */
 
   .pl {
     display: block;
@@ -86,21 +93,6 @@
     height: auto;
     margin: 0 auto 2.5rem;
     filter: drop-shadow(0 0 1.75rem hsl(0 0% 0% / .3));
-  }
-
-  .pl__ring-inner,
-  .pl__ring-outer {
-    animation-duration: var(--pulse-dur);
-    animation-iteration-count: infinite;
-  }
-
-  .pl__ring-inner {
-    animation-name: scale-in;
-    animation-timing-function: cubic-bezier(.65, 0, .35, 1);
-  }
-
-  .pl__ring-outer {
-    animation-name: stroke-out-in;
   }
 
   /* ---- type ---- */
@@ -157,30 +149,6 @@
     to   { opacity: 1; transform: none; }
   }
 
-  /* Original: scale 0 → 1 between 15% and 71.667%. Widened the rest phase so
-     the ring settles before the next breath. */
-  @keyframes scale-in {
-    0%, 12%     { transform: scale(0); }
-    62%, 100%   { transform: scale(1); }
-  }
-
-  /* Original swelled to r50 / stroke 15 with a snappy ease-in/ease-out pair.
-     Softer amplitude and symmetric easing turn the beat into a breath. */
-  @keyframes stroke-out-in {
-    0%, 48%, 100% {
-      animation-timing-function: cubic-bezier(.37, 0, .63, 1);
-      r: 45px;
-      stroke-width: 10px;
-      opacity: 1;
-    }
-    74% {
-      animation-timing-function: cubic-bezier(.37, 0, .63, 1);
-      r: 48px;
-      stroke-width: 13px;
-      opacity: .72;
-    }
-  }
-
   @keyframes blink {
     0%, 48%, 100% { opacity: .85; }
     74%           { opacity: .35; }
@@ -194,6 +162,8 @@
     66.667%, 83.889%    { background-color: var(--c3); }
   }
 
+  /* Covers the CSS animations only — SMIL ignores `animation: none`, so the
+     shape cycle is frozen from the script at the foot of the document. */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation: none !important;
@@ -205,10 +175,93 @@
 </head>
 <body>
   <main>
+    <!-- ================================================================
+         One ring, three forms: circle → triangle → square → circle.
+
+         All three are the SAME path — 4 cubic Bézier segments, same count,
+         same order — which is what lets them interpolate cleanly:
+           · circle   = 4 arcs (k = 0.5523·r), turned 45° so the anchors
+                        land on the square's corners
+           · square   = 4 straight runs (controls at 1/3 and 2/3)
+           · triangle = 3 sides + 1 degenerate segment at the apex, i.e.
+                        the two top corners collapse into one point
+
+         Coordinates are relative to the centre; translate(60,60) on the
+         <g> places them. Every rotate/scale therefore pivots around (0,0)
+         = the centre, with no reliance on transform-box/transform-origin.
+         ================================================================ -->
     <svg class="pl" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
-      <g fill="none" stroke="currentcolor" stroke-width="10" transform="translate(60,60)">
-        <circle class="pl__ring-outer" r="45" />
-        <circle class="pl__ring-inner" r="45" />
+      <defs>
+        <path id="acShape" d="M 31.82 -31.82
+                              C 49.39 -14.25, 49.39 14.25, 31.82 31.82
+                              C 14.25 49.39, -14.25 49.39, -31.82 31.82
+                              C -49.39 14.25, -49.39 -14.25, -31.82 -31.82
+                              C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z">
+          <animate
+            attributeName="d"
+            dur="10.8s"
+            repeatCount="indefinite"
+            calcMode="spline"
+            keyTimes="0;0.25;0.3333;0.5833;0.6667;0.9167;1"
+            keySplines="0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1"
+            values="
+              M 31.82 -31.82 C 49.39 -14.25, 49.39 14.25, 31.82 31.82 C 14.25 49.39, -14.25 49.39, -31.82 31.82 C -49.39 14.25, -49.39 -14.25, -31.82 -31.82 C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z;
+              M 31.82 -31.82 C 49.39 -14.25, 49.39 14.25, 31.82 31.82 C 14.25 49.39, -14.25 49.39, -31.82 31.82 C -49.39 14.25, -49.39 -14.25, -31.82 -31.82 C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z;
+              M 0 -52 C 15.01 -26, 30.02 0, 45.03 26 C 15.01 26, -15.01 26, -45.03 26 C -30.02 0, -15.01 -26, 0 -52 C 0 -52, 0 -52, 0 -52 Z;
+              M 0 -52 C 15.01 -26, 30.02 0, 45.03 26 C 15.01 26, -15.01 26, -45.03 26 C -30.02 0, -15.01 -26, 0 -52 C 0 -52, 0 -52, 0 -52 Z;
+              M 39 -39 C 39 -13, 39 13, 39 39 C 13 39, -13 39, -39 39 C -39 13, -39 -13, -39 -39 C -13 -39, 13 -39, 39 -39 Z;
+              M 39 -39 C 39 -13, 39 13, 39 39 C 13 39, -13 39, -39 39 C -39 13, -39 -13, -39 -39 C -13 -39, 13 -39, 39 -39 Z;
+              M 31.82 -31.82 C 49.39 -14.25, 49.39 14.25, 31.82 31.82 C 14.25 49.39, -14.25 49.39, -31.82 31.82 C -49.39 14.25, -49.39 -14.25, -31.82 -31.82 C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z" />
+        </path>
+      </defs>
+
+      <g transform="translate(60,60)" fill="none" stroke="currentcolor"
+         stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
+
+        <!-- The mark turns as it changes form. Each stop lands on an angle of
+             the shape's own symmetry so triangle and square sit level:
+             0° → 120° (3-fold) → 270° (4-fold) → 390°. At 390° we are back
+             to a circle, so the loop's jump to 0° is invisible. -->
+        <g>
+          <animateTransform
+            attributeName="transform" type="rotate"
+            dur="10.8s" repeatCount="indefinite" calcMode="spline"
+            keyTimes="0;0.25;0.3333;0.5833;0.6667;0.9167;1"
+            keySplines="0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1"
+            values="0;0;120;120;270;270;390" />
+
+          <!-- Echo — a faint ping outward. Same shape, same beat as the
+               breath, so it reads as one gesture rather than two. -->
+          <use class="pl__echo" href="#acShape" stroke-width="6" opacity="0">
+            <animateTransform attributeName="transform" type="scale"
+              dur="2.7s" repeatCount="indefinite" calcMode="spline"
+              keyTimes="0;1" keySplines=".22 .61 .36 1" values="1;1.3" />
+            <animate attributeName="opacity"
+              dur="2.7s" repeatCount="indefinite"
+              keyTimes="0;0.18;1" values="0;.3;0" />
+          </use>
+
+          <!-- The breath. Original amplitude and easing, moved off the
+               <circle>'s r (which does not exist on a <path>) and onto
+               scale + stroke-width. Four breaths per shape lap. -->
+          <use class="pl__ring" href="#acShape">
+            <animateTransform attributeName="transform" type="scale"
+              dur="2.7s" repeatCount="indefinite" calcMode="spline"
+              keyTimes="0;0.48;0.74;1"
+              keySplines=".37 0 .63 1;.37 0 .63 1;.37 0 .63 1"
+              values="1;1;1.05;1" />
+            <animate attributeName="stroke-width"
+              dur="2.7s" repeatCount="indefinite" calcMode="spline"
+              keyTimes="0;0.48;0.74;1"
+              keySplines=".37 0 .63 1;.37 0 .63 1;.37 0 .63 1"
+              values="10;10;13;10" />
+            <animate attributeName="opacity"
+              dur="2.7s" repeatCount="indefinite" calcMode="spline"
+              keyTimes="0;0.48;0.74;1"
+              keySplines=".37 0 .63 1;.37 0 .63 1;.37 0 .63 1"
+              values="1;1;.72;1" />
+          </use>
+        </g>
       </g>
     </svg>
 
@@ -218,5 +271,13 @@
 
     <p class="status">Under Construction · Coming Soon</p>
   </main>
+
+<script>
+  /* SMIL does not honour the reduced-motion media query the way CSS does,
+     so freeze the shape cycle explicitly — at t=0, i.e. on the circle. */
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelector('.pl').pauseAnimations();
+  }
+</script>
 </body>
 </html>

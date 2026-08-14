@@ -228,35 +228,64 @@ spec (RAG/router, Mistral integration, rate limit) — που χτίζεται �
 Στατική σελίδα "Coming Soon" στο [index.html](index.html). Χωρίς build step, χωρίς
 dependencies, χωρίς external assets — όλα inline ώστε να ανεβαίνει όπως είναι.
 
-**Περιεχόμενο σελίδας:** pulse ring → `Ask Carnivore Ai` → `No app. No sign-up. Just Ask.`
+**Περιεχόμενο σελίδας:** morphing mark → `Ask Carnivore Ai` → `No app. No sign-up. Just Ask.`
 → `Under Construction · Coming Soon`.
 
 ### Visual identity (landing)
 
-Full-bleed background που κυλάει αργά ανάμεσα σε τρία χρώματα, με ένα λευκό
-διπλό δαχτυλίδι που «αναπνέει» στο κέντρο.
+Full-bleed background που κυλάει αργά ανάμεσα σε τρία χρώματα, με ένα λευκό σχήμα
+στο κέντρο που «αναπνέει» και **αλλάζει μορφή: κύκλος → τρίγωνο → τετράγωνο → κύκλος.**
 
 | Token | Τιμή | Ρόλος |
 |---|---|---|
 | `--c1` | `hsl(343 72% 34%)` | wine |
 | `--c2` | `hsl(33 85% 32%)` | sear |
 | `--c3` | `hsl(223 65% 34%)` | indigo |
-| `--pulse-dur` | `2.6s` | μία «ανάσα» του ring |
+| `--pulse-dur` | `2.7s` | μία «ανάσα» του mark |
 | `--shift-dur` | `27s` | πλήρης κύκλος χρωμάτων |
 
-Το ring είναι διασκευή του
+Ο **κύκλος είναι η θέση ηρεμίας** — αυτό είναι το mark/favicon state. Το morph λέει
+«μία πόρτα, πολλές μορφές απάντησης», δηλαδή το switchboard positioning (§1) σε κίνηση —
+πιο κοντά στο concept από ό,τι ο χτύπος καρδιάς, που έλεγε απλώς «υγεία».
+
+**Ρητά ΟΧΙ αναφορά σε PlayStation.** Το set △ ○ ✕ □ *μαζί, σε διάταξη χειριστηρίου*
+είναι κατοχυρωμένο σήμα της Sony — και το gaming coding είναι off-brand για health.
+Το «φιλικό» το φέρνει το `stroke-linejoin: round` και ο αργός ρυθμός, όχι η αναφορά.
+
+**Πώς δουλεύει το morph** (λεπτομέρειες στα σχόλια του [index.html](index.html)):
+
+- Και τα τρία σχήματα είναι **το ίδιο path**: 4 τμήματα cubic Bézier, ίδιο πλήθος και
+  σειρά — γι' αυτό παρεμβάλλονται καθαρά. Ο κύκλος είναι 4 τόξα γυρισμένα 45° ώστε τα
+  άγκιστρα να πέφτουν στις γωνίες του τετραγώνου· το τρίγωνο έχει ένα **εκφυλισμένο
+  τμήμα** στην κορυφή (οι δύο πάνω γωνίες καταρρέουν σε ένα σημείο).
+- **SMIL (`<animate>`), όχι CSS** — το `d` δεν είναι animatable CSS property στον Firefox.
+- Οι συντεταγμένες είναι σχετικές ως προς το κέντρο, με `translate(60,60)` στο `<g>`:
+  κάθε rotate/scale γίνεται γύρω από το `(0,0)`, χωρίς εξάρτηση από `transform-box`.
+- **Περιστροφή σε γωνίες συμμετρίας:** `0° → 120°` (τρίγωνο, 3-fold) → `270°` (τετράγωνο,
+  4-fold) → `390°`. Κανένα σχήμα δεν κάθεται στραβά, και στο 390° είμαστε ήδη κύκλος
+  οπότε το loop πίσω στο 0° δεν φαίνεται.
+- **Συγχρονισμός:** `10.8s` ο κύκλος σχημάτων (2.7s hold + 0.9s morph × 3), `2.7s` η
+  ανάσα → **ακριβώς 4 ανάσες ανά γύρο**, ώστε οι δύο ρυθμοί να μην ξεφεύγουν.
+- Το **echo** (αχνό ping προς τα έξω) τρέχει στον ρυθμό της ανάσας, όχι σε δικό του.
+
+Η «ανάσα» κατάγεται από το
 [Heartbeating Ring Preloader](https://codepen.io/jkantner/pen/RNKyWKd) του Jon Kantner.
-Αλλαγές που έγιναν:
+Αλλαγές που έγιναν στην πορεία:
 
 - SCSS → plain CSS (τα `#{}` interpolations λύθηκαν σε ποσοστά· χωρίς `sass` build).
-- Το heartbeat έγινε ήρεμο pulse: `1s → 2.6s`, μικρότερο πλάτος (`r 50/sw 15 → 48/13`),
-  συμμετρικό easing αντί για το snappy `ease-in`/`ease-out` ζευγάρι.
+- Το heartbeat έγινε ήρεμη ανάσα: `1s → 2.7s`, μικρότερο πλάτος, συμμετρικό easing
+  (`.37 0 .63 1`) αντί για το snappy `ease-in`/`ease-out` ζευγάρι.
+- Η ανάσα **μετακόμισε από το `r` του `<circle>` σε `scale` + `stroke-width`** — το `r`
+  δεν υπάρχει σε `<path>`. Ίδιο πλάτος, ίδιο easing.
 - Τα χρώματα βάθυναν από `90% 50%` ώστε το λευκό κείμενο να περνάει WCAG AA
   (8.5:1 / 5.6:1 / 9.8:1 αντί για ~2.3:1 στο αρχικό πορτοκαλί).
 - `--shift-dur` `3s → 27s` — τα 3s ήταν στροβοσκόπιο.
 - Προστέθηκαν: `prefers-reduced-motion`, vignette για βάθος, `100svh`,
   dark chip πίσω από το status ώστε να διαβάζεται σε κάθε φάση του κύκλου.
-- Καθαρίστηκε το `width="20" height="20"` του `<svg>` που συγκρουόταν με το CSS.
+
+**Προσοχή:** το SMIL **δεν** ακούει το `animation: none` του `prefers-reduced-motion`.
+Παγώνει ρητά με `pauseAnimations()` από ένα τρίγραμμο inline script στο τέλος του
+document. Αν προστεθεί άλλο SMIL, θέλει και αυτό κάλυψη εκεί.
 
 Η παλέτα του landing είναι κοινή και για τα δύο sites — να διαβάζονται ως αδέλφια.
 
@@ -294,7 +323,8 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 
 ## Αρχές / κανόνες
 
-- Η σελίδα να παραμείνει self-contained (inline CSS, χωρίς CDN) όσο είμαστε σε landing φάση.
+- Η σελίδα να παραμείνει self-contained (inline CSS/JS, χωρίς CDN, χωρίς build step)
+  όσο είμαστε σε landing φάση.
 - Responsive & dark/light aware.
 - Το περιεχόμενο για την carnivore διατροφή είναι **ενημερωτικό, όχι ιατρική συμβουλή** —
   θέλει disclaimer παντού όπου δίνονται πληροφορίες υγείας. Ο framing rule (§8) *είναι*
@@ -315,6 +345,10 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 - [ ] Mistral integration (Small/Flash), prompt caching για το σταθερό KB context
 - [ ] Rate limit (safety, όχι μονετοποίηση)
 - [ ] Chat UI πάνω στο υπάρχον landing· worker-based flow σε Cloudflare
+- [ ] **Το morph να γίνει λειτουργικό σήμα** όταν ζήσει το bot: κύκλος σταθερός = idle
+      / σε περιμένω· morph σε εξέλιξη = ψάχνω στο index· σταμάτημα στον κύκλο = έτοιμο.
+      Τότε η κίνηση *σημαίνει* κάτι αντί να διακοσμεί, και το landing κρατάει ήδη το
+      vocabulary του τελικού UI.
 - [ ] Intro screen με disclaimer (πριν την πρώτη ερώτηση)
 - [ ] Buy-me-a-coffee στο footer — **ποτέ** μέσα στη ροή ερώτησης/απάντησης
 - [x] ~~Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`~~ ✅ 14/08/2026
@@ -376,6 +410,11 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
   στατική σελίδα. Τα testimonials μπαίνουν ως **link-out** στο κανάλι του Dave Mac.
 - **2026-08-14** — Δημιουργήθηκε ξεχωριστό repo για το portal: `noustelos/ask-CARNIVORES`
   (κενό). Επιβεβαιώθηκε ότι και τα δύο domains αγοράστηκαν 13/08/2026.
+- **2026-08-14** — Το pulse ring έγινε **morphing mark**: κύκλος → τρίγωνο → τετράγωνο →
+  κύκλος, με την ανάσα να συνεχίζεται από κάτω και ένα αχνό echo. Το morph εκφράζει το
+  switchboard positioning· ο κύκλος παραμένει η θέση ηρεμίας. Ρητά **χωρίς** αναφορά σε
+  PlayStation (σήμα Sony + λάθος coding για health). Εκκρεμεί: να γίνει λειτουργικό
+  σήμα idle/thinking όταν ζήσει το bot.
 
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
 > έγιναν μέσα σε **μία νύχτα** (13→14/08/2026).
