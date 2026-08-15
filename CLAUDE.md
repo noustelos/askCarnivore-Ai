@@ -645,6 +645,21 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 
 ### Bot (`askcarnivore.com`) — v1
 
+> **Πού σταματήσαμε (15/08/2026):** το `bot-v0` είναι parked σε preview, εγκεκριμένο,
+> **δεν γίνεται merge** μέχρι ο Nick να δώσει τα τέσσερα blockers παρακάτω. Δύο
+> σημειώσεις για την επιστροφή:
+>
+> 1. **Το `MISTRAL_API_KEY` μπαίνει και στο preview environment**, όχι μόνο στο
+>    production. Το Cloudflare Pages κρατάει χωριστά secrets ανά environment — αν
+>    μπει μόνο στο production, το preview μένει στο `503 not_configured` και μοιάζει
+>    με σπασμένος bot ενώ απλώς λείπει το key.
+> 2. **Το πρώτο πραγματικό end-to-end γίνεται στο preview URL μόλις μπει το key.**
+>    Μέχρι στιγμής η ροή έχει τρέξει μόνο σε Node με stubbed Mistral (ο workerd δεν
+>    τρέχει σε macOS 12.6 — θέλει 13.5+). Άρα *ο κώδικας* είναι επαληθευμένος, το
+>    *live behaviour του μοντέλου* όχι: τα πρώτα πράγματα που ελέγχονται εκεί είναι
+>    αν ο classifier πιάνει το personal-medical και αν το matching δουλεύει
+>    ελληνικά/αγγλικά.
+
 - [ ] **Register table** (θέμα → creator → register) — **μπλοκάρει τα πάντα.** Άντρες
       tagged· γυναίκες pending ώσπου ο Nick ακούσει τα κανάλια τους (§14.11). Το
       τεχνικό spec γράφεται *μετά* από αυτό, όχι πριν.
@@ -687,10 +702,11 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       / σε περιμένω· morph σε εξέλιξη = ψάχνω στο index· σταμάτημα στον κύκλο = έτοιμο.
       Τότε η κίνηση *σημαίνει* κάτι αντί να διακοσμεί, και το landing κρατάει ήδη το
       vocabulary του τελικού UI.
-- [~] Intro screen με disclaimer (πριν την πρώτη ερώτηση) — branch `bot-v0`: ο
-      disclaimer (framing + ιατρικό) είναι **μόνιμα ορατός κάτω από το ask box**,
-      πριν από κάθε ερώτηση. Ξεχωριστό intro screen δεν μπήκε: σε μια σελίδα που
-      πουλάει το «Just Ask», μια οθόνη-πύλη είναι τριβή. Αν χρειαστεί, εδώ αλλάζει.
+- [x] ~~Intro screen με disclaimer (πριν την πρώτη ερώτηση)~~ ✅ **κλειδωμένο
+      15/08/2026 από τον Nick:** ο disclaimer (framing + ιατρικό) είναι **μόνιμα
+      ορατός κάτω από το ask box**, ορατός πριν από κάθε ερώτηση. **ΟΧΙ intro
+      gate** — σε σελίδα που πουλάει το «Just Ask», μια οθόνη-πύλη είναι τριβή.
+      Μη το «αναβαθμίσεις» σε intro screen σε μελλοντικό πέρασμα.
 - [ ] Buy-me-a-coffee στο footer — **ποτέ** μέσα στη ροή ερώτησης/απάντησης
       (το footer υπάρχει ήδη, με το studio credit). **Λείπει το link** από τον Nick.
 - [x] ~~Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`~~ ✅ 14/08/2026
