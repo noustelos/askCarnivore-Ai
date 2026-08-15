@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask Carnivore Ai</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#4a1024">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%A9%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="chat.css">
+<style>
+  /* ------------------------------------------------------------------
+     The embeddable view (§16). This is what askcarnivores.com frames —
+     a window onto the one bot, not a second copy of it. Our half of the
+     deal is this page plus the frame-ancestors header in `_headers`;
+     the floating button, the panel and its animation live in the portal
+     repo and never touch anything here.
+
+     Deliberately quieter than the landing page: no colour cycle, no
+     morphing mark, no vignette. It sits inside somebody else's chrome
+     and runs as long as their panel is open — a permanent animation
+     would be a battery cost with nothing to say.
+
+     `noindex`: the same bot already has a canonical page at
+     askcarnivore.com. This one should not compete with it in search.
+     ------------------------------------------------------------------ */
+
+  *, *::before, *::after { border: 0; box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --c1: hsl(343 72% 34%);            /* wine — the landing's resting colour */
+    --fg: hsl(20 20% 97%);
+    --fg-soft: hsl(20 18% 97% / .82);
+    --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+            Helvetica, Arial, sans-serif;
+    font-size: 16px;
+  }
+
+  /* Fixed height, not min-height: inside a panel the thread must scroll
+     within itself. If the body is allowed to grow, the head and the ask box
+     leave the frame and the portal's panel gets a scrollbar of its own. */
+  body {
+    display: flex;
+    flex-direction: column;
+    height: 100svh;
+    overflow: hidden;
+    padding: 1.1rem 1rem 1rem;
+    background: var(--c1);
+    color: var(--fg);
+    font-family: var(--font);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1rem;
+  }
+
+  .head h1 { font-size: 1rem; font-weight: 700; letter-spacing: -.01em; }
+
+  .head a {
+    color: var(--fg-soft);
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-decoration: none;
+    opacity: .8;
+    white-space: nowrap;
+  }
+
+  .head a:hover, .head a:focus-visible { opacity: 1; text-decoration: underline; }
+
+  /* min-height:0 on both — without it a flex child refuses to shrink below its
+     content, and `overflow-y: auto` on the thread never gets a chance to fire. */
+  .chat { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; }
+  .chat__thread { flex: 1; min-height: 0; max-height: none; }
+  .head { flex: none; }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>Ask Carnivore Ai</h1>
+    <!-- The only tie between the two sites is a public hyperlink — including
+         this one, pointing back out of the frame to our own page. -->
+    <a href="https://askcarnivore.com" target="_blank" rel="noopener">Open full page ↗</a>
+  </div>
+
+  <section class="chat" id="chat">
+    <div class="chat__thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
+
+    <form class="chat__form" id="ask-form">
+      <label class="visually-hidden" for="q">Ask about the carnivore diet</label>
+      <input class="chat__input" id="q" name="q" type="text" autocomplete="off"
+             enterkeyhint="send" maxlength="500" placeholder="Ask a question…" required>
+      <button class="chat__send" id="send" type="submit">Ask</button>
+    </form>
+
+    <p class="chat__note">
+      This points you at what people in this community say — positions, not
+      settled fact, and not medical advice. For anything about your own health,
+      ask your doctor.
+    </p>
+  </section>
+
+<script src="chat.js"></script>
+</body>
+</html>

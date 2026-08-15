@@ -464,11 +464,22 @@ curated core. Χωρίς χρονική πίεση.*
 
 ## Τρέχουσα κατάσταση
 
-Στατική σελίδα "Coming Soon" στο [index.html](index.html). Χωρίς build step, χωρίς
-dependencies, χωρίς external assets — όλα inline ώστε να ανεβαίνει όπως είναι.
+**Live (`main`):** στατική σελίδα "Coming Soon".
+**Branch `bot-v0` (σε review, ΟΧΙ merged):** ο thin slice του bot — ask box πάνω στο
+landing, ένας worker, χειροκίνητο index. Το index είναι ακόμα **PLACEHOLDER**: όσο
+το `status` του `src/index.json` λέει `PLACEHOLDER`, η σελίδα δείχνει κίτρινο banner
+ότι τα links δεν είναι πραγματικές πηγές. Ο Nick αντικαθιστά περιεχόμενο και
+`status` **στο ίδιο commit** — ποτέ χωριστά.
+
+Χωρίς build step και χωρίς dependencies, όπως πριν. Το `chat.css` / `chat.js` είναι
+πλέον ξεχωριστά αρχεία αντί για inline: είναι **κοινά** για `/` και `/embed`, και ο
+κανόνας self-contained αφορά εξωτερικές εξαρτήσεις (CDN, build) — ένα αντίγραφο που
+θα απέκλινε θα ήταν χειρότερο (§16: ένας bot).
 
 **Περιεχόμενο σελίδας:** morphing mark → `Ask Carnivore Ai` → `No app. No sign-up. Just Ask.`
-→ `Under Construction · Coming Soon`, και στο footer το studio credit.
+→ ask box + disclaimer, και στο footer το studio credit. Μόλις ξεκινήσει συνομιλία
+(`body.is-active`) το mark μικραίνει και το tagline φεύγει, ώστε ο χώρος να πάει στις
+απαντήσεις.
 
 ### Studio credit (footer)
 
@@ -584,10 +595,35 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 
 ```
 .
-├── CLAUDE.md      # αυτό το αρχείο — concept, context & εκκρεμότητες
-├── index.html     # landing page (Under Construction)
-└── README.md
+├── CLAUDE.md         # αυτό το αρχείο — concept, context & εκκρεμότητες
+├── README.md
+├── index.html        # landing + ask box
+├── embed.html        # /embed — η όψη που κάνει frame το portal (§16)
+├── chat.css          # η επιφάνεια chat — κοινή και στις δύο σελίδες
+├── chat.js           # ο client — κοινός και στις δύο σελίδες
+├── _headers          # CSP, frame-ancestors
+├── functions/
+│   └── api/ask.js    # Ο worker: μία ροή
+├── src/
+│   ├── index.json    # το index — θέμα → creator → register → βίντεο
+│   ├── prompt.js     # το system prompt (index μέσα, URLs ποτέ)
+│   └── router.js     # validation & gating της απάντησης του μοντέλου
+└── test/
+    └── router.test.mjs
 ```
+
+**Δύο ιδιότητες που δεν είναι refactorable** (Bot v0 spec §4) — αν κάποιο επόμενο
+πέρασμα τις «τακτοποιήσει», έσπασε τον bot, δεν τον καθάρισε:
+
+1. **Το μοντέλο δεν βγάζει ποτέ URL.** Βλέπει ids και τίτλους, επιστρέφει ids, και
+   το `src/router.js` ξαναχτίζει τα links από το `src/index.json`. Δεν *μπορεί* να
+   παραπέμψει σε βίντεο που δεν υπάρχει, γιατί δεν είδε ποτέ URL για να το
+   αντιγράψει ή να το εφεύρει. Ό,τι μοιάζει με link μέσα στο κείμενό του κόβεται.
+2. **`intent: "personal-medical"` → μηδέν links**, στον worker, ό,τι κι αν ζήτησε
+   το μοντέλο. Το redirect σε γιατρό δεν στηρίζεται στην υπακοή του μοντέλου.
+
+Το `test/router.test.mjs` (`node --test`, χωρίς dependencies) υπάρχει για να
+μένουν αληθινές.
 
 ## Αρχές / κανόνες
 
@@ -615,31 +651,48 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 - [ ] **Curated video core** σε ~5-8 marquee θέματα (cholesterol, keto flu, getting
       started, insulin, electrolytes, fatty liver…) — **θέμα → creator → register →
       βίντεο**, ≥4 βίντεο ανά θέμα ώστε να απαντιέται το «δώσε κι άλλα» (§14.2).
+      *Το v0 έχει τον μηχανισμό, όχι το περιεχόμενο:* 3 θέματα × 4 placeholder
+      entries με πλήρες schema στο [src/index.json](src/index.json), ώστε να τρέχει
+      η ροή όσο ο Nick ετοιμάζει τα πραγματικά. **Blocker για live.**
       Χτίζεται με YouTube Data API scan + έτοιμα playlists + creator-approval, με
       δικά μας link labels· **ποτέ** transcripts ή rehost.
 - [ ] **API quota strategy** για το scanning — σχεδιασμός, όχι brute-force (§14.10)
-- [ ] System prompt: pure-router συμπεριφορά + framing rule + link-label discipline +
-      ιατρικό redirect + **Route A** για εξαντλημένες πηγές (§14.7) + η ατάκα
-      «not a ranking, it's a match» (§14.5)
-- [ ] Intent classifier (personal-medical / quick-practical / testimonial /
-      conceptual) — Άξονας 1 της §14.6
-- [ ] Session state: τι βίντεο δείχτηκαν ήδη, ώστε το «δώσε κι άλλα» να σερβίρει τα
-      επόμενα αντί για τα ίδια
-- [ ] Mistral integration (Small/Flash), prompt caching για το σταθερό index context
-- [ ] Rate limit (safety, όχι μονετοποίηση)
-- [ ] Chat UI πάνω στο υπάρχον landing· worker-based flow σε Cloudflare
-- [ ] **Public `/embed` view + `frame-ancestors https://askcarnivores.com`** στο CSP
-      — η δική μας μισή δουλειά του embed model (§16). Header δικός μας, όχι shared
-      secret. Το portal βάζει το `frame-src` και το chrome από τη δική του μεριά.
+- [x] ~~System prompt: pure-router + framing rule + link-label discipline + ιατρικό
+      redirect + **Route A** (§14.7) + «not a ranking, it's a match» (§14.5)~~
+      ✅ branch `bot-v0` — [src/prompt.js](src/prompt.js)
+- [x] ~~Intent classifier (personal-medical / quick-practical / testimonial /
+      conceptual) — Άξονας 1 της §14.6~~ ✅ branch `bot-v0`. Το personal-medical
+      **δεν** μένει στο μοντέλο: ο worker κόβει τα links (§ Δομή, κανόνας 2).
+- [x] ~~Session state: τι βίντεο δείχτηκαν ήδη~~ ✅ branch `bot-v0` — χωρίς μηχανή
+      session: κάθε assistant turn ξαναστέλνεται με `[already shown: …]`, το
+      history *είναι* το state.
+- [x] ~~Mistral integration (Small/Flash), prompt caching~~ ✅ branch `bot-v0` —
+      `mistral-small-latest`, system prompt byte-identical ανά request ώστε να
+      πιάνει το prefix cache. **Λείπει το key** (Cloudflare secret
+      `MISTRAL_API_KEY`) → χωρίς αυτό το endpoint απαντά `503 not_configured`.
+- [x] ~~Rate limit (safety, όχι μονετοποίηση)~~ ✅ branch `bot-v0` — 8/λεπτό,
+      60/ώρα, KV, με hash της IP (δεν αποθηκεύουμε διεύθυνση). **Λείπει το KV
+      namespace + binding `RATE_LIMIT`** → χωρίς αυτό τρέχει με rate limit
+      **off** και το λέει στο `meta`. Blocker για live.
+- [x] ~~Chat UI πάνω στο υπάρχον landing· worker-based flow σε Cloudflare~~
+      ✅ branch `bot-v0`
+- [x] ~~**Public `/embed` view + `frame-ancestors https://askcarnivores.com`**~~
+      ✅ branch `bot-v0` — [embed.html](embed.html) + [_headers](_headers). Header
+      δικός μας, όχι shared secret. Το `askcarnivores.com` είναι **σκόπιμα εκτός**
+      του allow-list του `/api/ask`: το portal μας φτάνει ως iframe, όχι ως client
+      (§16). Το portal βάζει το `frame-src` και το chrome από τη δική του μεριά.
 - [ ] **Cron maintenance worker για link rot** — **αναγκαίος**, όχι μελλοντικός:
       video-level σημαίνει χιλιάδες links που σαπίζουν (§14.10)
 - [ ] **Το morph να γίνει λειτουργικό σήμα** όταν ζήσει το bot: κύκλος σταθερός = idle
       / σε περιμένω· morph σε εξέλιξη = ψάχνω στο index· σταμάτημα στον κύκλο = έτοιμο.
       Τότε η κίνηση *σημαίνει* κάτι αντί να διακοσμεί, και το landing κρατάει ήδη το
       vocabulary του τελικού UI.
-- [ ] Intro screen με disclaimer (πριν την πρώτη ερώτηση)
+- [~] Intro screen με disclaimer (πριν την πρώτη ερώτηση) — branch `bot-v0`: ο
+      disclaimer (framing + ιατρικό) είναι **μόνιμα ορατός κάτω από το ask box**,
+      πριν από κάθε ερώτηση. Ξεχωριστό intro screen δεν μπήκε: σε μια σελίδα που
+      πουλάει το «Just Ask», μια οθόνη-πύλη είναι τριβή. Αν χρειαστεί, εδώ αλλάζει.
 - [ ] Buy-me-a-coffee στο footer — **ποτέ** μέσα στη ροή ερώτησης/απάντησης
-      (το footer υπάρχει ήδη, με το studio credit)
+      (το footer υπάρχει ήδη, με το studio credit). **Λείπει το link** από τον Nick.
 - [x] ~~Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`~~ ✅ 14/08/2026
 
 ### Portal (`askcarnivores.com`) — v1, στατικό
@@ -744,6 +797,20 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
   μέχρι να υπάρξουν, το portal δεν έχει income path και το Μοντέλο Α δεν έχει ακόμα
   ταμείο. Το `frame-ancestors` + `/embed` της §16 μπήκε στα δικά μας pending — είναι
   header δικός μας, όχι shared secret, οπότε το siloing μένει ακέραιο.
+
+- **2026-08-15** — **Bot v0 (thin slice)** στο branch `bot-v0`, σε review, **όχι
+  merged**. Ο βρόχος ερώτηση → medical check → θέμα → 3-4 βίντεο → links δουλεύει
+  άκρη-σε-άκρη με placeholder index. Δύο αρχιτεκτονικές επιλογές που κλείδωσαν:
+  - **Index = bundled JSON, όχι KV.** Το curation είναι editorial απόφαση· θέλει
+    diff και ιστορικό. KV θα έχει νόημα όταν μπει ο cron για link rot.
+  - **Το μοντέλο ματσάρει, ο κώδικας επαληθεύει.** Το prompt δεν περιέχει κανένα
+    URL — το μοντέλο βλέπει ids/τίτλους και επιστρέφει ids· τα links ξαναχτίζονται
+    από το index. Το hallucinated URL γίνεται *δομικά αδύνατο* αντί για θέμα καλού
+    prompt. Μαζί: το `personal-medical` gate ζει στον worker, όχι στο μοντέλο.
+  Επίσης: `/embed` + `frame-ancestors`, rate limit σε KV με hashed IP, disclaimer
+  μόνιμα ορατός, και `test/router.test.mjs` που φυλάει τους δύο κανόνες.
+  Εκκρεμούν για live: πραγματικό index content, `MISTRAL_API_KEY`, KV binding,
+  buy-me-a-coffee link.
 
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
 > έγιναν μέσα σε **μία νύχτα** (13→14/08/2026).

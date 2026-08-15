@@ -1,0 +1,31 @@
+# Cloudflare Pages headers.
+#
+# frame-ancestors is set PER PAGE, never on /*, on purpose. When several rules
+# match one request Pages merges them, and two Content-Security-Policy headers
+# are evaluated together — the strictest wins. A /* rule with
+# `frame-ancestors 'none'` would therefore quietly veto the allowance on
+# /embed, and the portal's panel would render an empty box with no clue why.
+# So each document names its own policy and no rule overlaps another.
+#
+# Our half of the embed model (§16): this header is ours alone. No shared
+# secret, no coordination with the portal repo — they set frame-src on their
+# side, we say who may frame us on ours.
+
+/
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/index.html
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+# The one embeddable surface. askcarnivores.com only — and only as a frame.
+/embed
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors https://askcarnivores.com https://www.askcarnivores.com
+
+/embed.html
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors https://askcarnivores.com https://www.askcarnivores.com
+
+# Safe to apply everywhere: none of these can conflict with the rules above.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()

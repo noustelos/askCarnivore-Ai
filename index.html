@@ -3,14 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ask Carnivore Ai — Coming Soon</title>
-<meta name="description" content="Ask Carnivore Ai — no app, no sign-up, just ask. Launching soon.">
+<title>Ask Carnivore Ai — No app. No sign-up. Just Ask.</title>
+<meta name="description" content="Ask a question about the carnivore diet and get sent to the videos that cover it. No app, no sign-up.">
 <meta name="theme-color" content="#4a1024">
 <meta property="og:title" content="Ask Carnivore Ai">
 <meta property="og:description" content="No app. No sign-up. Just Ask.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://askcarnivore.com">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%A9%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="chat.css">
 <style>
   /* ------------------------------------------------------------------
      Morphing ring: circle → triangle → square → circle, breathing
@@ -66,7 +67,10 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    overflow: hidden;
+    /* Was `overflow: hidden` when this page held four lines of text. The
+       thread scrolls inside itself, but a long answer on a short phone still
+       needs the page to give. Horizontal stays locked. */
+    overflow-x: hidden;
   }
 
   /* Vignette — adds depth and keeps the edges from flattening out. */
@@ -83,7 +87,7 @@
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 30rem;
+    max-width: 34rem;
     text-align: center;
     animation: rise 1s cubic-bezier(.16, 1, .3, 1) both;
   }
@@ -96,7 +100,16 @@
     height: auto;
     margin: 0 auto 2.5rem;
     filter: drop-shadow(0 0 1.75rem hsl(0 0% 0% / .3));
+    transition: width .6s cubic-bezier(.16, 1, .3, 1),
+                margin .6s cubic-bezier(.16, 1, .3, 1);
   }
+
+  /* Once a conversation starts, the masthead steps back and gives the room to
+     the answers. The mark stays — it is the one thing that carries over into
+     the working state. */
+  .is-active .pl { width: clamp(3rem, 12vw, 4rem); margin-bottom: 1.1rem; }
+  .is-active h1  { font-size: clamp(1.35rem, 5vw, 1.7rem); }
+  .is-active .tagline { display: none; }
 
   /* ---- type ---- */
 
@@ -117,23 +130,11 @@
     text-wrap: balance;
   }
 
-  .status {
-    display: inline-flex;
-    align-items: center;
-    gap: .6rem;
-    margin-top: 2rem;
-    padding: .5rem 1.05rem;
-    border: 1px solid hsl(0 0% 100% / .16);
-    border-radius: 999px;
-    /* Dark chip keeps this legible through every background phase. */
-    background: hsl(0 0% 0% / .28);
-    -webkit-backdrop-filter: blur(6px);
-    backdrop-filter: blur(6px);
-    font-size: .72rem;
-    font-weight: 600;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-  }
+  /* ---- the ask box ---- */
+
+  /* The chat surface itself is styled in chat.css, shared with /embed. Only
+     its placing on this page belongs here. */
+  .chat { margin-top: 2rem; }
 
   /* ---- footer credit ---- */
 
@@ -184,26 +185,11 @@
     transform: translateY(-.32em);
   }
 
-  .status::before {
-    content: "";
-    width: .4rem;
-    height: .4rem;
-    border-radius: 50%;
-    background: currentcolor;
-    opacity: .85;
-    animation: blink var(--pulse-dur) ease-in-out infinite;
-  }
-
   /* ---- animations ---- */
 
   @keyframes rise {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: none; }
-  }
-
-  @keyframes blink {
-    0%, 48%, 100% { opacity: .85; }
-    74%           { opacity: .35; }
   }
 
   /* Percentages below are the compiled form of the original SCSS
@@ -321,7 +307,26 @@
 
     <p class="tagline">No app. No sign-up. Just Ask.</p>
 
-    <p class="status">Under Construction · Coming Soon</p>
+    <!-- The same chat surface the portal frames at /embed — one markup
+         contract, one stylesheet, one client (chat.css / chat.js). -->
+    <section class="chat" id="chat">
+      <div class="chat__thread" id="thread" role="log" aria-live="polite" aria-label="Conversation"></div>
+
+      <form class="chat__form" id="ask-form">
+        <label class="visually-hidden" for="q">Ask about the carnivore diet</label>
+        <input class="chat__input" id="q" name="q" type="text" autocomplete="off"
+               enterkeyhint="send" maxlength="500" placeholder="Ask a question…" required>
+        <button class="chat__send" id="send" type="submit">Ask</button>
+      </form>
+
+      <!-- The framing rule is the accuracy disclaimer; the medical line sits on
+           top of it. Both are visible before the first question is asked. -->
+      <p class="chat__note">
+        This points you at what people in this community say — positions, not
+        settled fact, and not medical advice. For anything about your own health,
+        ask your doctor.
+      </p>
+    </section>
   </main>
 
   <footer>
@@ -337,5 +342,6 @@
     document.querySelector('.pl').pauseAnimations();
   }
 </script>
+<script src="chat.js"></script>
 </body>
 </html>
