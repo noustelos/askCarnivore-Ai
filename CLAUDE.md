@@ -99,8 +99,10 @@ model) ειδικά ήρθε αυτούσιο.
 
 - **Register tags για τις γυναίκες** — εκκρεμεί ώσπου ο Nick ακούσει τα κανάλια
   τους (§14.11). Άντρες: πλήρως tagged.
-- **Scan Layer** — YouTube API key (ο Nick το παίρνει) + ο agent χτίζει το
-  scan→grid. Αντικαθιστά το χειροκίνητο `src/index.json` του v0.
+- **Scan Layer** — το spec του δόθηκε 16/08/2026 και είναι καταγεγραμμένο
+  ολόκληρο παρακάτω («Scan Layer — build spec v1»). **Δεν έχει ξεκινήσει:**
+  λείπουν YouTube API key, περιεχόμενο `curation.json`, και ΟΚ στις τέσσερις
+  αποφάσεις αρχιτεκτονικής. Αντικαθιστά το χειροκίνητο `src/index.json` του v0.
 - **RAG/KB/vector** — μπαίνει όταν το πλέγμα ξεπεράσει το cached prompt (§14.9).
 - Ποιο portal tool πρώτο (πρόταση: Get Started 7 μερών).
 - Self-submission form για events — v-next (§13).
@@ -752,6 +754,169 @@ document. Αν προστεθεί άλλο SMIL, θέλει και αυτό κά
 
 Η παλέτα του landing είναι κοινή και για τα δύο sites — να διαβάζονται ως αδέλφια.
 
+---
+
+## Scan Layer — build spec v1 (**δεν έχει ξεκινήσει**)
+
+*Δεύτερο build spec του bot, μετά το v0. Χτίζει το layer που παράγει το
+προ-υπολογισμένο πλέγμα `θέμα × register → ταξινομημένα βίντεο` (§14.12–14.16).
+Πηγή: «ASKCARNIVORE.COM — Scan Layer Spec v1», δοσμένο 16/08/2026. Repo:
+**bot μόνο**.*
+
+**Καμία γραμμή δεν έχει γραφτεί, και δεν γράφεται ακόμα.** Λείπουν: (α) YouTube
+Data API key, (β) το περιεχόμενο του `curation.json`, (γ) ΟΚ στις τέσσερις
+αποφάσεις αρχιτεκτονικής στο τέλος της ενότητας. Ό,τι ακολουθεί είναι **brief +
+οδηγίες**, όχι υλοποίηση.
+
+**Προϋπόθεση:** ο bot v0 (branch `bot-v0`) υπάρχει — worker / prompt / gates /
+embed. Αυτό το layer **δεν τα ξαναγράφει**· αλλάζει μόνο *από πού διαβάζει το
+index ο worker* (χειροκίνητο JSON → παραγόμενο πλέγμα).
+
+### Δύο data αρχεία — ξεχωριστές ευθύνες
+
+**`src/curation.json` — ΑΝΘΡΩΠΙΝΟ, git-versioned (ο Nick το γράφει).**
+Ο χάρτης του §17. Editorial απόφαση → θέλει PR / diff / ιστορικό.
+
+```json
+{
+  "creators": [
+    { "id": "ken-berry", "name": "Dr. Ken Berry",
+      "channel_id": "UC…", "register_lean": "start",
+      "topics": ["cholesterol","getting-started","electrolytes"],
+      "roles": [] },
+    { "id": "robert-lustig", "name": "Robert Lustig",
+      "channel_id": "UC…", "register_lean": "deep",
+      "topics": ["insulin","metabolic","sugar"], "roles": [],
+      "note": "canonical παλιό + guest εμφανίσεις → δες pins" }
+  ],
+  "topics": [
+    { "id": "cholesterol", "aliases": ["ldl","lipids","χοληστερίνη","χοληστερόλη"] }
+  ],
+  "pins":     [ { "topic":"insulin","register":"deep","video_id":"…","rank":1 } ],
+  "blocklist":[ "videoId1","videoId2" ]
+}
+```
+
+**Το παραγόμενο πλέγμα — ΜΗΧΑΝΙΚΟ, σε Workers KV (το γράφει το cron).**
+`grid:{topic}:{register}` → ranked λίστα video entries. **Σε KV, όχι σε git** —
+ανανεώνεται περιοδικά χωρίς deploy. Ο ask-worker διαβάζει από KV, με **fallback
+στο bundled `index.json`** αν το KV είναι άδειο.
+
+### Η ροή του scan (cron)
+
+```
+για κάθε creator στο curation.json:
+  fetch νέα βίντεο (channel uploads / playlists) via YouTube API
+   → incremental: μόνο publishedAfter το τελευταίο scan (quota!)
+  για κάθε βίντεο: match σε topic(s) via title/description + aliases
+για κάθε (topic):
+  για κάθε creator: sort βίντεο κατά διάρκεια
+     → κοντύτερα = "start", μακρύτερα = "deep"        (§14.4)
+  γέμισε τα κουτιά start/deep:
+     rank κατά recency-weighted views                 (§14.12)
+     creator priority: η λίστα πρώτα, μετά οι υπόλοιποι
+  εφάρμοσε pins (force top) + blocklist (exclude)
+write grid:* σε KV
+```
+
+### Οι μηχανικοί κανόνες (καμία κρίση)
+
+- **Register = διάρκεια.** Ανά (topic, creator): κοντύτερο→start, μακρύτερο→deep.
+- **Πρώτο = recency-weighted views.** ΟΧΙ σκέτα views (age bias).
+- **Creator priority ιεραρχικά:** τραβά ΠΡΩΤΑ από τους creators του topic στο
+  curation· επεκτείνει εκτός λίστας μόνο αν κανείς τους δεν έχει βίντεο στο θέμα.
+- **Pins / blocklist πάνω απ' όλα:** pin → top rank στο κουτί του· blocklist →
+  εκτός πάντα. *(Εδώ πιάνονται εξαιρέσεις τύπου Lustig: παλιό canonical ή guest
+  εμφάνιση σε ξένο κανάλι → manual pin.)*
+
+### Cron & quota
+
+- **Cloudflare Cron Trigger** → scheduled worker. Αραιή συχνότητα — τα βίντεο δεν
+  αλλάζουν ώρα-ώρα.
+- **Quota discipline** (YouTube API = ημερήσιο όριο units): incremental
+  `publishedAfter`, cache channel/playlist IDs στο curation, batch requests,
+  αποθήκευση `lastScan`.
+- **Link rot στο ίδιο cron:** τσέκαρε ότι τα βίντεο του πλέγματος είναι ακόμα
+  public· πέτα/σημείωσε τα νεκρά. Αυτός **είναι** ο cron maintenance worker που
+  το concept χρέωσε αναγκαίο (§14.10).
+
+### Τι αλλάζει στον ask-worker (ελάχιστο)
+
+- **Πηγή index:** KV `grid:*` πρώτα, fallback στο bundled `index.json`. Τίποτα
+  άλλο στη ροή — gates, prompt, «το μοντέλο επιστρέφει μόνο ids» — δεν αλλάζει.
+- **Schema entry:** κερδίζει `duration`, `views`, `published_at`. Τα `id`, `url`,
+  `title`, `creator`, `topic`, `lang` μένουν.
+- **Register buttons:** το frontend ζητά «Start here / Go deeper» *μετά* το
+  topic-match· ο worker σερβίρει από `grid:{topic}:{register}`.
+
+### ⚠ Ασυμφωνίες με το v0 schema — να λυθούν **πριν** γραφτεί κώδικας
+
+Το spec δεν τις αναφέρει, αλλά το `src/index.json` του `bot-v0` τις έχει ήδη:
+
+- **`register` enum.** Το v0 γράφει `depth | breadth | layman | persona | pending`
+  (μοντέλο v2, ετικέτα πάνω στον creator). Το πλέγμα του v3 έχει **δύο** κουτιά:
+  `start | deep`. Το v0 enum είναι νεκρό — μεταφράζεται, δεν συνυπάρχει.
+- **`label` (§8).** Στο v0 είναι δικό μας κείμενο ανά entry· ένα αυτόματο scan δεν
+  παράγει labels. Default `null` (το μοντέλο το γράφει υπό τους link-label
+  κανόνες)· αν θέλουμε curated label σε ευαίσθητο θέμα, η θέση του είναι το
+  `curation.json`, όχι το παραγόμενο πλέγμα.
+- **`flagship`.** Αντικαθίσταται από τα `pins` του curation — μία θέση για
+  editorial override, όχι δύο.
+- **`type`** (`conceptual | testimonial | practical`). Το v3 έκοψε το
+  quick-practical ως ξεχωριστή κατηγορία (§14.6)· το `testimonial` ζει ακόμα
+  (άξονας Dave Mac, §17). Να αποφασιστεί αν το πεδίο συρρικνώνεται ή φεύγει.
+
+### Εκτός scope (overengineering guard)
+
+- **RAG / vector** — το πλέγμα χωράει στο cached prompt. Όχι ακόμα (§14.9).
+- **YouTube API ανά ερώτηση** — ΠΟΤΕ. Μόνο cron.
+- **Transcripts** — για v1 scan αρκούν title/description. Το NotebookLM μένει
+  χειροκίνητο build tool, όχι κομμάτι του cron.
+- **Auto-commit σε git από το cron** — όχι· το παραγόμενο πλέγμα ζει σε KV.
+- **Πεδίο `format`** (lecture/podcast) — γνωστό trade-off (§14.15), *αν/αργότερα*.
+
+### QA (όταν χτιστεί)
+
+**Urgent:** `curation.json` έγκυρο και το scan παράγει `grid:*` σε KV· register
+split σωστό (creator με 2 βίντεο/θέμα: κοντύτερο=start, μακρύτερο=deep)· creator
+priority (λίστα πρώτα, επέκταση μόνο σε κενό)· pins top-rank και blocklist
+εξαιρεί· ask-worker διαβάζει KV με fallback· **καμία κλήση YouTube API στο
+request path.**
+
+**Quality:** recency-weighting (πρόσφατο καλό βίντεο δεν θάβεται κάτω από παλιό
+viral)· incremental scan (δεν ξανασκανάρει όλο το catalog)· link-rot pass αφαιρεί
+νεκρά· Start/Deep buttons σερβίρουν από σωστό κουτί.
+
+### Workflow & τι δίνει ο Nick
+
+Branch `scan-layer` → **architecture confirm ΠΡΩΤΑ** (οι τέσσερις αποφάσεις
+παρακάτω) → preview → review → merge. Ίδια πειθαρχία με το `bot-v0`: τίποτα δεν
+πάει στο `main` πριν το εγκρίνει ο Nick.
+
+**Ο Nick δίνει:** (1) το περιεχόμενο του `curation.json` — ο roster του §17 ως
+structured data (creators + `channel_id` + `register_lean` + topics + roles +
+pins/blocklist)· *τα channel_ids τα βρίσκει ο agent αν δοθούν links στα κανάλια*·
+(2) **YouTube Data API key** ως Cloudflare secret.
+
+### ◻ Τέσσερις αποφάσεις αρχιτεκτονικής — προτάσεις, περιμένουν ΟΚ
+
+Το spec ζητά ρητά να προταθούν και να εγκριθούν πριν γραφτεί κώδικας:
+
+1. **Recency formula.** Πρόταση: `score = views / (ηλικία_σε_μήνες + 3)`. Το `+3`
+   εμποδίζει ένα φρέσκο βίντεο δύο ημερών να εκτοξευθεί στην κορυφή· ένα
+   πεντάχρονο viral με 1M views βγαίνει ~16k/μήνα και δεν θάβει πια το πρόσφατο.
+   Μία σταθερά, σε ένα σημείο — αλλάζει εύκολα αν δεν αρέσει το αποτέλεσμα.
+2. **Split rule** (creator με >2 βίντεο σε θέμα). Πρόταση: **median διάρκειας** του
+   creator στο θέμα — κάτω από τη median → start, πάνω → deep· σε μονό πλήθος το
+   median βίντεο μπαίνει **και στα δύο** κουτιά (καμία κρίση, και συμβατό με το
+   §14.16 όπου με 1 βίντεο start = deep).
+3. **Cron συχνότητα.** Πρόταση: **εβδομαδιαίο** incremental scan (Κυριακή 03:00
+   UTC) + **μηνιαίο** πλήρες link-rot πέρασμα σε όλο το πλέγμα.
+4. **KV layout.** Πρόταση: `grid:{topic}:{register}` → JSON array entries·
+   `grid:meta` → `{ lastScan, schema_version, topics[] }` ώστε ο worker να ξέρει
+   τα θέματα χωρίς KV list· `scan:state:{creator_id}` → `{ lastPublishedAt,
+   uploads_playlist_id }` για το incremental.
+
 ## Deployment
 
 **Live από 14/08/2026.** Cloudflare Pages, project `askcarnivore`, συνδεδεμένο στο
@@ -804,13 +969,25 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 
 ### Bot (`askcarnivore.com`) — v1
 
-- [ ] **Scan Layer — το επόμενο πράγμα που χτίζεται.** Περιμένει **YouTube API key**
-      (ο Nick το παίρνει). Cron scan → **προ-υπολογισμένο πλέγμα**
-      `θέμα × register → [ταξινομημένα βίντεο]` (§14.13). Input: ο roster του §17.
-      Το χειροκίνητο `src/index.json` του `bot-v0` **δεν πετιέται** — γίνεται το
-      *output* αυτού, με το schema να κερδίζει `duration`, `views`, `register`,
-      `published_at`. Ranking μηχανικό: recency-weighted views, register από
-      διάρκεια, creators ιεραρχικά από τη λίστα, **pin/blocklist** από πάνω (§14.12).
+- [ ] **Scan Layer — το επόμενο πράγμα που χτίζεται.** Το build spec δόθηκε
+      16/08/2026 και είναι καταγεγραμμένο στην ενότητα «Scan Layer — build spec
+      v1» παραπάνω· **καμία γραμμή κώδικα ακόμα**. Cron scan → **προ-υπολογισμένο
+      πλέγμα** `θέμα × register → [ταξινομημένα βίντεο]` (§14.13). Input: ο roster
+      του §17. Το χειροκίνητο `src/index.json` του `bot-v0` **δεν πετιέται** —
+      γίνεται το *output* αυτού, με το schema να κερδίζει `duration`, `views`,
+      `published_at`. Ranking μηχανικό (§14.12). Μπλοκάρεται από τα τρία παρακάτω.
+- [ ] **YouTube Data API key** ως Cloudflare secret — ο Nick το παίρνει
+      (αναμένεται 16/08/2026, απόγευμα).
+- [ ] **`src/curation.json`** — ο roster του §17 ως structured data: creators +
+      `channel_id` + `register_lean` + topics + roles + pins/blocklist. Το γράφει
+      ο Nick· τα `channel_id` τα βρίσκει ο agent αν δοθούν links στα κανάλια.
+      **Ανθρώπινο αρχείο, git-versioned** — δεν το πειράζει ποτέ το cron.
+- [ ] **ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής** (recency formula, split rule,
+      cron συχνότητα, KV layout) — προτάσεις έτοιμες στο τέλος του spec· το spec
+      ζητά ρητά έγκριση **πριν** γραφτεί κώδικας.
+- [ ] **Ασυμφωνίες v0 schema ↔ v3 πλέγμα** — `register` enum (`depth/breadth/
+      layman/persona` → `start/deep`), `label`, `flagship` → `pins`, `type`.
+      Λύνονται πριν την πρώτη γραμμή του scan layer· λεπτομέρειες στο spec.
 - [x] ~~**Register table** (θέμα → creator → register)~~ — **έπαψε να μπλοκάρει.**
       Το v3 το έλυσε μηχανικά: το register ζει **ανά βίντεο μέσω διάρκειας**, όχι
       ανά creator, οπότε δεν χρειάζεται πίνακας για να ξεκινήσει τίποτα. Μένει μόνο
@@ -990,6 +1167,19 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
   Το §16 (embed) ήρθε αυτούσιο από το v2. Το §15 ήταν πάλι οδηγία reconciliation,
   όχι concept: εκτελέστηκε αντί να αντιγραφεί, με την αρίθμηση να μένει κενή ώστε
   να δείχνουν σωστά οι παραπομπές §16/§17 και από τα δύο repos.
+
+- **2026-08-16** — **Scan Layer Spec v1** καταγράφηκε (νέα ενότητα «Scan Layer —
+  build spec v1»). Δεύτερο build spec του bot μετά το v0: `curation.json`
+  (ανθρώπινο, git) + YouTube API → πλέγμα `grid:{topic}:{register}` σε Workers KV,
+  γραμμένο από cron· ο ask-worker διαβάζει KV με fallback στο bundled index και
+  **τίποτα άλλο δικό του δεν αλλάζει**. Καταγραφή μόνο — **δεν ξεκίνησε
+  υλοποίηση**: λείπουν το YouTube API key (αναμένεται το απόγευμα), το
+  περιεχόμενο του `curation.json`, και το ΟΚ στις τέσσερις αποφάσεις
+  αρχιτεκτονικής (recency formula, split rule, cron συχνότητα, KV layout), για
+  τις οποίες υπάρχουν πλέον γραμμένες προτάσεις. Σημειώθηκαν επίσης **τέσσερις
+  ασυμφωνίες με το schema του `bot-v0`** που το spec δεν καλύπτει — το νεκρό
+  `register` enum του v2, το `label`, το `flagship` (→ `pins`) και το `type` —
+  ώστε να λυθούν πριν γραφτεί κώδικας αντί να ανακαλυφθούν μέσα στο scan.
 
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
 > έγιναν μέσα σε **μία νύχτα** (13→14/08/2026).
