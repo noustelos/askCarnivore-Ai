@@ -11,7 +11,7 @@
 | **Επιστρέφει** | **βίντεο** του index, cross-creator | directory, testimonials, tools, προϊόντα |
 | **Πρόσβαση** | χωρίς λογαριασμό, χωρίς app | ελεύθερη· λογαριασμοί μόνο αν/όταν χρειαστούν |
 | **Εμπόριο** | **κανένα** | affiliate, προϊόντα, tools |
-| **Στάδιο** | Under Construction — **live**, backend άχτιστο | **live** — στατικό, 24 κάρτες directory, χωρίς tools |
+| **Στάδιο** | Under Construction — **live**· ο κώδικας v0 έτοιμος στο branch `bot-v0`, **όχι merged** | **live** — στατικό, 24 κάρτες directory, χωρίς tools |
 
 Το ζευγάρι ενικός/πληθυντικός λειτουργεί υπέρ μας: το `askcarnivore` ρωτάει *το πράγμα*
 (τη μηχανή), το `askcarnivores` δείχνει *τους ανθρώπους*. Η διάκριση πρέπει να είναι
@@ -36,20 +36,27 @@ portal δεν μπαίνει σε αυτό εδώ το repo.**
 
 ---
 
-# ASKCARNIVORE — Concept Base (Modus Operandi) · v2
+# ASKCARNIVORE — Concept Base (Modus Operandi) · v3
 
 *Μία πηγή αλήθειας για το concept — όχι κώδικας, όχι τεχνική προδιαγραφή. Το «τι
-χτίζουμε και γιατί». Αντικαθιστά το v1.1.*
+χτίζουμε και γιατί». Αντικαθιστά το v2.*
 
-**Τι άλλαξε από το v1 (τίμια, όχι σιωπηλά):** το index έγινε **video-level** αντί
-για channel-level, και το «ποτέ RAG» έγινε «όχι στο core, ναι όταν το ζητήσει η
-κλίμακα». Και τα δύο σημειώνονται στα σημεία τους (§6, §9, §14) ώστε να μην
-«διορθωθούν» πίσω από μια μελλοντική ανάγνωση του v1.
+**Τι άλλαξε από το v2 (τίμια, όχι σιωπηλά):** το §14 ξαναγράφτηκε με το **τελικό,
+μηχανικό ranking model** — register ως «Start with / Go deep» ανά βίντεο μέσω
+διάρκειας, με τον **χρήστη** να το διαλέγει με button· ranking = recency-weighted
+views· creator-λίστα ιεραρχικά· **scan-to-grid** (το μοντέλο δεν ψάχνει ποτέ)·
+τρεις ξεχωριστοί άξονες register/topic/role· pin/blocklist από πάνω. Προστέθηκε
+το **§17 (Curation Roster)** — κλειδωμένη ανάθεση, input του Scan Layer.
+**Απλοποίηση:** το «quick-practical» έπαψε να είναι ξεχωριστή περίπτωση — σχεδόν
+τα πάντα είναι θέμα→βίντεο· μόνο το personal-medical μένει ξεχωριστό.
 
-**Τρέχουσα κατάσταση:** `askcarnivore.com` (bot) **live με placeholder** — backend
-άχτιστο. `askcarnivores.com` (portal) **live** — στατικό, directory με 24 κάρτες.
-Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model** ορίστηκε
-πλήρως και είναι πλέον ο πυρήνας του προϊόντος (§14).
+Ό,τι από το v2 δεν αναφέρεται εδώ ως αλλαγή, **μένει ως έχει** — το §16 (embed
+model) ειδικά ήρθε αυτούσιο.
+
+**Τρέχουσα κατάσταση:** `askcarnivore.com` (bot) — κώδικας v0 έτοιμος στο branch
+`bot-v0` (**όχι merged**), pending index content + Mistral key + KV + coffee link.
+`askcarnivores.com` (portal) **live** — στατικό, directory 24 κάρτες. Siloing:
+ξεχωριστά repos / Pages / secrets, hard rules στο Claude Code memory.
 
 ## STATUS — Κλειδωμένα / Ανοιχτά
 
@@ -59,16 +66,24 @@ Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model
   στη σωστή πηγή», όχι «AI που εξηγεί».
 - **Business model:** Μοντέλο Α — δωρεάν bot, όλο το χρήμα από το portal. Κανένα
   paywall πάνω στο verb.
-- **Bot = καθαρός δρομολογητής (pure router).** Δείχνει links, δεν παράγει φυσιολογία.
+- **Bot = καθαρός δρομολογητής (pure router).** Δείχνει links, δεν παράγει
+  φυσιολογία.
 - **Index = θέμα → βίντεο, cross-creator** (ΟΧΙ θέμα→κανάλι). Video-level, γιατί
   κανάλι = δεύτερη αναζήτηση, όχι απάντηση. (§14)
 - **Curation split:** ο Nick εγκρίνει τον **creator-ανά-θέμα**· ο **αλγόριθμος**
-  διαλέγει το βίντεο. (§14)
-- **Τρίτη διάσταση: register/ρόλος** (depth / breadth / layman / persona) → ο bot
-  ματσάρει την *ανάγκη*, όχι μόνο το θέμα. (§14)
-- **Relevance-ranked, ΟΧΙ quality-ranked.** «Not a ranking, it's a match.» (§14)
-- **Route A** για εξαντλημένες πηγές / «δώσε κι άλλα»: richer routing + ουδέτερη
-  orientation, ποτέ φυσιολογία. (§14)
+  διαλέγει το βίντεο. (§14.3)
+- **Register = «Start with / Go deep»**, ανά **βίντεο μέσω διάρκειας**
+  (μικρότερο=start, μεγαλύτερο=deep)· **ο χρήστης το διαλέγει με button**. (§14.4)
+- **Ranking μηχανικό, καμία κρυφή κρίση:** πρώτο = recency-weighted views·
+  register = διάρκεια· creators = η λίστα ιεραρχικά· pin/blocklist από πάνω.
+  (§14.12)
+- **Scan-to-grid:** το μοντέλο ΔΕΝ ψάχνει — cron scan παράγει προ-υπολογισμένο
+  πλέγμα `θέμα×register→βίντεο`· το μοντέλο διαλέγει μόνο κουτί. (§14.13)
+- **Τρεις ξεχωριστοί άξονες:** register / topic / role — πολλαπλά tags ανά
+  creator, όχι ένα bucket. (§14.14)
+- **Relevance-ranked, ΟΧΙ quality-ranked.** «Not a ranking, it's a match». (§14.5)
+- **Route A** για «δώσε κι άλλα»: richer routing + ουδέτερη orientation, ποτέ
+  φυσιολογία. (§14.7)
 - **Provider:** Mistral (EU, open-weight, GDPR-friendly, φθηνό).
 - **Framing rule:** «τι λέει η κοινότητα / αυτοί οι γιατροί» — θέσεις, όχι
   αποδεδειγμένες αλήθειες. (§8)
@@ -76,24 +91,27 @@ Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model
 - **NotebookLM = build tool μόνο.** Attribution ≠ license. (§14)
 - **Events Calendar (§13):** curated-first, στατικό. Commission δεν ζητιέται ποτέ·
   δεκτό μόνο αν προταθεί· πληρωμή ποτέ δεν αποφασίζει σειρά.
-- **Embed model (§16):** ο bot διαθέσιμος *μέσα* στο portal ως **component-wrapper
-  γύρω από iframe** του public bot URL. Ένας bot, ένα index. Το component ΠΟΤΕ δεν
-  καλεί τον worker κατευθείαν — αυτό θα ήταν coupling.
+- **Embed model (§16):** ο bot διαθέσιμος *μέσα* στο portal ως
+  **component-wrapper γύρω από iframe** του public bot URL. Ένας bot, ένα index.
+  Το component ΠΟΤΕ δεν καλεί τον worker κατευθείαν (αυτό θα ήταν coupling).
 
 **◻ Open:**
 
 - **Register tags για τις γυναίκες** — εκκρεμεί ώσπου ο Nick ακούσει τα κανάλια
   τους (§14.11). Άντρες: πλήρως tagged.
-- **RAG/KB/vector για full video-scan** — μπαίνει όταν η κλίμακα το ζητήσει (§14.9).
-- **API quota strategy** για το scanning (§14.10).
+- **Scan Layer** — το spec του δόθηκε 16/08/2026 και είναι καταγεγραμμένο
+  ολόκληρο παρακάτω («Scan Layer — build spec v1»). **Δεν έχει ξεκινήσει:**
+  λείπουν YouTube API key, περιεχόμενο `curation.json`, και ΟΚ στις τέσσερις
+  αποφάσεις αρχιτεκτονικής. Αντικαθιστά το χειροκίνητο `src/index.json` του v0.
+- **RAG/KB/vector** — μπαίνει όταν το πλέγμα ξεπεράσει το cached prompt (§14.9).
 - Ποιο portal tool πρώτο (πρόταση: Get Started 7 μερών).
 - Self-submission form για events — v-next (§13).
 
 ## 1. Positioning
 
 Ο κόμβος όπου, αντί να ψάχνει κανείς στο Google «ποιο κανάλι έχει ο Ken Berry, τι
-βιβλία, ποιο podcast», ρωτάει **μία φορά** και δρομολογείται στη σωστή πηγή. Το bot
-είναι η φυσικής-γλώσσας πόρτα σε αυτόν τον κόμβο.
+βιβλία, ποιο podcast», ρωτάει **μία φορά** και δρομολογείται στη σωστή πηγή. Το
+bot είναι η φυσικής-γλώσσας πόρτα σε αυτόν τον κόμβο.
 
 **Γιατί αυτό, όχι «καλύτερες απαντήσεις από ChatGPT»:**
 
@@ -120,27 +138,30 @@ Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model
 
 ## 3. Business Model — Μοντέλο Α
 
-**Δωρεάν bot, subsidized από το portal.** Κανένα paywall / credit / sign-up πάνω
-στο bot — προστατεύει το «Just Ask».
+**Δωρεάν bot, subsidized από το portal.** Κανένα paywall/credit/sign-up πάνω στο
+bot — προστατεύει το «Just Ask».
 
 - **Bot income:** μόνο **buy-me-a-coffee**, διακριτικό — footer, μετά την απάντηση,
-  ΠΟΤΕ μέσα στη ροή. Τη στιγμή που μπει ανάμεσα σε ερώτηση και απάντηση, έγινε
-  paywall.
-- **Portal income:** affiliate (βιβλία / Amazon), directory, tools. Εδώ ζει το ταμείο.
+  ΠΟΤΕ μέσα στη ροή.
+- **Portal income:** affiliate (βιβλία / Amazon), directory, tools. Εκεί ζει το
+  ταμείο.
 - Το affiliate ζει **μέσα στα tools** — όχι ξεχωριστή φάση.
 
 ## 4. Το Bot — Pure Router
 
-**Δεν εξηγεί. Δείχνει.** Σε κάθε ερώτηση: intent → topic → creator/register →
-**βίντεο** → links. (Πλήρης ροή: §14.6.)
+**Δεν εξηγεί. Δείχνει.** Σχεδόν τα πάντα = **θέμα → βίντεο**. (Πλήρης ροή: §14.6.)
 
 **Τι κάνει:**
 
-- Εννοιολογικό («τι είναι το Randle cycle;») → τα καλύτερα *βίντεα* που το
-  καλύπτουν, cross-creator, 3-4 (κι άλλα αν ζητηθούν).
+- Εννοιολογικό («τι είναι το Randle;», «keto flu τώρα») → το μοντέλο βρίσκει θέμα
+  → **[Start here | Go deeper]** (ο χρήστης διαλέγει) → βίντεο από το
+  προ-υπολογισμένο πλέγμα (§14). Κι άλλα αν ζητηθούν. *(Το «keto flu» ΔΕΝ είναι
+  ξεχωριστή περίπτωση: δεν δίνουμε πληροφορία, δείχνουμε πηγή — δεν θα πάθει
+  τίποτα να δει 15 λεπτά βίντεο.)*
 - Testimonial («εμπειρίες με carnivore για δερματικά») → Dave Mac / stories,
   experience-framing.
-- Γρήγορο πρακτικό («keto flu τώρα») → portal tools, όχι 90λεπτο βίντεο.
+- **Personal-medical** («τα φάρμακά μου») → **redirect σε γιατρό**. Το μόνο
+  μη-routing.
 
 **Τι ΔΕΝ κάνει:**
 
@@ -149,14 +170,13 @@ Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model
 - Δεν πουλάει.
 
 **Ιατρικό scope:** δρομολογεί σε «τι είναι / τι λέει η κοινότητα». ΠΟΤΕ «κόψε τη
-μετφορμίνη / δοσολόγησε ινσουλίνη». Το tell: αν χρειάζεται τη *συγκεκριμένη
-ιατρική κατάσταση αυτού του ανθρώπου* → **redirect σε γιατρό**. Το bot ποτέ δεν
-αναφέρει πρώτο «φάρμακο/ινσουλίνη».
+μετφορμίνη / δοσολόγησε ινσουλίνη». Tell: αν χρειάζεται τη *συγκεκριμένη ιατρική
+κατάσταση αυτού του ανθρώπου* → **redirect σε γιατρό**. Το bot ποτέ δεν αναφέρει
+πρώτο «φάρμακο/ινσουλίνη».
 
 ## 5. Το Portal — Ανθρώπινος κόμβος
 
-- **Directory** γιατρών & creators (κανάλια, podcasts, βιβλία, links) — 24 κάρτες,
-  live.
+- **Directory** γιατρών & creators (κανάλια, podcasts, βιβλία, links) — 24 κάρτες.
 - **Testimonials** (link-out σε Dave Mac — Zero Carb).
 - **Tools:** Get Started (7 μέρες), Electrolytes, Shopping List, Macro calculator.
   *Evergreen, shareable — ίσως ο πραγματικός μαγνήτης, όχι το SEO.*
@@ -165,11 +185,8 @@ Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model
 
 ## 6. Το Index — βασικά (πλήρες μοντέλο: §14)
 
-**Δομή: θέμα → βίντεο** (cross-creator), όχι εγχειρίδιο φυσιολογίας. **Αυτό
-αναθεωρεί το v1 «θέμα → πηγή» / channel-level** — αν διαβάσεις κάπου τη μονάδα ως
-«κανάλι», είναι κατάλοιπο, όχι απόφαση.
-
-Οι IP κανόνες ισχύουν αναλλοίωτοι:
+**Δομή: θέμα → βίντεο** (cross-creator), όχι εγχειρίδιο φυσιολογίας. Οι IP κανόνες
+που ισχύουν παντού:
 
 - **Link-out, όχι rehost.** Δείχνουμε σε δημόσιο YouTube/podcast. Ποτέ transcripts
   ή ουσιαστικά κομμάτια.
@@ -177,7 +194,7 @@ Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model
 - **NotebookLM = build tool μόνο** — μαθαίνουμε/εντοπίζουμε, γράφουμε με δικά μας
   λόγια + link-out.
 - **Link rot:** video-level = χιλιάδες links → ο **Cron maintenance worker γίνεται
-  αναγκαίος**, όχι nice-to-have. (§14.10)
+  αναγκαίος** (όχι nice-to-have). (§14.10)
 
 Το *πώς* διαλέγεται, curate-άρεται και χτίζεται → §14.
 
@@ -195,44 +212,43 @@ Siloing: ξεχωριστά repos / Pages projects / secrets. Το **index model
 Το bot λέει ελάχιστα — αλλά αυτά τα ελάχιστα (**πώς ονομάζει το link**) είναι το
 μόνο σημείο που κουβαλάει ευθύνη.
 
-**Ο κανόνας:** «τι λέει η κοινότητα / αυτοί οι γιατροί» — θέσεις, όχι αποδεδειγμένες
-αλήθειες. Είναι ο accuracy disclaimer *και* αυτό που επιτρέπει να λιστάρουμε
-**όλους** χωρίς να υπογράφουμε κανέναν.
+**Ο κανόνας:** «τι λέει η κοινότητα / αυτοί οι γιατροί» — θέσεις, όχι
+αποδεδειγμένες αλήθειες. Accuracy disclaimer *και* αυτό που επιτρέπει να
+λιστάρουμε **όλους** χωρίς να υπογράφουμε κανέναν.
 
 **Link labels — πάντα εμπειρία, ποτέ treatment claim:**
 
 - ✅ «εμπειρίες ανθρώπων που δοκίμασαν carnivore για δερματικά»
 - ❌ «πώς θεραπεύτηκε το έκζεμα»
 
-**Το residual (χωρίς dual-answer):** το bot δεν *παρουσιάζει* τη mainstream άποψη,
+**Το residual (χωρίς dual-answer):** ο bot δεν *παρουσιάζει* τη mainstream άποψη,
 αλλά ούτε *αρνείται ότι υπάρχει*. «Εδώ τι λένε αυτές οι φωνές, άκου κι αποφάσισε»
 (το θέλουμε) vs «settled science, οι διαφωνούντες πουλημένοι» (μας καίει).
 
 **Δύο επιφάνειες, δύο στάσεις — και οι δύο σωστές:** το *directory* λέει «not a
-ranking» (γενική ιεραρχία προσώπων — όχι). Ο *bot* κρίνει relevance ανά θέμα (ναι —
-«με απλά λόγια → Berry / σε βάθος → Bikman»). Δεν αντιφάσκουν: το πρώτο είναι
+ranking» (γενική ιεραρχία προσώπων — όχι). Ο *bot* κρίνει relevance ανά θέμα (ναι
+— «με απλά λόγια → Berry / σε βάθος → Bikman»). Δεν αντιφάσκουν: το πρώτο είναι
 κατάταξη ανθρώπων, το δεύτερο ταίριασμα ερώτησης. (§14.5)
 
 ## 9. Τεχνική βάση (light — πλήρες spec αργότερα)
 
 - **Provider:** Mistral (Small/Flash tier αρκεί για routing).
-- **Prompt caching:** το σταθερό index/context πληρώνεται μία φορά. Κρίσιμο για κόστος.
+- **Prompt caching:** το σταθερό index/context πληρώνεται μία φορά. Κρίσιμο για
+  κόστος.
 - **Rate limit:** ΑΣΦΑΛΕΙΑ, όχι μονετοποίηση.
-- **RAG — αναθεωρημένο:** το «ποτέ RAG» του v1 ίσχυε για channel-level. Το
-  **curated best-of core** (μερικές εκατοντάδες βίντεο) χωράει στο cached prompt —
-  δεν θέλει RAG. Το **full video-scan** (χιλιάδες) το θέλει. Άρα RAG/KB/vector
-  μπαίνει *όταν η κλίμακα το ζητήσει*, όχι στο core. Μην το διαβάσεις ως «μπήκε
-  RAG»· μπήκε ένα κατώφλι. (§14.9)
-- **YouTube Data API** για το scanning — με σχεδιασμό quota, όχι brute-force (§14.10).
-- **Cron maintenance worker:** από «μελλοντικός» σε **αναγκαίος** — video-level
-  σημαίνει χιλιάδες links που σαπίζουν.
+- **RAG — αναθεωρημένο:** το «ποτέ RAG» ίσχυε για channel-level. Το **curated
+  best-of core** (μερικές εκατοντάδες βίντεο) χωράει στο cached prompt — δεν θέλει
+  RAG. Το **full video-scan** (χιλιάδες) το θέλει. Άρα RAG/KB/vector μπαίνει *όταν
+  η κλίμακα το ζητήσει*, όχι στο core. (§14.9)
+- **YouTube Data API** για το scanning — με σχεδιασμό quota, όχι brute-force.
+  (§14.10)
 - **Stack:** Cloudflare Pages + workers (όπως AskSantorini), siloed.
 
 ## 10. Content Sourcing / Outreach
 
 - **Email στους creators (3 asks σε ένα mail, low-friction):** (1) **τα καλύτερά
-  τους βίντεο ανά θέμα / έτοιμο playlist** — όχι «οργάνωσέ μου τα πάντα»·
-  (2) ευλογία/partnership· (3) τα events/retreats/talks τους (§13).
+  τους βίντεο ανά θέμα / έτοιμο playlist** (όχι «οργάνωσέ μου τα πάντα»)· (2)
+  ευλογία/partnership· (3) τα events/retreats/talks τους (§13).
 - **Το demo πουλάει μόνο του — η κοφτή κίνηση:** μη στέλνεις «θα φτιάξω». Στείλε
   **link**· ο creator ρωτάει *το δικό του θέμα*, βλέπει τον εαυτό του **σωστά
   τοποθετημένο δίπλα** στους συναδέλφους (όχι από κάτω), πιάνει την αξία σε 5
@@ -252,14 +268,14 @@ ranking» (γενική ιεραρχία προσώπων — όχι). Ο *bot* 
 - Curated video core σε ~5-8 marquee θέματα (cholesterol, keto flu, getting
   started, insulin, electrolytes, fatty liver…), χτισμένο με scan + playlists +
   έγκριση creators.
-- Intent classifier + topic → creator → register → βίντεο (§14.6).
+- Intent classifier + topic→creator→register→βίντεο (§14.6).
 - Framing + link-labels + Route A στο system prompt.
 - Rate limit, buy-me-a-coffee.
 
 **Μεγαλώνει μετά:** περισσότερα θέματα, video lists από emails, register tags
 γυναικών, RAG όταν το ζητήσει η κλίμακα.
 
-**ΠΟΤΕ:** credit / account / Stripe (Μοντέλο Α). Bot που παράγει φυσιολογία (Route B).
+**ΠΟΤΕ:** credit/account/Stripe (Μοντέλο Α). Bot που παράγει φυσιολογία (Route B).
 
 *Χωρίς χρονική πίεση — «καλό αποτέλεσμα, όχι εντυπωσιασμοί».*
 
@@ -272,21 +288,26 @@ ranking» (γενική ιεραρχία προσώπων — όχι). Ο *bot* 
 
 ## 13. Events Calendar (v1.1+)
 
-**Τι είναι:** το switchboard εφαρμοσμένο στα events — το ένα μέρος που μαζεύει κάθε
-carnivore event/retreat/talk. Το portal δεν *διοργανώνει*, **δρομολογεί**.
+**Τι είναι:** το switchboard εφαρμοσμένο στα events — το ένα μέρος που μαζεύει
+κάθε carnivore event/retreat/talk. Το portal δεν *διοργανώνει*, **δρομολογεί**.
+Είναι το «community events» της §5, ξεδιπλωμένο.
 
 **Το ρίσκο = συντήρηση.** Calendar με περασμένα events μοιάζει εγκαταλελειμμένο —
 χειρότερο από ανύπαρκτο. Γι' αυτό:
 
+**Κανόνες build:**
+
 1. **Curated-first** — 15-20 πραγματικά events από πεπερασμένους διοργανωτές
-   (Revero/Baker retreats, low-carb/carnivore conferences, talks). «Όλος ο πλανήτης»
-   = όραμα, όχι v1.
+   (Revero/Baker retreats, low-carb/carnivore conferences, talks). «Όλος ο
+   πλανήτης» = όραμα, όχι v1.
 2. **Στατικό, όχι backend** — static JSON/markdown → calendar view.
-3. **Self-submission form → v-next** — το σημείο static→backend (moderation, spam).
+3. **Self-submission form → v-next** — το σημείο static→backend (moderation,
+   spam). Ξεχωριστό, μεταγενέστερο.
 
 **Commission (κλειδωμένος κανόνας):**
 
-- **Δεν ζητιέται ποτέ.** Δεκτό μόνο αν το προτείνει ο διοργανωτής → μηδέν pay-to-play.
+- **Δεν ζητιέται ποτέ.** Δεκτό μόνο αν το προτείνει ο διοργανωτής → μηδέν
+  pay-to-play.
 - **Πληρωμή ΠΟΤΕ δεν αποφασίζει** ποιο event μπαίνει ή πόσο ψηλά.
 - **Disclosure** όπου υπάρχει.
 - Μπόνους, όχι λόγος ύπαρξης. *Side effect:* πρώτο income path του portal.
@@ -302,9 +323,9 @@ directory/index content.
 
 ### 14.1 Μονάδα = βίντεο, όχι κανάλι
 
-Κανάλι = δεύτερη αναζήτηση, όχι απάντηση. Η αξία είναι θέμα → *το βίντεο*. Αν ο bot
-δίνει κανάλια, έφτιαξες πιο ωραίο κατάλογο συνδρομών· αν δίνει βίντεο, κάτι που δεν
-υπάρχει. **Αναθεωρεί το v1 «θέμα→πηγή (channel-level)».**
+Κανάλι = δεύτερη αναζήτηση, όχι απάντηση. Η αξία είναι θέμα → *το βίντεο*. Αν ο
+bot δίνει κανάλια, έφτιαξες πιο ωραίο κατάλογο συνδρομών· αν δίνει βίντεο, κάτι
+που δεν υπάρχει. **Αναθεωρεί το v1 «θέμα→πηγή (channel-level)».**
 
 ### 14.2 Topic-first, cross-creator
 
@@ -314,43 +335,65 @@ index (≥4/θέμα) + session state (τι έδειξε ήδη → σερβίρ
 
 ### 14.3 Curation split — ΠΟΙΟΣ vs ΠΟΙΟ ΒΙΝΤΕΟ
 
-- **Ο Nick εγκρίνει τον creator-ανά-θέμα.** Φθηνό, βασισμένο σε 4 χρόνια γνώσης·
-  μία έγκριση («Lustig για ινσουλίνη») καλύπτει *όλα* τα σημερινά και αυριανά
-  βίντεά του στο θέμα. Δεν ξεπερνιέται από νέο περιεχόμενο.
-- **Ο αλγόριθμος διαλέγει το βίντεο** (τίτλοι/playlists).
+- **Nick εγκρίνει τον creator-ανά-θέμα.** Φθηνό, βασισμένο σε 4 χρόνια γνώσης· μία
+  έγκριση («Lustig για ινσουλίνη») καλύπτει *όλα* τα σημερινά+αυριανά βίντεά του
+  στο θέμα. Δεν ξεπερνιέται από νέο περιεχόμενο.
+- **Αλγόριθμος διαλέγει το βίντεο** (τίτλοι/playlists).
 - Άρα creator-approval = **δάπεδο ποιότητας** («δεν θα βγει χαζομάρα»), όχι εγγύηση
-  «το καλύτερό του βίντεο». *Optional:* pin 1-2 flagship βίντεο σε 5-6 signature θέματα.
+  «το καλύτερό του βίντεο». *Optional:* pin 1-2 flagship βίντεο σε 5-6 signature
+  θέματα.
 
-### 14.4 Τρισδιάστατος πίνακας: θέμα → creator → register
+### 14.4 Register: «Start with / Go deep» — ανά βίντεο, μέσω διάρκειας, επιλογή χρήστη
 
-Register = ο *ρόλος/ύφος* του creator, όχι κατάταξη:
+Ο δεύτερος άξονας δίπλα στο θέμα είναι το **register** — αλλά ΟΧΙ ως βαθμολογία
+δημιουργού.
 
-| Register | Ποιοι | Τι σημαίνει |
-|---|---|---|
-| **Depth** | Bikman, Lustig | διαλέξεις-επιπέδου |
-| **Breadth** | Bart Kay | πολλά θέματα |
-| **Layman/friendly** | Berry | απλή γλώσσα, για newcomers |
-| **Teaching + persona/humor** | Mason· Bart Kay ιδιόρρυθμος | |
+**Ονομασία UI: «Start with» / «Go deep».** Περιγράφει το *στάδιο του αναγνώστη*,
+όχι τον δημιουργό — μη-μειωτικό για PhD (το «entry-level» θα βαθμολογούσε τον
+creator· το «start with» τον χρήστη). Ίδια λογική με το αλφάβητο στο directory:
+δεν κατατάσσεις ανθρώπους.
 
-Επιτρέπει match της **ανάγκης**, όχι μόνο του θέματος: «χοληστερίνη με απλά λόγια →
-Berry / σε βάθος → Bikman/Lustig». Έτσι το depth-matching επιστρέφει με ασφάλεια ως
-**routing** (δείχνει βίντεο), όχι ως explainer — η §4 μένει ανέπαφη.
+**Κρίσιμο: το register ζει ανά ΒΙΝΤΕΟ μέσα στο θέμα, όχι ανά δημιουργό.** Ο ίδιος
+creator έχει και intro και βαθιά βίντεο (π.χ. ο Mason 2 βίντεο για το μεταβολικό —
+το μικρότερο είναι το start του, το μεγαλύτερο το deep του). Μηχανικός κανόνας:
+**μέσα στα βίντεο ενός creator σε ένα θέμα, μικρότερη διάρκεια = "start with",
+μεγαλύτερη = "go deep".** Καμία ποιοτική κρίση από εμάς — το ρολόι το λέει.
+
+**Ποιος διαλέγει το register: ο ΧΡΗΣΤΗΣ, με button.** Το μοντέλο πιάνει εύκολα το
+*θέμα* από τη γλώσσα· πιάνει *αναξιόπιστα* το register («θέλει αρχάριο ή βαθύ;» δεν
+προκύπτει πάντα από τη διατύπωση). Άρα μετά το topic-match, ο bot δείχνει
+**[Start here | Go deeper]** — ο χρήστης το λέει με ένα tap. Refinement του «Just
+Ask», όπως ο βιβλιοθηκάριος ρωτά «για μελέτη ή εισαγωγή;». Τα δύο κουμπιά
+αντιστοιχούν ακριβώς στους δύο κάδους του πλέγματος.
+
+Έτσι το depth-matching επιστρέφει ως **routing** (δείχνει βίντεο), όχι explainer.
+§4 ανέπαφη.
 
 ### 14.5 Relevance-ranked, ΟΧΙ quality-ranked
 
-Ο bot δεν λέει «ο Χ είναι καλύτερος». Λέει «για *αυτή* την ερώτηση, σε *αυτό* το
-επίπεδο, να τι ταιριάζει». Ο Berry τρίτος στη βαθιά ερώτηση δεν είναι «χειρότερος» —
-είναι σωστός για *άλλη* ερώτηση, πρώτος εκεί. **«Not a ranking, it's a match.»**
+Ο bot δεν λέει «Χ καλύτερος». Λέει «για *αυτή* την ερώτηση, σε *αυτό* το επίπεδο,
+να τι ταιριάζει». Ο Berry τρίτος στη βαθιά ερώτηση δεν είναι «χειρότερος» — είναι
+σωστός για *άλλη* ερώτηση, πρώτος εκεί. **«Not a ranking, it's a match.»**
 
 Copy του bot: «οι λίστες δεν είναι βαθμολογημένες — αφορούν την ερώτησή σου». Αυτή
 είναι και η ατάκα που κάνει τους creators να νιώθουν *τοποθετημένοι*, όχι κριμένοι.
 
-### 14.6 Δύο άξονες στο runtime
+### 14.6 Ροή στο runtime (τελική, απλοποιημένη)
 
-- **Άξονας 1 — intent class:** *personal-medical* → redirect γιατρό· *quick-practical*
-  → portal tool· *testimonial* → Dave Mac/stories (experience-framing)· *conceptual*
-  → Άξονας 2.
-- **Άξονας 2 — topic → creator → register → βίντεο.**
+Σχεδόν τα πάντα = **θέμα → βίντεο**. Ο χάρτης απόφασης, και πόσο λίγη κρίση μένει
+πάνω μας:
+
+- **Θέμα** → το πιάνει το μοντέλο από τη γλώσσα.
+- **Register (Start/Deep)** → το διαλέγει ο **χρήστης με button** (§14.4).
+- **Ποιο βίντεο** → μηχανικά: deep = μεγαλύτερη διάρκεια, start = μικρότερη· πρώτο
+  = περισσότερα views (recency-weighted, §14.12).
+- **Ποιοι creators** → η λίστα curation, **ιεραρχικά** (go-deep λίστα πρώτα, μετά
+  οι υπόλοιποι — §14.12).
+- **Personal-medical** → **redirect σε γιατρό**. Το μόνο που ΔΕΝ είναι routing.
+
+Καμία κρίση ποιότητας δεν έμεινε πάνω μας πουθενά — κάθε βήμα είναι είτε μηχανικό,
+είτε user-driven, είτε προ-εγκεκριμένο (creator approval). Αυτό είναι και
+ασφαλέστερο *και* συνεπές με τον switchboard: ο switchboard δρομολογεί, δεν κρίνει.
 
 ### 14.7 Route A (κλειδωμένο) — για εξαντλημένες πηγές / «δώσε κι άλλα»
 
@@ -368,12 +411,11 @@ Copy του bot: «οι λίστες δεν είναι βαθμολογημέν�
   περιγραφικοί → title-based matching πιάνει ~70-80% χωρίς να δει περιεχόμενο.
 - **Έτοιμα playlists ανά θέμα** = δωρεάν topic→videos mapping.
 - **Dave Mac:** έτοιμες λίστες «τι θεράπευσαν οι καλεσμένοι» = έτοιμος
-  testimonials-ανά-πάθηση index. (Στα δικά μας link labels ξαναγράφεται ως
-  εμπειρία, όχι ως treatment claim — §8.)
+  testimonials-ανά-πάθηση index.
 - **NotebookLM:** fallback scan/tagging όπου οι τίτλοι δεν φτάνουν ή όπου ο creator
   δεν απάντησε.
-- **Emails βελτιώνουν, δεν ξεκινούν.** Το core χτίζεται μόνο του. Mixed granularity
-  ok (όποιος έδωσε → video-level· όποιος όχι → best-effort scan).
+- **Emails βελτιώνουν, δεν ξεκινούν.** Το core χτίζεται μόνο. Mixed granularity ok
+  (όποιος έδωσε → video-level· όποιος όχι → best-effort scan).
 
 ### 14.9 RAG revision (τίμια)
 
@@ -381,7 +423,8 @@ Copy του bot: «οι λίστες δεν είναι βαθμολογημέν�
 - **Curated best-of** ανά θέμα = μερικές εκατοντάδες βίντεο → **χωράει στο cached
   prompt, δεν θέλει RAG**. Το sourcing model «τα καλύτερα, όχι όλο το catalog» σε
   κρατάει εκτός firehose.
-- **Full video-scan** = χιλιάδες εγγραφές με metadata → **εδώ RAG/vector έχει νόημα.**
+- **Full video-scan** = χιλιάδες εγγραφές με metadata → **εδώ RAG/vector έχει
+  νόημα.**
 - Πρακτικά: ξεκίνα prompt-fits (core)· RAG/KB μπαίνει όταν η κλίμακα το ζητήσει.
 
 ### 14.10 Νέες επιχειρησιακές ανησυχίες (από το scanning)
@@ -395,33 +438,104 @@ Copy του bot: «οι λίστες δεν είναι βαθμολογημέν�
 ### 14.11 Blind spot (συνειδητά, όχι κρυφά)
 
 Ο Nick παρακολουθεί 4 χρόνια όλους **εκτός από τις γυναίκες**. Άρα ο register
-πίνακας ξεκινά: άντρες **πλήρως tagged**, γυναίκες **«θέμα ναι / register pending»**
-μέχρι να ακούσει τα κανάλια τους. Ede / Bright / O'Hearn / Wiedeman μπαίνουν
-προσωρινά με βάση playlists / emails / NotebookLM + φήμη, μέχρι δική του κρίση.
-**Σειρά, όχι έλλειψη.**
+πίνακας ξεκινά: άντρες **πλήρως tagged**, γυναίκες **«θέμα ναι / register
+pending»** μέχρι να ακούσει τα κανάλια τους. Ede/Bright/O'Hearn/Wiedeman μπαίνουν
+προσωρινά με βάση playlists/emails/NotebookLM + φήμη, μέχρι δική του κρίση. Σειρά,
+όχι έλλειψη.
+
+### 14.12 Ranking — μηχανικό, καμία κρυφή κρίση
+
+- **Πρώτο = views, recency-weighted** (ΟΧΙ σκέτα views — age bias: ένα παλιό viral
+  θάβει καλό πρόσφατο, και σε πεδίο που εξελίσσεται το παλιό μπορεί να είναι
+  ξεπερασμένο). Views-ανά-χρόνο ή blend με recency.
+- **Register = διάρκεια** (§14.4): μικρότερο = start, μεγαλύτερο = deep, *ανά
+  creator ανά θέμα*.
+- **Creators = η λίστα, ιεραρχικά.** Ο αλγόριθμος τραβά **ΠΡΩΤΑ** από τους creators
+  της λίστας (π.χ. go-deep list)· μόνο αν κανείς τους δεν έχει βίντεο στο θέμα,
+  επεκτείνει εκτός λίστας. Η λίστα δίνει προτεραιότητα, η διαθεσιμότητα το τελικό.
+- **Manual pin / blocklist από πάνω.** Ο αλγόριθμος διαλέγει, αλλά ο Nick
+  καρφιτσώνει flagship ή αποκλείει video id. Editorial έλεγχος όπου τον θες,
+  αυτόματο παντού αλλού. *Εξαίρεση-παράδειγμα: Lustig — το canonical του είναι
+  παλιό, και πλέον εμφανίζεται guest σε άλλα κανάλια· εκεί το pin (ή manual entry
+  για guest εμφάνιση) πιάνει ό,τι χάνει ο αλγόριθμος «recency+views στο δικό του
+  κανάλι».*
+
+### 14.13 Scan-to-grid — το μοντέλο ΔΕΝ ψάχνει ποτέ
+
+Το scan τρέχει σε **cron time** και παράγει ένα **στατικό, προ-υπολογισμένο
+πλέγμα**: `θέμα × register → [ταξινομημένα βίντεο]`. Όταν φτάνει η ερώτηση, το
+«start-with χοληστερίνη → αυτά τα 3 βίντεο» είναι **ήδη γραμμένο**. Το μοντέλο δεν
+αποφασίζει *ποια* βίντεο υπάρχουν — μόνο *ποιο κουτί* ταιριάζει (topic-match).
+**Μηδέν live αναζήτηση, μηδέν σπατάλη Mistral.** Το «KB» **ΕΙΝΑΙ** αυτό το πλέγμα.
+Πηγή: YouTube API στο cron, cached· ποτέ κλήση API ανά ερώτηση χρήστη. (Λύνει
+quota + link rot μαζί — γι' αυτό ο **Cron worker είναι αναγκαίος**.)
+
+### 14.14 Τρεις ξεχωριστοί άξονες — μη τους μπερδέψεις
+
+Το data model έχει **τρεις διαφορετικές ετικέτες**, ΟΧΙ ένα bucket ανά creator:
+
+- **Register** (Start with / Go deep) — ανάγκη/βάθος, ανά βίντεο (§14.4).
+- **Topic** (χοληστερίνη, fertility, metabolic, recipes…) — θέμα.
+- **Role** (π.χ. Coaches) — τύπος: κάποιος που θέλει *προπονητή να δουλέψει μαζί
+  του* — άλλη πρόθεση από «θέλω να μάθω».
+
+Ένας creator παίρνει **register lean + topic tags + optional role** — πολλαπλά, όχι
+ένα. Ο Lustig είναι go-deep ΚΑΙ metabolic· ο Kiltz go-deep ΚΑΙ fertility· ο
+Shapefixer start-with ΚΑΙ coach. Γι' αυτό εμφανίζονται σε πολλά κουτιά. Τα
+«buckets» του §17 είναι απλώς ο τρόπος *εισαγωγής*· από κάτω μένει ο
+πολυδιάστατος πίνακας.
+
+### 14.15 «Duration = proxy για deep» — γνωστό trade-off (όχι πρόβλημα τώρα)
+
+Τις περισσότερες φορές long = deep. Αποκλίνει σε μία κατηγορία: ένα **δίωρο casual
+podcast** είναι long αλλά πιο χαλαρό από μια σφιχτή 25λεπτη lecture. Για v0:
+**σκέτη διάρκεια, όπως αποφασίστηκε** (μη-ξαφνιαστείς όταν βγει podcast αντί
+lecture). *Αν* ενοχλήσει στην πράξη, μηχανική διόρθωση (όχι κρίση): πεδίο **format**
+(lecture/podcast/short) που συχνά μαντεύει το API, και το «go deep» προτιμά
+lectures. Αν/αργότερα, όχι τώρα.
+
+### 14.16 Το κουτί δεν αδειάζει (γιατί κόψαμε το «δεν έχω deep»)
+
+Επειδή το register ζει ανά-βίντεο-μέσω-διάρκειας, κάθε θέμα με ≥1 βίντεο παράγει
+αυτόματα και start (μικρότερο) και deep (μεγαλύτερο). Άρα ο bot **δεν λέει ποτέ
+«δεν έχω σε βάθος»** — θα σήμαινε «το έκρινα και δεν βρήκα», που δεν το κάνουμε.
+(Οι go-deep creators καλύπτουν σχεδόν τα πάντα — A1C, Randle, grounding…) *Ακμή:*
+αν σε ένα θέμα υπάρχει μόνο 1 βίντεο, start = deep = το ίδιο· απλώς σέρβιρέ το,
+καμία ιδιαίτερη σημείωση. *(Το honest-unmatched του §14.7 αφορά θέμα που δεν
+καλύφθηκε καθόλου — άλλο πράγμα από «άδειο register».)*
 
 ## 15. *(κενό — ήταν οδηγία, όχι concept)*
 
-Το §15 του brief ήταν η εντολή reconciliation προς τον agent: «ευθυγράμμισε τα παλιά
-docs». Εκτελέστηκε αντί να αντιγραφεί — βλ. Changelog 2026-08-15. Η αρίθμηση μένει
-ως έχει ώστε οι παραπομπές «Concept Base §16» από το portal repo να δείχνουν σωστά.
+Το §15 του v3 ήταν, όπως και στο v2, **εντολή reconciliation προς τον agent** και
+όχι concept: «ενημέρωσε τα παλιά docs». Εκτελέστηκε αντί να αντιγραφεί — βλ.
+Changelog 16/08/2026. Η αρίθμηση μένει κενή ώστε οι παραπομπές §16/§17 να δείχνουν
+σωστά και από τα δύο repos.
+
+Τι ζητούσε, για το αρχείο: το χειροκίνητο `src/index.json` **δεν πετιέται** — γίνεται
+το **output του Scan Layer** (§14.13), με το schema να κερδίζει πεδία (duration,
+views, register, published_at)· ο worker/prompt/gates/embed του v0 μένουν ίδιοι· το
+«no RAG / no D1 / KV μόνο» ισχύει για το προ-υπολογισμένο πλέγμα· ο **cron
+maintenance worker είναι αναγκαίος**· τα **Start here / Go deeper** buttons μπαίνουν
+στο bot frontend και στο `/embed`· τα portal/directory briefs δεν αλλάζουν· και το
+επόμενο τεχνικό spec (RAG/router internals) γράφεται **αφού** τρέξει το Scan Layer.
 
 ## 16. Embed Model — ο bot μέσα στο portal
 
 **Το πρόβλημα:** να πηγαινοέρχεται ο χρήστης σε δύο domains για να ρωτήσει είναι
-τριβή — και η τριβή σκοτώνει το «Just Ask». Θέλουμε τον bot διαθέσιμο *μέσα* στο
+τριβή — και τριβή σκοτώνει το «Just Ask». Θέλουμε τον bot διαθέσιμο *μέσα* στο
 portal, χωρίς να σπάσουμε το siloing.
 
 **Η λύση: component-wrapper γύρω από iframe του public bot URL.** Τρεις στρώσεις:
 
-| Στρώση | Ζει στο | Τι είναι |
-|---|---|---|
-| **Component** | portal repo | floating κουμπί, panel, animation, styling — καθαρό cosmetic |
-| **iframe** | portal repo | `<iframe src="askcarnivore.com/embed">` — δείχνει στο **public** bot URL |
-| **Bot** | **αυτό εδώ το repo** | frontend + worker + index, στο δικό του origin, ανέγγιχτος |
+- **Component** = το portal-side chrome — floating κουμπί, panel που ανοίγει/κλείνει,
+  animation, styling. Ζει στο **portal repo**, καθαρό cosmetic.
+- **iframe** = `<iframe src="askcarnivore.com/embed">` μέσα στο component — δείχνει
+  στο **public bot URL**.
+- **Bot** = ο ίδιος bot (frontend + worker + index) πίσω από το iframe boundary, στο
+  **δικό του origin/repo**, ανέγγιχτος.
 
 **Ένας bot, ένα index.** Το portal είναι *παράθυρο* στον bot, όχι *αντίγραφό* του.
-Ό,τι βελτιώνεις εδώ φαίνεται και στα δύο σημεία αυτόματα. Δεν υπάρχει copy να
+Ό,τι βελτιώνεις στον bot φαίνεται και στα δύο σημεία αυτόματα. Δεν υπάρχει copy να
 αποκλίνει.
 
 **Ο κανόνας που κρατάει το siloing (μη διαπραγματεύσιμος):**
@@ -429,22 +543,27 @@ portal, χωρίς να σπάσουμε το siloing.
 > Το component επιτρέπεται να χειρίζεται **μόνο εμφάνιση**. ΠΟΤΕ δεν καλεί τον
 > worker του bot κατευθείαν.
 
-Τη στιγμή που το component αρχίσει να κάνει `fetch` στον worker (native-component
-μοντέλο) αντί να φορτώνει iframe, γλίστρησες σε **cross-repo coupling** — CORS,
-γνώση του bot endpoint, δύο πράγματα που αποκλίνουν. Αυτό είναι το tell. Το iframe
-boundary είναι που κρατάει τον κανόνα «η μόνη σύνδεση = δημόσιο hyperlink»: ένα
-iframe *είναι* δημόσιο URL σε παράθυρο.
+Τη στιγμή που το component αρχίσει να κάνει `fetch` στον worker του bot
+(native-component μοντέλο) αντί να φορτώνει iframe, γλίστρησες σε **cross-repo
+coupling** — CORS, γνώση του bot endpoint, δύο πράγματα που αποκλίνουν. Αυτό είναι
+το tell. Το iframe boundary είναι που κρατάει τον κανόνα siloing «η μόνη σύνδεση =
+δημόσιο hyperlink» — ένα iframe *είναι* δημόσιο URL σε παράθυρο.
 
-**⚠ Λέξη-παγίδα «instance» / «component»:** ΜΗΝ στηθεί δεύτερος bot (copy κώδικα /
-worker / key / index στο portal repo) — σπάει το «ένα index» και διπλασιάζει τη
+**⚠ Λέξη-παγίδα «instance» / «component»:** ΜΗΝ στήσεις δεύτερο bot (copy
+κώδικα/worker/key/index στο portal repo) — σπάει το «ένα index» και διπλασιάζει
 συντήρηση. Ο κανόνας siloing «copy, don't link» αφορά *στατικά στοιχεία* (λογότυπο,
 footer), **όχι τη μηχανή του bot**. Τον bot τον κάνεις embed, δεν τον αντιγράφεις.
 
-**Τι χρωστάει η μεριά μας:** ένα public `/embed` view και ένας `frame-ancestors`
-CSP header που επιτρέπει στο `askcarnivores.com` να μας κάνει embed — header
-**δικός μας**, όχι shared secret, οπότε το siloing μένει ακέραιο. Τα αντίστοιχα του
-portal (`frame-src`, lazy-load στο click, chrome) είναι δική του δουλειά. Analytics
-χωριστά: του iframe μένουν εδώ, του portal εκεί.
+**4 πρακτικοί κανόνες (τεχνικά):**
+
+1. **Lazy-load στο click.** Το iframe φορτώνει μόνο όταν ο χρήστης πατήσει το
+   κουμπί — αλλιώς επιβαρύνεις κάθε portal pageload (mobile / 2017 μηχάνημα). Το
+   portal μένει στιγμιαίο.
+2. **`frame-ancestors` header** στη μεριά *του bot* που επιτρέπει στο
+   `askcarnivores.com` να τον κάνει embed (CSP bot-side, όχι shared secret).
+3. **Chrome portal-side, περιεχόμενο bot-side.** Το κουμπί/panel είναι HTML/CSS του
+   portal· μόνο το *περιεχόμενο* του παραθύρου είναι ο framed bot.
+4. **Analytics χωριστά** — του iframe μένουν του bot, του portal του portal.
 
 **Μονόδρομο:** bot μέσα στο portal, ναι — portal μέσα στο bot, όχι. Ο bot μένει
 καθαρή διεπαφή, δεν γεμίζει με εμπόριο.
@@ -453,10 +572,47 @@ portal (`frame-src`, lazy-load στο click, chrome) είναι δική του 
 όποιον έρχεται κατευθείαν, πληθυντικός για όποιον ξεφυλλίζει) — απλώς η πόρτα του
 bot υπάρχει και ως *παράθυρο μέσα στο δωμάτιο* του portal.
 
-*Τέλος v2. Επόμενο λογικό βήμα: (α) ο Nick ακούει τις γυναίκες → register tags·
-(β) curated video core στα marquee θέματα (scan + playlists + έγκριση)· (γ) μετά,
-τεχνικό spec RAG/router — γράφεται **αφού** κλειδώσει το register table + το
-curated core. Χωρίς χρονική πίεση.*
+## 17. Curation Roster (κλειδωμένο — input του Scan Layer)
+
+*Ο χάρτης του Nick. Θυμήσου §14.14: αυτά είναι **buckets εισαγωγής**· κάθε creator
+μπορεί να έχει register + topic + role, όχι ένα μόνο κουτί. Οι γυναίκες μπαίνουν με
+register **provisional** μέχρι ο Nick τις ακούσει (§14.11).*
+
+**Register lean — Start with:** Ken Berry, Shawn Baker, Kelly Hogan, Judy Cho,
+Laura Spath, Lisa Wiedeman, Carnivore Teacher Alpha, Shapefixer.
+*(Shapefixer & Carnivore Teacher Alpha = ρητά «start-with level» — ο «συμπαθητικός
+θείος που εξηγεί».)*
+
+**Register lean — Go deep:** Bart Kay, Ben Bikman, Paul Mason, Robert Lustig,
+Georgia Ede, Robert Kiltz, Anthony Chaffee, Amber O'Hearn.
+
+**Topic — Recipes:** Coach Carnivore Cam (Cameron, 100% carnivore — προτεραιότητα),
+Maria Emmerich (low-carb — δεύτερη).
+
+**Topic — Fertility:** Robert Kiltz, Elizabeth Bright.
+
+**Topic — Metabolic Health:** Robert Lustig, Philip Ovadia, Gary Fettke.
+
+**Role — Coaches:** Richard Smith (νεότερος, δυναμικός), Coach Stephen (χτισμένο
+κοινό), Shapefixer.
+
+**Ξεχωριστό tier — Testimonials/Interviews:** **Dave Mac** — ΕΚΤΟΣ register/topic
+buckets, δικός του άξονας (συνεντεύξεις καλεσμένων, λίστες «τι βελτίωσαν»). Δεν
+μπαίνει σε start/deep.
+
+**Excluded (hard):** Paul Saladino (permanent, σε όλο το project)· Kelli Ritter
+(απορρίφθηκε).
+
+*Πολλαπλή παρουσία = σωστό, όχι λάθος: Lustig (go-deep + metabolic), Kiltz (go-deep
++ fertility), Shapefixer (start-with + coach), Bright (fertility +
+γυναίκα-provisional).*
+
+**Ο roster είναι ήδη το directory του portal.** Τα 24 ονόματα εδώ ταιριάζουν ένα
+προς ένα με τις 24 κάρτες που είναι live στο `askcarnivores.com` — κάθε όνομα του
+roster είναι κάρτα, κάθε κάρτα είναι όνομα του roster. Άρα η λίστα creators δεν
+είναι πια «να δοθεί»: ο Scan Layer έχει το input του, και το portal έχει το
+τελικό του directory. Οι buckets όμως μένουν **δικοί μας** — το portal κρατάει τις
+κάρτες σε ένα επίπεδο αλφαβητικό grid, χωρίς register/topic/role.
 
 ---
 
@@ -477,9 +633,54 @@ landing, ένας worker, χειροκίνητο index. Το index είναι α
 θα απέκλινε θα ήταν χειρότερο (§16: ένας bot).
 
 **Περιεχόμενο σελίδας:** morphing mark → `Ask Carnivore Ai` → `No app. No sign-up. Just Ask.`
-→ ask box + disclaimer, και στο footer το studio credit. Μόλις ξεκινήσει συνομιλία
-(`body.is-active`) το mark μικραίνει και το tagline φεύγει, ώστε ο χώρος να πάει στις
-απαντήσεις.
+→ ask box + disclaimer, και στο footer η επικοινωνία + το studio credit. Μόλις
+ξεκινήσει συνομιλία (`body.is-active`) το mark μικραίνει και το tagline φεύγει, ώστε
+ο χώρος να πάει στις απαντήσεις.
+
+### Contact (footer)
+
+`info@askcarnivores.com`, πάνω από το studio credit και πιο σβηστό από αυτό — η
+υπογραφή μένει τελευταία και τίποτα από τα δύο δεν ανταγωνίζεται το ask box.
+
+**Είναι η διεύθυνση του portal (πληθυντικός) πάνω στο domain του bot (ενικός),
+επίτηδες.** Το `info@askcarnivores.com` είναι το mailbox που **υπάρχει**. Μην το
+«διορθώσεις» σε `info@askcarnivore.com` αν δεν έχει φτιαχτεί πραγματικά: ένα
+`mailto:` που γυρίζει πίσω είναι χειρότερο από καθόλου διεύθυνση — γι' αυτόν
+ακριβώς τον λόγο και τα δύο sites έμειναν χωρίς μέχρι τις 16/08/2026.
+
+**Αντιγράφηκε στο χέρι** από το `askcarnivores.com`, δεν μοιράζεται και δεν
+γίνεται import — ο κανόνας siloing διπλασιάζει τα κοινά στοιχεία και δέχεται το
+κόστος συντήρησης. Αν αλλάξει εκεί, αλλάζει και εδώ με το χέρι.
+
+Δύο ακόμα επιλογές, ίδιες και στα δύο repos: φαίνεται **ολόκληρη** η διεύθυνση
+αντί για τη λέξη «Contact» (αντιγράφεται κι από όποιον δεν έχει mail client), και
+**χωρίς `target`/`rel`** — το `mailto:` δίνει τη σκυτάλη σε mail app, δεν ανοίγει
+σελίδα. Το CSP δεν χρειάζεται αλλαγή: το `form-action` αφορά υποβολή φόρμας, όχι
+πλοήγηση link.
+
+Δεν μπήκε στο `/embed`: εκεί το παράθυρο ζει ήδη μέσα στο portal, που έχει τη
+διεύθυνση στο δικό του footer.
+
+**⚠ Τα `<!--email_off-->` γύρω από το link δεν είναι διακοσμητικά.** Το Cloudflare
+**Email Address Obfuscation** (Scrape Shield — **ενεργό by default σε κάθε zone**)
+ξαναγράφει κάθε διεύθυνση που βρίσκει σε placeholder `[email protected]` και
+φυτεύει `/cdn-cgi/scripts/.../email-decode.min.js` για να την αποκαταστήσει. Στο
+portal το script **μπλοκάρεται από το CSP**, οπότε ο επισκέπτης βλέπει για πάντα το
+placeholder — έτσι ακριβώς βρέθηκε το bug στις 16/08/2026, live, ενώ τοπικά με Go
+Live φαινόταν μια χαρά. **Σε αυτό εδώ το branch το CSP υπάρχει** ([_headers](_headers)),
+άρα ισχύει ό,τι και στο portal και τα markers είναι που κρατούν τη διεύθυνση ορατή —
+μην τα αφαιρέσεις. Λένε στο Cloudflare να μην την πειράξει καθόλου, που είναι και το
+ζητούμενο: τη θέλουμε αθόλωτη, ένα role address που τρώει το spam αντί για άνθρωπο.
+
+*Άξιο επαλήθευσης στο preview:* το decode script σερβίρεται same-origin
+(`/cdn-cgi/scripts/…`), οπότε θεωρητικά ένα `script-src 'self'` θα το επέτρεπε — στο
+portal πάντως η διεύθυνση δεν αποκωδικοποιήθηκε ποτέ. Ό,τι κι αν φταίει ακριβώς, τα
+markers λύνουν το θέμα και στις δύο περιπτώσεις, γι' αυτό μπήκαν προληπτικά.
+
+Εναλλακτική αν χρειαστεί ποτέ zone-wide: dashboard → Security → **Settings** →
+φίλτρο *Client-side abuse* → **Email Address Obfuscation → Off** (ή API PATCH
+`email_obfuscation: "off"`). Δεν το κάναμε — το fix στο repo είναι versioned και
+δεν εξαρτάται από ρύθμιση που μπορεί να γυρίσει πίσω.
 
 ### Studio credit (footer)
 
@@ -567,6 +768,169 @@ Full-bleed background που κυλάει αργά ανάμεσα σε τρία 
 document. Αν προστεθεί άλλο SMIL, θέλει και αυτό κάλυψη εκεί.
 
 Η παλέτα του landing είναι κοινή και για τα δύο sites — να διαβάζονται ως αδέλφια.
+
+---
+
+## Scan Layer — build spec v1 (**δεν έχει ξεκινήσει**)
+
+*Δεύτερο build spec του bot, μετά το v0. Χτίζει το layer που παράγει το
+προ-υπολογισμένο πλέγμα `θέμα × register → ταξινομημένα βίντεο` (§14.12–14.16).
+Πηγή: «ASKCARNIVORE.COM — Scan Layer Spec v1», δοσμένο 16/08/2026. Repo:
+**bot μόνο**.*
+
+**Καμία γραμμή δεν έχει γραφτεί, και δεν γράφεται ακόμα.** Λείπουν: (α) YouTube
+Data API key, (β) το περιεχόμενο του `curation.json`, (γ) ΟΚ στις τέσσερις
+αποφάσεις αρχιτεκτονικής στο τέλος της ενότητας. Ό,τι ακολουθεί είναι **brief +
+οδηγίες**, όχι υλοποίηση.
+
+**Προϋπόθεση:** ο bot v0 (branch `bot-v0`) υπάρχει — worker / prompt / gates /
+embed. Αυτό το layer **δεν τα ξαναγράφει**· αλλάζει μόνο *από πού διαβάζει το
+index ο worker* (χειροκίνητο JSON → παραγόμενο πλέγμα).
+
+### Δύο data αρχεία — ξεχωριστές ευθύνες
+
+**`src/curation.json` — ΑΝΘΡΩΠΙΝΟ, git-versioned (ο Nick το γράφει).**
+Ο χάρτης του §17. Editorial απόφαση → θέλει PR / diff / ιστορικό.
+
+```json
+{
+  "creators": [
+    { "id": "ken-berry", "name": "Dr. Ken Berry",
+      "channel_id": "UC…", "register_lean": "start",
+      "topics": ["cholesterol","getting-started","electrolytes"],
+      "roles": [] },
+    { "id": "robert-lustig", "name": "Robert Lustig",
+      "channel_id": "UC…", "register_lean": "deep",
+      "topics": ["insulin","metabolic","sugar"], "roles": [],
+      "note": "canonical παλιό + guest εμφανίσεις → δες pins" }
+  ],
+  "topics": [
+    { "id": "cholesterol", "aliases": ["ldl","lipids","χοληστερίνη","χοληστερόλη"] }
+  ],
+  "pins":     [ { "topic":"insulin","register":"deep","video_id":"…","rank":1 } ],
+  "blocklist":[ "videoId1","videoId2" ]
+}
+```
+
+**Το παραγόμενο πλέγμα — ΜΗΧΑΝΙΚΟ, σε Workers KV (το γράφει το cron).**
+`grid:{topic}:{register}` → ranked λίστα video entries. **Σε KV, όχι σε git** —
+ανανεώνεται περιοδικά χωρίς deploy. Ο ask-worker διαβάζει από KV, με **fallback
+στο bundled `index.json`** αν το KV είναι άδειο.
+
+### Η ροή του scan (cron)
+
+```
+για κάθε creator στο curation.json:
+  fetch νέα βίντεο (channel uploads / playlists) via YouTube API
+   → incremental: μόνο publishedAfter το τελευταίο scan (quota!)
+  για κάθε βίντεο: match σε topic(s) via title/description + aliases
+για κάθε (topic):
+  για κάθε creator: sort βίντεο κατά διάρκεια
+     → κοντύτερα = "start", μακρύτερα = "deep"        (§14.4)
+  γέμισε τα κουτιά start/deep:
+     rank κατά recency-weighted views                 (§14.12)
+     creator priority: η λίστα πρώτα, μετά οι υπόλοιποι
+  εφάρμοσε pins (force top) + blocklist (exclude)
+write grid:* σε KV
+```
+
+### Οι μηχανικοί κανόνες (καμία κρίση)
+
+- **Register = διάρκεια.** Ανά (topic, creator): κοντύτερο→start, μακρύτερο→deep.
+- **Πρώτο = recency-weighted views.** ΟΧΙ σκέτα views (age bias).
+- **Creator priority ιεραρχικά:** τραβά ΠΡΩΤΑ από τους creators του topic στο
+  curation· επεκτείνει εκτός λίστας μόνο αν κανείς τους δεν έχει βίντεο στο θέμα.
+- **Pins / blocklist πάνω απ' όλα:** pin → top rank στο κουτί του· blocklist →
+  εκτός πάντα. *(Εδώ πιάνονται εξαιρέσεις τύπου Lustig: παλιό canonical ή guest
+  εμφάνιση σε ξένο κανάλι → manual pin.)*
+
+### Cron & quota
+
+- **Cloudflare Cron Trigger** → scheduled worker. Αραιή συχνότητα — τα βίντεο δεν
+  αλλάζουν ώρα-ώρα.
+- **Quota discipline** (YouTube API = ημερήσιο όριο units): incremental
+  `publishedAfter`, cache channel/playlist IDs στο curation, batch requests,
+  αποθήκευση `lastScan`.
+- **Link rot στο ίδιο cron:** τσέκαρε ότι τα βίντεο του πλέγματος είναι ακόμα
+  public· πέτα/σημείωσε τα νεκρά. Αυτός **είναι** ο cron maintenance worker που
+  το concept χρέωσε αναγκαίο (§14.10).
+
+### Τι αλλάζει στον ask-worker (ελάχιστο)
+
+- **Πηγή index:** KV `grid:*` πρώτα, fallback στο bundled `index.json`. Τίποτα
+  άλλο στη ροή — gates, prompt, «το μοντέλο επιστρέφει μόνο ids» — δεν αλλάζει.
+- **Schema entry:** κερδίζει `duration`, `views`, `published_at`. Τα `id`, `url`,
+  `title`, `creator`, `topic`, `lang` μένουν.
+- **Register buttons:** το frontend ζητά «Start here / Go deeper» *μετά* το
+  topic-match· ο worker σερβίρει από `grid:{topic}:{register}`.
+
+### ⚠ Ασυμφωνίες με το v0 schema — να λυθούν **πριν** γραφτεί κώδικας
+
+Το spec δεν τις αναφέρει, αλλά το `src/index.json` του `bot-v0` τις έχει ήδη:
+
+- **`register` enum.** Το v0 γράφει `depth | breadth | layman | persona | pending`
+  (μοντέλο v2, ετικέτα πάνω στον creator). Το πλέγμα του v3 έχει **δύο** κουτιά:
+  `start | deep`. Το v0 enum είναι νεκρό — μεταφράζεται, δεν συνυπάρχει.
+- **`label` (§8).** Στο v0 είναι δικό μας κείμενο ανά entry· ένα αυτόματο scan δεν
+  παράγει labels. Default `null` (το μοντέλο το γράφει υπό τους link-label
+  κανόνες)· αν θέλουμε curated label σε ευαίσθητο θέμα, η θέση του είναι το
+  `curation.json`, όχι το παραγόμενο πλέγμα.
+- **`flagship`.** Αντικαθίσταται από τα `pins` του curation — μία θέση για
+  editorial override, όχι δύο.
+- **`type`** (`conceptual | testimonial | practical`). Το v3 έκοψε το
+  quick-practical ως ξεχωριστή κατηγορία (§14.6)· το `testimonial` ζει ακόμα
+  (άξονας Dave Mac, §17). Να αποφασιστεί αν το πεδίο συρρικνώνεται ή φεύγει.
+
+### Εκτός scope (overengineering guard)
+
+- **RAG / vector** — το πλέγμα χωράει στο cached prompt. Όχι ακόμα (§14.9).
+- **YouTube API ανά ερώτηση** — ΠΟΤΕ. Μόνο cron.
+- **Transcripts** — για v1 scan αρκούν title/description. Το NotebookLM μένει
+  χειροκίνητο build tool, όχι κομμάτι του cron.
+- **Auto-commit σε git από το cron** — όχι· το παραγόμενο πλέγμα ζει σε KV.
+- **Πεδίο `format`** (lecture/podcast) — γνωστό trade-off (§14.15), *αν/αργότερα*.
+
+### QA (όταν χτιστεί)
+
+**Urgent:** `curation.json` έγκυρο και το scan παράγει `grid:*` σε KV· register
+split σωστό (creator με 2 βίντεο/θέμα: κοντύτερο=start, μακρύτερο=deep)· creator
+priority (λίστα πρώτα, επέκταση μόνο σε κενό)· pins top-rank και blocklist
+εξαιρεί· ask-worker διαβάζει KV με fallback· **καμία κλήση YouTube API στο
+request path.**
+
+**Quality:** recency-weighting (πρόσφατο καλό βίντεο δεν θάβεται κάτω από παλιό
+viral)· incremental scan (δεν ξανασκανάρει όλο το catalog)· link-rot pass αφαιρεί
+νεκρά· Start/Deep buttons σερβίρουν από σωστό κουτί.
+
+### Workflow & τι δίνει ο Nick
+
+Branch `scan-layer` → **architecture confirm ΠΡΩΤΑ** (οι τέσσερις αποφάσεις
+παρακάτω) → preview → review → merge. Ίδια πειθαρχία με το `bot-v0`: τίποτα δεν
+πάει στο `main` πριν το εγκρίνει ο Nick.
+
+**Ο Nick δίνει:** (1) το περιεχόμενο του `curation.json` — ο roster του §17 ως
+structured data (creators + `channel_id` + `register_lean` + topics + roles +
+pins/blocklist)· *τα channel_ids τα βρίσκει ο agent αν δοθούν links στα κανάλια*·
+(2) **YouTube Data API key** ως Cloudflare secret.
+
+### ◻ Τέσσερις αποφάσεις αρχιτεκτονικής — προτάσεις, περιμένουν ΟΚ
+
+Το spec ζητά ρητά να προταθούν και να εγκριθούν πριν γραφτεί κώδικας:
+
+1. **Recency formula.** Πρόταση: `score = views / (ηλικία_σε_μήνες + 3)`. Το `+3`
+   εμποδίζει ένα φρέσκο βίντεο δύο ημερών να εκτοξευθεί στην κορυφή· ένα
+   πεντάχρονο viral με 1M views βγαίνει ~16k/μήνα και δεν θάβει πια το πρόσφατο.
+   Μία σταθερά, σε ένα σημείο — αλλάζει εύκολα αν δεν αρέσει το αποτέλεσμα.
+2. **Split rule** (creator με >2 βίντεο σε θέμα). Πρόταση: **median διάρκειας** του
+   creator στο θέμα — κάτω από τη median → start, πάνω → deep· σε μονό πλήθος το
+   median βίντεο μπαίνει **και στα δύο** κουτιά (καμία κρίση, και συμβατό με το
+   §14.16 όπου με 1 βίντεο start = deep).
+3. **Cron συχνότητα.** Πρόταση: **εβδομαδιαίο** incremental scan (Κυριακή 03:00
+   UTC) + **μηνιαίο** πλήρες link-rot πέρασμα σε όλο το πλέγμα.
+4. **KV layout.** Πρόταση: `grid:{topic}:{register}` → JSON array entries·
+   `grid:meta` → `{ lastScan, schema_version, topics[] }` ώστε ο worker να ξέρει
+   τα θέματα χωρίς KV list· `scan:state:{creator_id}` → `{ lastPublishedAt,
+   uploads_playlist_id }` για το incremental.
 
 ## Deployment
 
@@ -659,25 +1023,64 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 >    *live behaviour του μοντέλου* όχι: τα πρώτα πράγματα που ελέγχονται εκεί είναι
 >    αν ο classifier πιάνει το personal-medical και αν το matching δουλεύει
 >    ελληνικά/αγγλικά.
+>
+> **Ενημέρωση 16/08/2026:** το πρώτο blocker άλλαξε σχήμα. Το πραγματικό index **δεν
+> γράφεται πια στο χέρι** — γίνεται *output* του Scan Layer, οπότε αυτό που δίνει ο
+> Nick είναι `curation.json` + YouTube API key. Ο μηχανισμός του v0 (worker, prompt,
+> gates, embed) μένει ως έχει· το `scan-layer` branch ξεκινά **από εδώ**, όχι από το
+> `main`.
 
-- [ ] **Register table** (θέμα → creator → register) — **μπλοκάρει τα πάντα.** Άντρες
-      tagged· γυναίκες pending ώσπου ο Nick ακούσει τα κανάλια τους (§14.11). Το
-      τεχνικό spec γράφεται *μετά* από αυτό, όχι πριν.
+- [ ] **Scan Layer — το επόμενο πράγμα που χτίζεται.** Το build spec δόθηκε
+      16/08/2026 και είναι καταγεγραμμένο στην ενότητα «Scan Layer — build spec
+      v1» παραπάνω· **καμία γραμμή κώδικα ακόμα**. Cron scan → **προ-υπολογισμένο
+      πλέγμα** `θέμα × register → [ταξινομημένα βίντεο]` (§14.13). Input: ο roster
+      του §17. Το χειροκίνητο `src/index.json` του `bot-v0` **δεν πετιέται** —
+      γίνεται το *output* αυτού, με το schema να κερδίζει `duration`, `views`,
+      `published_at`. Ranking μηχανικό (§14.12). Μπλοκάρεται από τα τρία παρακάτω.
+- [ ] **YouTube Data API key** ως Cloudflare secret — ο Nick το παίρνει
+      (αναμένεται 16/08/2026, απόγευμα).
+- [ ] **`src/curation.json`** — ο roster του §17 ως structured data: creators +
+      `channel_id` + `register_lean` + topics + roles + pins/blocklist. Το γράφει
+      ο Nick· τα `channel_id` τα βρίσκει ο agent αν δοθούν links στα κανάλια.
+      **Ανθρώπινο αρχείο, git-versioned** — δεν το πειράζει ποτέ το cron.
+- [ ] **ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής** (recency formula, split rule,
+      cron συχνότητα, KV layout) — προτάσεις έτοιμες στο τέλος του spec· το spec
+      ζητά ρητά έγκριση **πριν** γραφτεί κώδικας.
+- [ ] **Ασυμφωνίες v0 schema ↔ v3 πλέγμα** — `register` enum (`depth/breadth/
+      layman/persona` → `start/deep`), `label`, `flagship` → `pins`, `type`.
+      Λύνονται πριν την πρώτη γραμμή του scan layer· λεπτομέρειες στο spec.
+- [x] ~~**Register table** (θέμα → creator → register)~~ — **έπαψε να μπλοκάρει.**
+      Το v3 το έλυσε μηχανικά: το register ζει **ανά βίντεο μέσω διάρκειας**, όχι
+      ανά creator, οπότε δεν χρειάζεται πίνακας για να ξεκινήσει τίποτα. Μένει μόνο
+      το **register lean** των γυναικών ως provisional (§14.11) — προτεραιότητα
+      creator στη λίστα, όχι προϋπόθεση.
 - [ ] **Curated video core** σε ~5-8 marquee θέματα (cholesterol, keto flu, getting
-      started, insulin, electrolytes, fatty liver…) — **θέμα → creator → register →
-      βίντεο**, ≥4 βίντεο ανά θέμα ώστε να απαντιέται το «δώσε κι άλλα» (§14.2).
-      *Το v0 έχει τον μηχανισμό, όχι το περιεχόμενο:* 3 θέματα × 4 placeholder
-      entries με πλήρες schema στο [src/index.json](src/index.json), ώστε να τρέχει
-      η ροή όσο ο Nick ετοιμάζει τα πραγματικά. **Blocker για live.**
-      Χτίζεται με YouTube Data API scan + έτοιμα playlists + creator-approval, με
-      δικά μας link labels· **ποτέ** transcripts ή rehost.
-- [ ] **API quota strategy** για το scanning — σχεδιασμός, όχι brute-force (§14.10)
+      started, insulin, electrolytes, fatty liver…) — ≥4 βίντεο ανά θέμα ώστε να
+      απαντιέται το «δώσε κι άλλα» (§14.2). Παράγεται από το Scan Layer + έτοιμα
+      playlists + creator-approval, με δικά μας link labels· **ποτέ** transcripts ή
+      rehost. *Το v0 έχει τον μηχανισμό, όχι το περιεχόμενο:* 3 θέματα × 4
+      placeholder entries με πλήρες schema στο [src/index.json](src/index.json),
+      ώστε να τρέχει η ροή όσο ετοιμάζονται τα πραγματικά. **Blocker για live.**
+- [ ] **API quota strategy** για το scanning — σχεδιασμός, όχι brute-force (§14.10).
+      Το scan-to-grid το μισολύνει από μόνο του: **καμία κλήση API ανά ερώτηση
+      χρήστη**, μόνο στο cron.
 - [x] ~~System prompt: pure-router + framing rule + link-label discipline + ιατρικό
       redirect + **Route A** (§14.7) + «not a ranking, it's a match» (§14.5)~~
-      ✅ branch `bot-v0` — [src/prompt.js](src/prompt.js)
+      ✅ branch `bot-v0` — [src/prompt.js](src/prompt.js). *Θα ξαναπεραστεί όταν
+      μπει το πλέγμα:* το prompt σήμερα περιγράφει το bundled index, όχι τα
+      `grid:{topic}:{register}` κουτιά.
+- [ ] **[Start here | Go deeper] buttons** στο bot frontend **και στο `/embed`** —
+      ο bot τα δείχνει *μετά* το topic-match και ο **χρήστης** διαλέγει register με
+      ένα tap (§14.4). Τα δύο κουμπιά αντιστοιχούν ακριβώς στους δύο κάδους του
+      πλέγματος. Μην προσπαθήσεις να μαντέψεις το register από τη διατύπωση — το
+      μοντέλο το πιάνει αναξιόπιστα, γι' αυτό ρωτάμε. **Το μόνο v3 κομμάτι του UI
+      που λείπει από το v0.**
 - [x] ~~Intent classifier (personal-medical / quick-practical / testimonial /
-      conceptual) — Άξονας 1 της §14.6~~ ✅ branch `bot-v0`. Το personal-medical
-      **δεν** μένει στο μοντέλο: ο worker κόβει τα links (§ Δομή, κανόνας 2).
+      conceptual)~~ ✅ branch `bot-v0`. Το personal-medical **δεν** μένει στο
+      μοντέλο: ο worker κόβει τα links (§ Δομή, κανόνας 2). *Delta v3:* το
+      «quick-practical» έπαψε να είναι ξεχωριστή κατηγορία (§14.6) — μένουν
+      conceptual/testimonial → routing και personal-medical → redirect. Μικρή
+      αφαίρεση στον classifier όταν μπει το πλέγμα, όχι ξαναγράψιμο.
 - [x] ~~Session state: τι βίντεο δείχτηκαν ήδη~~ ✅ branch `bot-v0` — χωρίς μηχανή
       session: κάθε assistant turn ξαναστέλνεται με `[already shown: …]`, το
       history *είναι* το state.
@@ -720,7 +1123,11 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 - [x] ~~Αγορά domain~~ ✅ 13/08/2026
 - [x] ~~Ξεχωριστό repo~~ ✅ 14/08/2026 — `noustelos/ask-CARNIVORES`
 - [x] ~~Cloudflare Pages project + custom domain~~ ✅ — **live**
-- [x] ~~Directory γιατρών & creators~~ ✅ 24 κάρτες, EN + EL, links επαληθευμένα
+- [x] ~~Directory γιατρών & creators~~ ✅ 24 κάρτες, EN + EL, links επαληθευμένα —
+      **και ταιριάζουν ένα προς ένα με τον roster του §17**, οπότε η «τελική λίστα
+      creators» έπαψε να είναι εκκρεμότητα και για τις δύο πλευρές (16/08/2026)
+- [x] ~~Επικοινωνία~~ ✅ 16/08/2026 — `info@askcarnivores.com` στο footer και των
+      τριών σελίδων τους· ίδια διεύθυνση αντιγράφηκε και εδώ
 - [x] ~~Link-out testimonials (Dave Mac — Zero Carb)~~ ✅
 - [x] ~~Disclaimer~~ ✅ στο site, όχι σε intro screen — στατική σελίδα, δεν έχει «πριν
       την πρώτη ερώτηση»
@@ -813,6 +1220,48 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
   μέχρι να υπάρξουν, το portal δεν έχει income path και το Μοντέλο Α δεν έχει ακόμα
   ταμείο. Το `frame-ancestors` + `/embed` της §16 μπήκε στα δικά μας pending — είναι
   header δικός μας, όχι shared secret, οπότε το siloing μένει ακέραιο.
+- **2026-08-16** — Μπήκε **επικοινωνία στο footer**: `info@askcarnivores.com`, το
+  πρώτο πραγματικό mailbox του project. Είναι η διεύθυνση του portal πάνω στο
+  domain του bot, επίτηδες — αντιγραμμένη στο χέρι, όχι μοιρασμένη. Λόγοι και οι
+  παγίδες στο «Contact (footer)» παραπάνω.
+- **2026-08-16** — **Cloudflare Email Obfuscation**: το portal έδειχνε live
+  `[email protected]` ενώ τοπικά ήταν σωστό. Αιτία: Scrape Shield ξαναγράφει τη
+  διεύθυνση και το decode script το κόβει το CSP. Λύθηκε με `<!--email_off-->` και
+  στα δύο repos — εδώ **προληπτικά**, γιατί σήμερα δεν έχουμε CSP αλλά το `bot-v0`
+  φέρνει ένα.
+- **2026-08-16** — **Concept Base v3** αντικατέστησε το v2 μέσα σε αυτό το αρχείο.
+  Τι άλλαξε ουσιαστικά:
+  - **Το register έπαψε να είναι πίνακας και έγινε ρολόι.** Ζει **ανά βίντεο μέσω
+    διάρκειας** (μικρότερο=start, μεγαλύτερο=deep) αντί για ετικέτα πάνω στον
+    creator — και **το διαλέγει ο χρήστης με button**, γιατί το μοντέλο πιάνει
+    αναξιόπιστα το βάθος από τη διατύπωση. Αυτό ξεμπλόκαρε την «register table»
+    που κρατούσε όλο το v1 πίσω.
+  - **Scan-to-grid:** το μοντέλο δεν ψάχνει ποτέ. Το cron παράγει προ-υπολογισμένο
+    πλέγμα `θέμα × register → βίντεο` και το μοντέλο διαλέγει μόνο κουτί. Λύνει
+    quota και link rot μαζί, και κάνει τον cron worker αναγκαίο.
+  - **Ranking χωρίς κρίση:** recency-weighted views, creators ιεραρχικά από τη
+    λίστα, pin/blocklist από πάνω. Καμία ποιοτική απόφαση δεν έμεινε πάνω μας.
+  - **Τρεις άξονες** (register/topic/role) αντί για ένα bucket ανά creator.
+  - **Απλοποίηση:** το «quick-practical» έπαψε να είναι ξεχωριστή κατηγορία του
+    classifier — μόνο το personal-medical μένει εκτός routing.
+  - Νέο **§17 Curation Roster**, που αποδείχθηκε ότι ταιριάζει **ένα προς ένα** με
+    τις 24 live κάρτες του portal.
+  Το §16 (embed) ήρθε αυτούσιο από το v2. Το §15 ήταν πάλι οδηγία reconciliation,
+  όχι concept: εκτελέστηκε αντί να αντιγραφεί, με την αρίθμηση να μένει κενή ώστε
+  να δείχνουν σωστά οι παραπομπές §16/§17 και από τα δύο repos.
+
+- **2026-08-16** — **Scan Layer Spec v1** καταγράφηκε (νέα ενότητα «Scan Layer —
+  build spec v1»). Δεύτερο build spec του bot μετά το v0: `curation.json`
+  (ανθρώπινο, git) + YouTube API → πλέγμα `grid:{topic}:{register}` σε Workers KV,
+  γραμμένο από cron· ο ask-worker διαβάζει KV με fallback στο bundled index και
+  **τίποτα άλλο δικό του δεν αλλάζει**. Καταγραφή μόνο — **δεν ξεκίνησε
+  υλοποίηση**: λείπουν το YouTube API key (αναμένεται το απόγευμα), το
+  περιεχόμενο του `curation.json`, και το ΟΚ στις τέσσερις αποφάσεις
+  αρχιτεκτονικής (recency formula, split rule, cron συχνότητα, KV layout), για
+  τις οποίες υπάρχουν πλέον γραμμένες προτάσεις. Σημειώθηκαν επίσης **τέσσερις
+  ασυμφωνίες με το schema του `bot-v0`** που το spec δεν καλύπτει — το νεκρό
+  `register` enum του v2, το `label`, το `flagship` (→ `pins`) και το `type` —
+  ώστε να λυθούν πριν γραφτεί κώδικας αντί να ανακαλυφθούν μέσα στο scan.
 
 - **2026-08-15** — **Bot v0 (thin slice)** στο branch `bot-v0`, σε review, **όχι
   merged**. Ο βρόχος ερώτηση → medical check → θέμα → 3-4 βίντεο → links δουλεύει

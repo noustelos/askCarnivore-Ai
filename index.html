@@ -145,6 +145,34 @@
     animation: rise 1s cubic-bezier(.16, 1, .3, 1) .25s both;
   }
 
+  /* The contact line sits above the studio credit, and quieter than it: the
+     signature belongs last, and neither should compete with the ask box. */
+  .contact {
+    /* block + fit-content, not inline-block: the credit below is inline-block
+       too, and the two would share a line whenever the width allowed it. This
+       takes its own line while the focus ring still hugs the text. */
+    display: block;
+    width: fit-content;
+    margin: 0 auto .55rem;
+    padding: .4rem .3rem;
+    color: var(--fg-soft);
+    font-size: clamp(.6rem, 2.3vw, .7rem);
+    letter-spacing: .02em;
+    line-height: 1;
+    text-decoration: none;
+    opacity: .6;
+    transition: opacity .25s ease;
+  }
+
+  .contact:hover,
+  .contact:focus-visible { opacity: 1; }
+
+  .contact:focus-visible {
+    border-radius: .35rem;
+    outline: 2px solid hsl(0 0% 100% / .75);
+    outline-offset: 2px;
+  }
+
   .by {
     display: inline-block;
     padding: .4rem .3rem;
@@ -330,6 +358,32 @@
   </main>
 
   <footer>
+    <!-- Contact. COPIED BY HAND from askcarnivores.com, not shared and not
+         imported — the siloing rule duplicates shared elements across the two
+         repos and accepts the double maintenance. Change it here too if it
+         ever changes there.
+
+         It is the PLURAL domain's address on the singular domain, deliberately:
+         info@askcarnivores.com is the mailbox that exists. Do not "correct" it
+         to info@askcarnivore.com unless that mailbox is real — a mailto: that
+         bounces is worse than no address at all, which is why this site shipped
+         without one until now.
+
+         Shown in full rather than behind the word "Contact" (copyable without a
+         mail handler), and with no target/rel: it hands off to a mail client,
+         it does not open a page.
+
+         The email_off markers are load-bearing, not decoration. Cloudflare's
+         Email Address Obfuscation (Scrape Shield, on by default on every zone)
+         rewrites any address it finds into a "[email protected]" placeholder and
+         injects /cdn-cgi/scripts/.../email-decode.min.js to restore it. On
+         askcarnivores.com that script is blocked by the CSP, so the placeholder
+         is all a visitor ever sees. This branch ships a CSP too (_headers), so
+         the same thing would happen here.
+         These markers tell Cloudflare to leave the address alone, which is what
+         we want regardless: the role address is unobfuscated on purpose. -->
+    <!--email_off--><a class="contact" href="mailto:info@askcarnivores.com">info@askcarnivores.com</a><!--/email_off-->
+
     <!-- The "/>" is the studio's mark, not punctuation — decorative here,
          so it stays out of the accessible name ("A NOUSTELOS_STUDIO PROJECT"). -->
     <a class="by" href="https://noustelos.gr/" target="_blank" rel="noopener">A <span class="by__name">NOUSTELOS_STUDIO</span> PROJECT<span class="by__mark" aria-hidden="true">/&gt;</span></a>
