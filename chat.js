@@ -23,10 +23,8 @@
   let warned = false;
 
   const REGISTER = {
-    depth: 'in depth',
-    layman: 'plain language',
-    breadth: 'wide overview',
-    persona: 'personal voice',
+    start: 'start here',
+    deep: 'in depth',
     // `pending` says nothing: we have not judged that creator's level yet, so
     // the UI does not put words in our mouth (§14.11).
     pending: '',

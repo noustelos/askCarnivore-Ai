@@ -15,11 +15,21 @@ import { loadIndex, resolveModelOutput, stripUrls, MAX_LINKS } from '../src/rout
 const index = loadIndex(JSON.parse(readFileSync(new URL('../src/index.json', import.meta.url))));
 const ids = index.entries.map((entry) => entry.id);
 
-test('the index loads and unions aliases per topic', () => {
+test('the index loads and carries its topic aliases', () => {
   assert.ok(index.entries.length >= 8);
-  assert.equal(index.status, 'PLACEHOLDER', 'placeholder content must announce itself');
+  assert.equal(index.status, 'CURATED', 'real content, so no placeholder banner');
+  assert.ok(index.entries.every((entry) => /^https:\/\/www\.youtube\.com\/watch\?v=/.test(entry.url)));
   assert.ok(index.topics.get('cholesterol').includes('χοληστερίνη'));
   assert.ok(index.topics.get('cholesterol').includes('ldl'));
+});
+
+test('a topic with no video of its own never reaches the prompt', () => {
+  const sparse = loadIndex({
+    topics: [{ id: 'gout', aliases: ['ουρικό'] }, { id: 'cholesterol', aliases: ['ldl'] }],
+    videos: [{ id: 'a', topic: 'cholesterol', url: 'https://x/1', title: 't', lang: 'en' }],
+  });
+
+  assert.deepEqual([...sparse.topics.keys()], ['cholesterol']);
 });
 
 test('a personal-medical turn loses every link, however many were asked for', () => {
@@ -45,14 +55,14 @@ test('invented ids are dropped; real ones survive', () => {
       intent: 'conceptual',
       topic: 'cholesterol',
       answer_lang: 'en',
-      video_ids: ['ph-chol-depth-1', 'totally-made-up-id', 'ph-chol-layman-1'],
+      video_ids: ['mason-cholesterol-deep', 'totally-made-up-id', 'mason-cholesterol-start'],
       copy: 'Two of these cover it.',
     },
   });
 
   assert.deepEqual(
     result.links.map((link) => link.id),
-    ['ph-chol-depth-1', 'ph-chol-layman-1'],
+    ['mason-cholesterol-deep', 'mason-cholesterol-start'],
   );
   assert.ok(result.notes.includes('unknown-id:totally-made-up-id'));
 });
@@ -81,7 +91,7 @@ test('links are rebuilt from the index — the model cannot dictate a URL', () =
     raw: {
       intent: 'conceptual',
       answer_lang: 'en',
-      video_ids: ['ph-chol-depth-1'],
+      video_ids: ['berry-cholesterol-1'],
       // Fields the model has no business setting. They must be ignored.
       url: 'https://evil.example/hijack',
       links: [{ url: 'https://evil.example/hijack' }],
@@ -89,8 +99,8 @@ test('links are rebuilt from the index — the model cannot dictate a URL', () =
     },
   });
 
-  assert.equal(result.links[0].url, index.byId.get('ph-chol-depth-1').url);
-  assert.equal(result.links[0].title, index.byId.get('ph-chol-depth-1').title);
+  assert.equal(result.links[0].url, index.byId.get('berry-cholesterol-1').url);
+  assert.equal(result.links[0].title, index.byId.get('berry-cholesterol-1').title);
 });
 
 test('URLs written into the prose are stripped', () => {
@@ -99,7 +109,7 @@ test('URLs written into the prose are stripped', () => {
     raw: {
       intent: 'conceptual',
       answer_lang: 'en',
-      video_ids: ['ph-chol-depth-1'],
+      video_ids: ['berry-cholesterol-1'],
       copy: 'Search youtube.com or see https://example.com/foo for more.',
     },
   });
@@ -127,13 +137,22 @@ test('the list is capped and de-duplicated', () => {
 });
 
 test('a video in another language is served and flagged, not dropped', () => {
+  // Built here rather than read from the index: today's index is all English,
+  // and this rule must hold whatever the curation happens to contain.
+  const bilingual = loadIndex({
+    topics: [{ id: 'cholesterol', aliases: ['ldl'] }],
+    videos: [
+      { id: 'en-1', topic: 'cholesterol', url: 'https://x/en', title: 'en', lang: 'en' },
+      { id: 'el-1', topic: 'cholesterol', url: 'https://x/el', title: 'el', lang: 'el' },
+    ],
+  });
   const result = resolveModelOutput({
-    index,
+    index: bilingual,
     raw: {
       intent: 'conceptual',
       topic: 'cholesterol',
       answer_lang: 'el',
-      video_ids: ['ph-chol-depth-1', 'ph-chol-breadth-1'],
+      video_ids: ['en-1', 'el-1'],
       copy: 'Το πρώτο είναι στα αγγλικά.',
     },
   });
@@ -145,7 +164,7 @@ test('a video in another language is served and flagged, not dropped', () => {
 });
 
 test('a curated label wins over whatever the model wrote', () => {
-  const curated = index.byId.get('ph-chol-testimonial-1');
+  const curated = index.byId.get('bikman-cholesterol-1');
   const result = resolveModelOutput({
     index,
     raw: {
@@ -164,7 +183,7 @@ test('a curated label wins over whatever the model wrote', () => {
 test('an unusable intent degrades to conceptual, with the note kept', () => {
   const result = resolveModelOutput({
     index,
-    raw: { intent: 'whatever', answer_lang: 'en', video_ids: ['ph-chol-depth-1'], copy: 'x' },
+    raw: { intent: 'whatever', answer_lang: 'en', video_ids: ['berry-cholesterol-1'], copy: 'x' },
   });
 
   assert.equal(result.intent, 'conceptual');

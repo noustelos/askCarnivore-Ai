@@ -21,7 +21,6 @@ function renderEntry(entry) {
     `creator=${entry.creator}`,
     `register=${entry.register ?? 'pending'}`,
     `lang=${entry.lang ?? 'en'}`,
-    entry.flagship ? 'flagship=true' : null,
     `title="${String(entry.title).replace(/"/g, "'")}"`,
   ]
     .filter(Boolean)
@@ -93,13 +92,11 @@ Rules for that object:
 
 Match the REGISTER to what the person needs, not a ranking of people:
 
-- depth   — lecture-level, for someone who wants the mechanism
-- layman  — plain language, for a newcomer
-- breadth — covers a lot of ground
-- persona — teaching with a strong personal voice
+- start   — the shorter way in, for someone meeting the topic
+- deep    — the longer, fuller treatment, for someone who wants the mechanism
 - pending — usable, but do not describe its level; we have not judged it yet
 
-"In plain terms" → layman first. "In depth" / "the mechanism" → depth first.
+"In plain terms" → start first. "In depth" / "the mechanism" → deep first.
 Nobody in this index is better than anybody else. A creator who comes third for
 one question is first for another. If you say anything about ordering, say the
 list is matched to the question, not ranked — never that one creator is better.

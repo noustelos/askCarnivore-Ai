@@ -50,22 +50,28 @@ const BARE_DOMAIN_RE =
 
 /**
  * Index file → the shape the worker and the prompt both read.
- * Aliases are union'd per topic so that four entries of one topic listing
- * slightly different aliases cannot drift into four different topics.
+ *
+ * Aliases are declared once, on the topic, rather than repeated on every video:
+ * four entries of one topic can no longer drift into four spellings of it. This
+ * is the shape the scan layer will emit, so the loader already speaks it.
  */
 export function loadIndex(raw) {
-  const entries = Array.isArray(raw?.entries) ? raw.entries : [];
   const byId = new Map();
-  const topics = new Map();
+  const aliases = new Map();
 
-  for (const entry of entries) {
+  for (const topic of Array.isArray(raw?.topics) ? raw.topics : []) {
+    if (!topic?.id) continue;
+    aliases.set(topic.id, new Set([topic.id, ...(topic.aliases ?? []).map(String)]));
+  }
+
+  const topics = new Map();
+  for (const entry of Array.isArray(raw?.videos) ? raw.videos : []) {
     if (!entry?.id || !entry?.url || !entry?.topic) continue;
     if (byId.has(entry.id)) continue; // first wins; a duplicate id is a curation bug
     byId.set(entry.id, entry);
-
-    const aliases = topics.get(entry.topic) ?? new Set([entry.topic]);
-    for (const alias of entry.topic_aliases ?? []) aliases.add(String(alias));
-    topics.set(entry.topic, aliases);
+    // A topic exists for the bot only once a video lands in it: an empty box is
+    // a promise we cannot keep, and the prompt would advertise it.
+    topics.set(entry.topic, aliases.get(entry.topic) ?? new Set([entry.topic]));
   }
 
   return {
