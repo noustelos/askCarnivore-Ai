@@ -21,11 +21,15 @@
     "  label     OUR framing of the link (§8); null = the model writes it under",
     "            the link-label rules.",
     "",
+    "Every url is checked against YouTube before it lands here, and the uploader",
+    "must be the creator's own channel: a clip or re-upload channel sends the",
+    "traffic to the wrong person and rots sooner (§6).",
+    "",
     "Rules that outlive this file: link-out only, never rehost, never transcripts.",
     "Labels are experience/position, never a treatment claim."
   ],
   "status": "CURATED",
-  "note": "Seed index — 2 θέματα, χειροκίνητο. Register tags = Nick's manual (υπερισχύουν της διάρκειας). PENDING: Judy Cho getting-started (χρειάζεται video URL, όχι channel).",
+  "note": "Seed index — 2 θέματα, χειροκίνητο. Register tags = Nick's manual (υπερισχύουν της διάρκειας).",
   "topics": [
     {
       "id": "getting-started",
@@ -62,16 +66,16 @@
       "label": "Judy Cho — 5 tips to start carnivore and make it stick"
     },
     {
-      "id": "alpha-getting-started-1",
+      "id": "baker-getting-started-1",
       "topic": "getting-started",
       "type": "conceptual",
-      "creator": "Carnivore Teacher Alpha",
+      "creator": "Dr. Shawn Baker",
       "register": "start",
-      "title": "Beginner's Guide to Starting a Keto Diet: Easy Steps!",
-      "url": "https://www.youtube.com/watch?v=MZuJ2-Emxr0",
-      "duration": "6:26",
+      "title": "How To Get Started on a Carnivore Diet",
+      "url": "https://www.youtube.com/watch?v=SgDiSbiQv9A",
+      "duration": "6:38",
       "lang": "en",
-      "label": "Carnivore Teacher Alpha — quick beginner's steps"
+      "label": "Dr. Shawn Baker — how to get started on carnivore"
     },
     {
       "id": "hogan-getting-started-1",
@@ -126,12 +130,12 @@
       "topic": "cholesterol",
       "type": "conceptual",
       "creator": "Dr. Ken Berry",
-      "register": "deep",
-      "title": "Why Your \"High Cholesterol\" is a LIE (2026 Truth)",
-      "url": "https://www.youtube.com/watch?v=sIgD1KHWT6k",
-      "duration": "1:01:00",
+      "register": "start",
+      "title": "You NEED Cholesterol for these 7 Things (Is Cholesterol Bad?) 2026",
+      "url": "https://www.youtube.com/watch?v=kRtljOrDFpw",
+      "duration": "7:55",
       "lang": "en",
-      "label": "Dr. Ken Berry — his view on 'high cholesterol' readings"
+      "label": "Dr. Ken Berry — what cholesterol does in the body"
     },
     {
       "id": "cho-cholesterol-1",
@@ -175,11 +179,11 @@
       "type": "conceptual",
       "creator": "Dr. Paul Mason",
       "register": "start",
-      "title": "Cholesterol Made Simple in 5 Minutes",
-      "url": "https://www.youtube.com/watch?v=hR-UlhPENAI",
-      "duration": "5:25",
+      "title": "LDL is NOT the same as cholesterol",
+      "url": "https://www.youtube.com/watch?v=4EPGKkDdtvI",
+      "duration": "1:42",
       "lang": "en",
-      "label": "Dr. Paul Mason — cholesterol in 5 minutes"
+      "label": "Dr. Paul Mason — LDL vs cholesterol, briefly"
     }
   ]
 }
