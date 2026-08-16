@@ -1,0 +1,189 @@
+{
+  "$comment": [
+    "AskCarnivore index — hand-curated, git-versioned. This is the whole product.",
+    "",
+    "Shape (the one the Scan Layer will emit): topic aliases live ONCE on the",
+    "topic; `videos` is the flat list. While `status` is \"PLACEHOLDER\" the bot",
+    "shows a warning banner; \"CURATED\" means every url below is a real, verified",
+    "source. Content and status change in the SAME commit — never separately.",
+    "",
+    "Fields:",
+    "  id        stable slug, referenced by the model. NEVER reuse an id for a",
+    "            different video — the worker resolves links from this file.",
+    "  topic     canonical topic key, lowercase-kebab; must exist in `topics`.",
+    "  type      conceptual | testimonial | practical",
+    "  creator   display name, exactly as the creator writes it.",
+    "  register  start | deep  (§14.4) — shorter way in vs fuller treatment.",
+    "  lang      en | el — the language spoken in the video, not of the title.",
+    "  title     the video's own title. Not our words.",
+    "  url       verified watch URL. The model never sees this field.",
+    "  duration  mm:ss — the basis the register is meant to follow (§14.4).",
+    "  label     OUR framing of the link (§8); null = the model writes it under",
+    "            the link-label rules.",
+    "",
+    "Every url is checked against YouTube before it lands here, and the uploader",
+    "must be the creator's own channel: a clip or re-upload channel sends the",
+    "traffic to the wrong person and rots sooner (§6).",
+    "",
+    "Rules that outlive this file: link-out only, never rehost, never transcripts.",
+    "Labels are experience/position, never a treatment claim."
+  ],
+  "status": "CURATED",
+  "note": "Seed index — 2 θέματα, χειροκίνητο. Register tags = Nick's manual (υπερισχύουν της διάρκειας).",
+  "topics": [
+    {
+      "id": "getting-started",
+      "aliases": ["how to start", "beginner", "getting started", "start carnivore", "πώς ξεκινάω", "αρχάριος", "ξεκίνημα", "πρώτες μέρες"]
+    },
+    {
+      "id": "cholesterol",
+      "aliases": ["ldl", "lipids", "heart disease", "χοληστερίνη", "χοληστερόλη", "λιπίδια", "καρδιά"]
+    }
+  ],
+  "videos": [
+    {
+      "id": "berry-getting-started-1",
+      "topic": "getting-started",
+      "type": "conceptual",
+      "creator": "Dr. Ken Berry",
+      "register": "start",
+      "title": "CARNIVORE Diet (Beginner's Guide) All You Need to Get Started - 2026",
+      "url": "https://www.youtube.com/watch?v=e56gVwMFVPw",
+      "duration": "22:23",
+      "lang": "en",
+      "label": "Dr. Ken Berry — beginner's guide to starting carnivore"
+    },
+    {
+      "id": "cho-getting-started-1",
+      "topic": "getting-started",
+      "type": "conceptual",
+      "creator": "Judy Cho",
+      "register": "start",
+      "title": "5 Tips on How to (Successfully) Start a Carnivore Diet - What you need to know to make it stick",
+      "url": "https://www.youtube.com/watch?v=idzfbxc_hAw",
+      "duration": "12:43",
+      "lang": "en",
+      "label": "Judy Cho — 5 tips to start carnivore and make it stick"
+    },
+    {
+      "id": "baker-getting-started-1",
+      "topic": "getting-started",
+      "type": "conceptual",
+      "creator": "Dr. Shawn Baker",
+      "register": "start",
+      "title": "How To Get Started on a Carnivore Diet",
+      "url": "https://www.youtube.com/watch?v=SgDiSbiQv9A",
+      "duration": "6:38",
+      "lang": "en",
+      "label": "Dr. Shawn Baker — how to get started on carnivore"
+    },
+    {
+      "id": "hogan-getting-started-1",
+      "topic": "getting-started",
+      "type": "conceptual",
+      "creator": "Kelly Hogan",
+      "register": "deep",
+      "title": "Starting Carnivore! A beginner's guide with Kelly Hogan, Laura Spath, and Brandon Crouch",
+      "url": "https://www.youtube.com/watch?v=uScdcxgeMoM",
+      "duration": "34:03",
+      "lang": "en",
+      "label": "Kelly Hogan, Laura Spath & Brandon Crouch — beginner's guide panel"
+    },
+    {
+      "id": "berry-getting-started-2",
+      "topic": "getting-started",
+      "type": "conceptual",
+      "creator": "Dr. Ken Berry",
+      "register": "deep",
+      "title": "Carnivore Diet FAQ for Beginners (33 Questions Answered)",
+      "url": "https://www.youtube.com/watch?v=t2om-RJbLyg",
+      "duration": "42:56",
+      "lang": "en",
+      "label": "Dr. Ken Berry — 33 beginner questions answered"
+    },
+    {
+      "id": "chaffee-getting-started-1",
+      "topic": "getting-started",
+      "type": "conceptual",
+      "creator": "Dr. Anthony Chaffee",
+      "register": "deep",
+      "title": "Carnivore For Beginners: How To Start A Carnivore Diet with Tips, Tricks, and Common Pitfalls",
+      "url": "https://www.youtube.com/watch?v=V8ns1j28vhc",
+      "duration": "17:48",
+      "lang": "en",
+      "label": "Dr. Anthony Chaffee — how to start, with common pitfalls"
+    },
+    {
+      "id": "chaffee-cholesterol-1",
+      "topic": "cholesterol",
+      "type": "conceptual",
+      "creator": "Dr. Anthony Chaffee",
+      "register": "start",
+      "title": "The Truth about Cholesterol and Heart Disease",
+      "url": "https://www.youtube.com/watch?v=UbFXqjABIvo",
+      "duration": "32:51",
+      "lang": "en",
+      "label": "Dr. Anthony Chaffee — cholesterol and heart disease, explained"
+    },
+    {
+      "id": "berry-cholesterol-1",
+      "topic": "cholesterol",
+      "type": "conceptual",
+      "creator": "Dr. Ken Berry",
+      "register": "start",
+      "title": "You NEED Cholesterol for these 7 Things (Is Cholesterol Bad?) 2026",
+      "url": "https://www.youtube.com/watch?v=kRtljOrDFpw",
+      "duration": "7:55",
+      "lang": "en",
+      "label": "Dr. Ken Berry — what cholesterol does in the body"
+    },
+    {
+      "id": "cho-cholesterol-1",
+      "topic": "cholesterol",
+      "type": "conceptual",
+      "creator": "Judy Cho",
+      "register": "start",
+      "title": "Cholesterol on Carnivore: What Levels Are Actually Optimal?",
+      "url": "https://www.youtube.com/watch?v=q6nJ8bZKs1Y",
+      "duration": "19:42",
+      "lang": "en",
+      "label": "Judy Cho — what cholesterol levels look like on carnivore"
+    },
+    {
+      "id": "bikman-cholesterol-1",
+      "topic": "cholesterol",
+      "type": "conceptual",
+      "creator": "Ben Bikman",
+      "register": "deep",
+      "title": "LDL Isn't the Problem? The Real Drivers of Heart Disease",
+      "url": "https://www.youtube.com/watch?v=E5UJd-lS90c",
+      "duration": "23:15",
+      "lang": "en",
+      "label": "Ben Bikman — drivers of heart disease beyond LDL (his view)"
+    },
+    {
+      "id": "mason-cholesterol-deep",
+      "topic": "cholesterol",
+      "type": "conceptual",
+      "creator": "Dr. Paul Mason",
+      "register": "deep",
+      "title": "The truth about high cholesterol",
+      "url": "https://www.youtube.com/watch?v=rdgS3PuSuyg",
+      "duration": "20:43",
+      "lang": "en",
+      "label": "Dr. Paul Mason — the case on high cholesterol"
+    },
+    {
+      "id": "mason-cholesterol-start",
+      "topic": "cholesterol",
+      "type": "conceptual",
+      "creator": "Dr. Paul Mason",
+      "register": "start",
+      "title": "LDL is NOT the same as cholesterol",
+      "url": "https://www.youtube.com/watch?v=4EPGKkDdtvI",
+      "duration": "1:42",
+      "lang": "en",
+      "label": "Dr. Paul Mason — LDL vs cholesterol, briefly"
+    }
+  ]
+}
