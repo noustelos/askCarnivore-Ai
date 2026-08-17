@@ -11,7 +11,7 @@
 | **Επιστρέφει** | **βίντεο** του index, cross-creator | directory, testimonials, tools, προϊόντα |
 | **Πρόσβαση** | χωρίς λογαριασμό, χωρίς app | ελεύθερη· λογαριασμοί μόνο αν/όταν χρειαστούν |
 | **Εμπόριο** | **κανένα** | affiliate, προϊόντα, tools |
-| **Στάδιο** | **LIVE και απαντάει** (16/08/2026) — 12 βίντεο, 2 θέματα, χειροκίνητο index | **live** — στατικό, 24 κάρτες directory, χωρίς tools |
+| **Στάδιο** | **LIVE και απαντάει** (16/08/2026) — 12 βίντεο, 2 θέματα, χειροκίνητο index | **live** — στατικό, 27 κάρτες directory, χωρίς tools |
 
 Το ζευγάρι ενικός/πληθυντικός λειτουργεί υπέρ μας: το `askcarnivore` ρωτάει *το πράγμα*
 (τη μηχανή), το `askcarnivores` δείχνει *τους ανθρώπους*. Η διάκριση πρέπει να είναι
@@ -57,7 +57,8 @@ model) ειδικά ήρθε αυτούσιο.
 ο v0 έγινε merge στις 16/08 (`4b15301`) με πραγματικό index. Το `bot-v0` **δεν
 υπάρχει πια**: ήταν πλήρως merged και διαγράφηκε τοπικά και στο origin (17/08).
 *Recovery, αν ποτέ χρειαστεί:* `git branch bot-v0 49efece`.
-`askcarnivores.com` (portal) **live** — στατικό, directory 24 κάρτες. Siloing:
+`askcarnivores.com` (portal) **live** — στατικό, directory 27 κάρτες (24 μέχρι
+τις 17/08). Siloing:
 ξεχωριστά repos / Pages / secrets, hard rules στο Claude Code memory.
 
 ## STATUS — Κλειδωμένα / Ανοιχτά
@@ -180,7 +181,7 @@ bot — προστατεύει το «Just Ask».
 
 ## 5. Το Portal — Ανθρώπινος κόμβος
 
-- **Directory** γιατρών & creators (κανάλια, podcasts, βιβλία, links) — 24 κάρτες.
+- **Directory** γιατρών & creators (κανάλια, podcasts, βιβλία, links) — 27 κάρτες.
 - **Testimonials** (link-out σε Dave Mac — Zero Carb).
 - **Tools:** Get Started (7 μέρες), Electrolytes, Shopping List, Macro calculator.
   *Evergreen, shareable — ίσως ο πραγματικός μαγνήτης, όχι το SEO.*
@@ -604,6 +605,20 @@ Maria Emmerich (low-carb — δεύτερη).
 buckets, δικός του άξονας (συνεντεύξεις καλεσμένων, λίστες «τι βελτίωσαν»). Δεν
 μπαίνει σε start/deep.
 
+**◻ Προστέθηκαν 17/08/2026 — ΧΩΡΙΣ bucket ακόμα:** **Dr. Sten Ekberg**, **Jason
+Fung**, **Nick Norwitz**. Μπήκαν ως κάρτες στο portal· εδώ **δεν** τους έβαλα σε
+register/topic/role, γιατί αυτό είναι editorial απόφαση του Nick (§14.3: εκείνος
+εγκρίνει τον creator-ανά-θέμα, ο αλγόριθμος διαλέγει βίντεο). Μέχρι να τους
+βαθμολογήσει, **δεν μπαίνουν στο `curation.json`** — άρα ο Scan Layer δεν θα τους
+δει και ο bot δεν θα τους σερβίρει.
+
+*Τι δείχνει το περιεχόμενο των καρτών τους, ως **πρόταση προς έγκριση**, όχι ως
+απόφαση:* Norwitz → cholesterol / metabolic, go-deep lean (Oxford PhD, LMHR
+research)· Fung → fasting / metabolic, go-deep lean (**όχι carnivore** — νηστεία
+και χαμηλοί υδατάνθρακες, «background/mechanisms, not a protocol»)· Ekberg →
+start-with lean, ευρύ keto-και-ευεξία (**και προσοχή: χειροπράκτης, ΠΟΤΕ MD** —
+ο κανόνας είναι γραμμένος και ως σχόλιο στην κάρτα του).
+
 **Excluded (hard):** Paul Saladino (permanent, σε όλο το project)· Kelli Ritter
 (απορρίφθηκε).
 
@@ -611,11 +626,13 @@ buckets, δικός του άξονας (συνεντεύξεις καλεσμέ
 + fertility), Shapefixer (start-with + coach), Bright (fertility +
 γυναίκα-provisional).*
 
-**Ο roster είναι ήδη το directory του portal.** Τα 24 ονόματα εδώ ταιριάζουν ένα
-προς ένα με τις 24 κάρτες που είναι live στο `askcarnivores.com` — κάθε όνομα του
-roster είναι κάρτα, κάθε κάρτα είναι όνομα του roster. Άρα η λίστα creators δεν
-είναι πια «να δοθεί»: ο Scan Layer έχει το input του, και το portal έχει το
-τελικό του directory. Οι buckets όμως μένουν **δικοί μας** — το portal κρατάει τις
+**Ο roster είναι σχεδόν το directory του portal — αλλά όχι πια ένα προς ένα.**
+Μέχρι τις 17/08/2026 τα 24 ονόματα εδώ ήταν ακριβώς οι 24 κάρτες του
+`askcarnivores.com`. Πλέον το portal έχει **27 κάρτες** και ο roster **24
+bucketed + 3 χωρίς bucket** (βλ. παραπάνω): το directory είναι **τρία μπροστά**.
+Δεν είναι λάθος να διορθωθεί με sweep — είναι σειρά: ο Nick τους βαθμολογεί όταν
+τους ακούσει. Η λίστα creators πάντως δεν είναι πια «να δοθεί»: ο Scan Layer έχει
+το input του, και το portal έχει το τελικό του directory. Οι buckets όμως μένουν **δικοί μας** — το portal κρατάει τις
 κάρτες σε ένα επίπεδο αλφαβητικό grid, χωρίς register/topic/role.
 
 ---
@@ -1248,9 +1265,10 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 - [x] ~~Αγορά domain~~ ✅ 13/08/2026
 - [x] ~~Ξεχωριστό repo~~ ✅ 14/08/2026 — `noustelos/ask-CARNIVORES`
 - [x] ~~Cloudflare Pages project + custom domain~~ ✅ — **live**
-- [x] ~~Directory γιατρών & creators~~ ✅ 24 κάρτες, EN + EL, links επαληθευμένα —
-      **και ταιριάζουν ένα προς ένα με τον roster του §17**, οπότε η «τελική λίστα
-      creators» έπαψε να είναι εκκρεμότητα και για τις δύο πλευρές (16/08/2026)
+- [x] ~~Directory γιατρών & creators~~ ✅ **27 κάρτες**, EN + EL, links
+      επαληθευμένα. Ταίριαζαν ένα προς ένα με τον roster του §17 μέχρι τις
+      17/08/2026· τώρα το directory είναι **τρία μπροστά** (Ekberg, Fung,
+      Norwitz) και ταξινομημένο **με επίθετο** αντί για μικρό όνομα.
 - [x] ~~Επικοινωνία~~ ✅ 16/08/2026 — `info@askcarnivores.com` στο footer και των
       τριών σελίδων τους· ίδια διεύθυνση αντιγράφηκε και εδώ
 - [x] ~~Link-out testimonials (Dave Mac — Zero Carb)~~ ✅
@@ -1446,6 +1464,20 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
     `git branch bot-v0 49efece`. Από εδώ και πέρα **δεν υπάρχει staging branch**:
     το `main` σερβίρει κοινό, οπότε ό,τι θέλει review παίρνει δικό του branch.
   - **Reconciliation αυτού του αρχείου** με την πραγματικότητα — αυτό το πέρασμα.
+
+- **2026-08-17** — **Το portal πήγε από 24 σε 27 κάρτες** και ξαναταξινομήθηκε
+  **με επίθετο** (πριν: μικρό όνομα· ο Dave Mac μένει pinned πρώτος για τον
+  δομικό του λόγο). Η δουλειά έγινε **στο portal repo**· εδώ καταγράφεται μόνο
+  ό,τι μας αφορά:
+  - **Τρία νέα ονόματα** — Dr. Sten Ekberg, Jason Fung, Nick Norwitz — μπήκαν
+    στο §17 **χωρίς bucket**. Register/topic/role είναι απόφαση του Nick (§14.3),
+    οπότε μέχρι να τους ακούσει **δεν μπαίνουν στο `curation.json`** και ο bot
+    δεν τους σερβίρει.
+  - **Η αντιστοιχία roster ↔ directory έσπασε**, συνειδητά: 24 bucketed εδώ, 27
+    κάρτες εκεί. Καταγράφεται αντί να «διορθωθεί» με sweep.
+  - **Ekberg = χειροπράκτης, ποτέ MD.** Ο κανόνας ζει και ως σχόλιο πάνω από τη
+    γραμμή ρόλου του, στο portal repo — αν κάποτε μπει στο index του bot, ισχύει
+    και στα δικά μας link labels (§8).
 
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
 > έγιναν μέσα σε **μία νύχτα** (13→14/08/2026). Ο bot που απαντάει ήρθε δύο μέρες
