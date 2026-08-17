@@ -55,9 +55,12 @@
   body {
     min-height: 100svh;
     display: grid;
-    /* Two rows so the credit sits at the foot without overlapping the mark
-       on a short landscape viewport — main stays centred in what is left. */
-    grid-template-rows: 1fr auto;
+    /* Three rows so the credit sits at the foot without overlapping the mark
+       on a short landscape viewport — main stays centred in what is left, and
+       the status strip takes the top. Each child names its own row: dismissing
+       the strip removes it from the grid, and auto-placement would then slide
+       main into the top row and stop centring it. */
+    grid-template-rows: auto 1fr auto;
     place-items: center;
     padding: 2rem 1.5rem;
     background-color: var(--c1);
@@ -83,7 +86,62 @@
                                 transparent 35%, hsl(0 0% 0% / .38) 100%);
   }
 
+  /* ---- status strip ----
+     Says how mature the site is, nothing more. The medical disclaimer under
+     the ask box is a different promise and lives apart from this on purpose:
+     merging them would let someone dismiss the disclaimer with an ×. */
+
+  .status {
+    grid-row: 1;
+    justify-self: stretch;
+    position: relative;
+    z-index: 1;
+    /* Full-bleed: cancels the body's 2rem/1.5rem padding, then puts it back
+       inside so the text keeps the same gutter as everything else. */
+    margin: -2rem -1.5rem 0;
+    padding: .5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* A dark scrim rather than a fixed colour: the background underneath
+       cycles through three hues, and only a scrim reads on all of them. */
+    background: hsl(0 0% 0% / .3);
+    border-bottom: 1px solid hsl(0 0% 100% / .1);
+    color: var(--fg-soft);
+    font-size: clamp(.72rem, 2.6vw, .8rem);
+    line-height: 1.35;
+    text-align: left;
+  }
+
+  .status p { margin: 0; }
+  .status strong { color: var(--fg); font-weight: 600; }
+
+  .status__x {
+    flex: none;
+    margin-left: auto;
+    width: 1.65rem;
+    height: 1.65rem;
+    border-radius: .35rem;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 1.05rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: .7;
+    transition: opacity .2s ease, background-color .2s ease;
+  }
+
+  .status__x:hover,
+  .status__x:focus-visible { opacity: 1; background: hsl(0 0% 100% / .12); }
+
+  .status__x:focus-visible {
+    outline: 2px solid hsl(0 0% 100% / .75);
+    outline-offset: 2px;
+  }
+
   main {
+    grid-row: 2;
     position: relative;
     z-index: 1;
     width: 100%;
@@ -139,6 +197,7 @@
   /* ---- footer credit ---- */
 
   footer {
+    grid-row: 3;
     position: relative;
     z-index: 1;
     margin-top: 2.5rem;
@@ -253,6 +312,18 @@
 </style>
 </head>
 <body>
+  <!-- Maturity, not liability. The medical disclaimer under the ask box is a
+       separate promise and stays exactly where it is — never fold the two into
+       one strip, or dismissing the notice would dismiss the disclaimer.
+
+       English is in the markup so the page reads correctly with no JavaScript
+       at all; the Greek copy is swapped in by the script at the foot when the
+       browser asks for Greek. The × is created there too, so a visitor without
+       JavaScript is not handed a button that does nothing. -->
+  <aside class="status" id="status" aria-label="Site status">
+    <p data-el="Σε ανάπτυξη — live και μεγαλώνει. Προσθέτουμε θέματα και πηγές συνεχώς. Αν δεν καλύπτεται ακόμα η ερώτησή σου, σύντομα θα καλύπτεται."><strong>In development</strong> — live and growing. We're adding topics and sources often. If your question isn't covered yet, it soon will be.</p>
+  </aside>
+
   <main>
     <!-- ================================================================
          One ring, three forms: circle → triangle → square → circle.
@@ -373,8 +444,12 @@
   <footer>
     <!-- Which model does the routing, and where it is hosted. Plain text, no
          link and no logo: this is disclosure, not a partnership badge, and a
-         provider mark would need permission we have not asked for. Mirrored by
-         hand into askcarnivores.com's footer — copied, never shared. -->
+         provider mark would need permission we have not asked for.
+
+         This belongs to the bot alone, and to /embed, which is the same bot
+         seen through the portal's panel. It does NOT go on askcarnivores.com:
+         that site is static and routes nothing, so the sentence would be a
+         claim about software it does not run. -->
     <p class="powered">Routing powered by Mistral · EU-based AI</p>
 
     <!-- Contact. COPIED BY HAND from askcarnivores.com, not shared and not
@@ -414,6 +489,37 @@
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.querySelector('.pl').pauseAnimations();
   }
+
+  /* The status strip: Greek copy for a Greek browser, and a × that stays
+     dismissed. localStorage is wrapped because a locked-down browser throws on
+     access rather than returning null — a notice is not worth an exception
+     that stops the rest of this file running. */
+  (function () {
+    var strip = document.getElementById('status');
+    var store = function (fn) { try { return fn(localStorage); } catch (e) { return null; } };
+
+    if (store(function (s) { return s.getItem('status-dismissed'); }) === '1') {
+      strip.remove();
+      return;
+    }
+
+    if (/^el\b/i.test(navigator.language || '')) {
+      var line = strip.querySelector('p');
+      line.lang = 'el';
+      line.textContent = line.dataset.el;
+    }
+
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'status__x';
+    close.textContent = '×';
+    close.setAttribute('aria-label', strip.querySelector('p').lang === 'el' ? 'Κλείσιμο' : 'Dismiss');
+    close.addEventListener('click', function () {
+      strip.remove();
+      store(function (s) { return s.setItem('status-dismissed', '1'); });
+    });
+    strip.append(close);
+  })();
 </script>
 <script src="chat.js"></script>
 </body>

@@ -79,6 +79,21 @@
   .chat { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; }
   .chat__thread { flex: 1; min-height: 0; max-height: none; }
   .head { flex: none; }
+
+  /* Provider disclosure, carried here as well as on the landing page: framed
+     inside the portal this is the only surface a person sees, so it is the
+     only place the credit can appear for them. `flex: none` so the one line
+     it costs comes off the panel, never off the thread's scrolling room. */
+  .powered {
+    flex: none;
+    margin-top: .6rem;
+    color: var(--fg-soft);
+    font-size: .62rem;
+    letter-spacing: .02em;
+    line-height: 1;
+    text-align: center;
+    opacity: .55;
+  }
 </style>
 </head>
 <body>
@@ -105,6 +120,10 @@
       ask your doctor.
     </p>
   </section>
+
+  <!-- Plain text, no link and no logo — disclosure, not a partnership badge.
+       Same sentence as the landing page's footer; change one, change both. -->
+  <p class="powered">Routing powered by Mistral · EU-based AI</p>
 
 <script src="chat.js"></script>
 </body>
