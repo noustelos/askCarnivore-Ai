@@ -36,10 +36,19 @@ portal δεν μπαίνει σε αυτό εδώ το repo.**
 
 ---
 
-# ASKCARNIVORE — Concept Base (Modus Operandi) · v3
+# ASKCARNIVORE — Concept Base (Modus Operandi) · v3.1
 
 *Μία πηγή αλήθειας για το concept — όχι κώδικας, όχι τεχνική προδιαγραφή. Το «τι
 χτίζουμε και γιατί». Αντικαθιστά το v2.*
+
+**Τι άλλαξε στο v3.1 (17/08/2026):** ο roster (§17) πήγε σε **27 creators** και η
+λίστα **κλείδωσε στους 27** — Ekberg / Fung / Norwitz μπήκαν **με buckets**, όχι
+εκκρεμείς· νέο **§14.12b** (trusted hosts vs re-uploads — source-list filter, με
+global trusted host το `@DoctorsToTrust`)· νέο **topic «mental health &
+nutrition»** με τη Georgia Ede, της οποίας το register **έπαψε να είναι
+provisional**· το **curation seed υπάρχει** (16 θέματα × 27 creators + channel
+handles, το mapping sheet του Nick)· και το §16 απέκτησε το **γιατί iframe και όχι
+redirect**, μαζί με κανόνες UX για κοινό 50+.
 
 **Τι άλλαξε από το v2 (τίμια, όχι σιωπηλά):** το §14 ξαναγράφτηκε με το **τελικό,
 μηχανικό ranking model** — register ως «Start with / Go deep» ανά βίντεο μέσω
@@ -82,6 +91,11 @@ model) ειδικά ήρθε αυτούσιο.
   (§14.12)
 - **Scan-to-grid:** το μοντέλο ΔΕΝ ψάχνει — cron scan παράγει προ-υπολογισμένο
   πλέγμα `θέμα×register→βίντεο`· το μοντέλο διαλέγει μόνο κουτί. (§14.13)
+- **Trusted hosts, όχι approval gate (§14.12b):** κάθε creator σκανάρεται μόνο από
+  το δικό του κανάλι + trusted hosts· **global trusted host: `@DoctorsToTrust`**.
+  Guest εμφανίσεις μέσα, re-uploads/clip channels έξω — αυτόματα, χωρίς κρίση.
+- **Λίστα creators κλειστή στους 27** (§17). Νέος μπαίνει μόνο με κριτήριο του
+  Nick, ποτέ με πρόταση δική μας.
 - **Τρεις ξεχωριστοί άξονες:** register / topic / role — πολλαπλά tags ανά
   creator, όχι ένα bucket. (§14.14)
 - **Relevance-ranked, ΟΧΙ quality-ranked.** «Not a ranking, it's a match». (§14.5)
@@ -101,7 +115,8 @@ model) ειδικά ήρθε αυτούσιο.
 **◻ Open:**
 
 - **Register tags για τις γυναίκες** — εκκρεμεί ώσπου ο Nick ακούσει τα κανάλια
-  τους (§14.11). Άντρες: πλήρως tagged.
+  τους (§14.11). Άντρες: πλήρως tagged. **Εξαίρεση: η Georgia Ede κλείδωσε**
+  (go-deep + δικό της topic «mental health & nutrition») στο v3.1.
 - **Scan Layer** — το spec του δόθηκε 16/08/2026 και είναι καταγεγραμμένο
   ολόκληρο παρακάτω («Scan Layer — build spec v1»). **Μηδέν κώδικας ακόμα.**
   Το YouTube API key **υπάρχει** πλέον ως Cloudflare secret, αχρησιμοποίητο·
@@ -444,9 +459,13 @@ Copy του bot: «οι λίστες δεν είναι βαθμολογημέν�
 
 Ο Nick παρακολουθεί 4 χρόνια όλους **εκτός από τις γυναίκες**. Άρα ο register
 πίνακας ξεκινά: άντρες **πλήρως tagged**, γυναίκες **«θέμα ναι / register
-pending»** μέχρι να ακούσει τα κανάλια τους. Ede/Bright/O'Hearn/Wiedeman μπαίνουν
+pending»** μέχρι να ακούσει τα κανάλια τους. Ede/Bright/O'Hearn/Wiedeman μπήκαν
 προσωρινά με βάση playlists/emails/NotebookLM + φήμη, μέχρι δική του κρίση. Σειρά,
 όχι έλλειψη.
+
+**Ενημέρωση v3.1 (17/08/2026): η Ede βγήκε από το provisional** — είναι go-deep
+και κρατάει μόνη της το θέμα «mental health & nutrition» (§17). Bright, O'Hearn
+και Wiedeman μένουν provisional.
 
 ### 14.12 Ranking — μηχανικό, καμία κρυφή κρίση
 
@@ -464,6 +483,32 @@ pending»** μέχρι να ακούσει τα κανάλια τους. Ede/Bri
   παλιό, και πλέον εμφανίζεται guest σε άλλα κανάλια· εκεί το pin (ή manual entry
   για guest εμφάνιση) πιάνει ό,τι χάνει ο αλγόριθμος «recency+views στο δικό του
   κανάλι».*
+
+### 14.12b Trusted hosts vs re-uploads — ο source-list filter (no gate)
+
+*Νέο στο v3.1. Γεννήθηκε από πραγματικό λάθος: στην πρώτη εκδοχή του live index
+δύο entries έδειχναν σε re-uploads (Martin Silva, CarnivoreTribe) αντί για τα
+κανάλια των Berry/Mason. Πιάστηκε με το χέρι· τώρα πιάνεται από το data model.*
+
+Το «no approval gate» δεν σημαίνει «no filter». Το φιλτράρισμα των re-uploads
+μετακομίζει από *έγκριση* σε **ορισμό πηγών** μέσα στο `curation.json`:
+
+- **Κάθε creator σκανάρεται μόνο από εγκεκριμένες πηγές:** το δικό του κανάλι
+  **+ trusted hosts**.
+- **Global trusted host: `@DoctorsToTrust`** — εκεί φιλοξενούνται guest
+  εμφανίσεις σχεδόν όλων. Ορίζεται **μία φορά** ως καθολική εμπιστεύσιμη πηγή,
+  όχι creator-creator.
+- **Αποτέλεσμα:** guest εμφανίσεις (Lustig στο DoctorsToTrust) → **μέσα**
+  (αυθεντικές)· re-uploads / clip channels → **έξω αυτόματα**, γιατί δεν είναι
+  στη λίστα πηγών. Μηδέν gate, αλλά δεν περνάνε.
+- **⚠ Caveat:** «trusted host» = εμπιστεύομαι την *αυθεντικότητα*, ΟΧΙ «κάθε
+  βίντεό του για κάθε θέμα». Το scan ταιριάζει ακόμα **σωστός creator × σωστό
+  θέμα** — «Lustig για ινσουλίνη σε βίντεο DoctorsToTrust» ναι· «ό,τι έχει το
+  DoctorsToTrust για ινσουλίνη» όχι. Η πηγή είναι εμπιστεύσιμη ως προς την
+  προέλευση· το θέμα το ορίζει το ματσάρισμα.
+
+*Αυτό λύνει και το ανοιχτό `trusted_sources` του Scan Layer spec: το πεδίο
+σημαίνει «κανάλι creator + trusted hosts», με το `@DoctorsToTrust` global.*
 
 ### 14.13 Scan-to-grid — το μοντέλο ΔΕΝ ψάχνει ποτέ
 
@@ -511,9 +556,11 @@ lectures. Αν/αργότερα, όχι τώρα.
 
 ## 15. *(κενό — ήταν οδηγία, όχι concept)*
 
-Το §15 του v3 ήταν, όπως και στο v2, **εντολή reconciliation προς τον agent** και
-όχι concept: «ενημέρωσε τα παλιά docs». Εκτελέστηκε αντί να αντιγραφεί — βλ.
-Changelog 16/08/2026. Η αρίθμηση μένει κενή ώστε οι παραπομπές §16/§17 να δείχνουν
+Το §15 ήταν σε **κάθε** έκδοση (v2, v3, v3.1) **εντολή reconciliation προς τον
+agent** και όχι concept: «ενημέρωσε τα παλιά docs». Εκτελείται αντί να
+αντιγράφεται — βλ. Changelog 16 και 17/08/2026. *Το v3.1 του έδωσε και τίτλο
+(«Reconciliation») και το §9/§14.9 παραπέμπουν σε αυτό ως «Worker Architecture
+spec»· η ουσία δεν αλλάζει και μένει εκτελεσμένη, όχι αντιγραμμένη.* Η αρίθμηση μένει κενή ώστε οι παραπομπές §16/§17 να δείχνουν
 σωστά και από τα δύο repos.
 
 Τι ζητούσε, για το αρχείο: το χειροκίνητο `src/index.json` **δεν πετιέται** — γίνεται
@@ -570,6 +617,30 @@ footer), **όχι τη μηχανή του bot**. Τον bot τον κάνεις
    portal· μόνο το *περιεχόμενο* του παραθύρου είναι ο framed bot.
 4. **Analytics χωριστά** — του iframe μένουν του bot, του portal του portal.
 
+**Γιατί iframe, ΟΧΙ redirect (εξετάστηκε & απορρίφθηκε — v3.1):** το κοινό είναι
+**50+, οι περισσότεροι με ιατρικά**. Το «floating button → redirect στο άλλο
+domain → δεύτερο button για επιστροφή» είναι *περισσότερη* τριβή για αυτή την
+ηλικία, όχι λιγότερη: δύο page loads, αλλαγή περιβάλλοντος, «πού είμαι / πώς
+γυρίζω». Το iframe panel κρατά τον χρήστη *στη σελίδα* — ανοίγει παράθυρο,
+κλείνει, τίποτα δεν έφυγε. Μηδέν navigation. Επίσης το redirect σκοτώνει το «Just
+Ask» (ρώτα εκεί που είσαι) και είναι *δυσκολότερο* build (cross-domain return,
+διατήρηση context). Το iframe = ευκολότερο για τον χρήστη ΚΑΙ για το build.
+
+**UX για 50+ (design του component — βάρος στην ευκολία):**
+
+- **Μεγάλος, ΛΕΚΤΙΚΟΣ launcher** — κουμπί με λέξεις («Ask a question» / «Ρωτήστε»),
+  όχι μικρό cryptic chat-bubble εικονίδιο που δεν αναγνωρίζεται ως «εδώ ρωτάς».
+- **Μεγάλα γράμματα & tap targets** μέσα στο panel — μεγάλο input, μεγάλα
+  Start/Deep buttons, άνετο spacing (χρήστες με κόπωση ή brain fog δυσκολεύονται
+  σε μικρά targets).
+- **Full ή σχεδόν-full panel σε mobile** — όχι μικρό παραθυράκι σε γωνία· μεγάλο,
+  με ξεκάθαρο **X** πάνω δεξιά.
+- **Το «κλείσιμο» είναι το αντίστοιχο του «πίσω»**, χωρίς redirect: κλείνεις το
+  panel, είσαι ήδη πίσω.
+
+*Αυτά είναι δικά τους να τα χτίσουν (portal-side chrome), αλλά ο λόγος τους ζει
+εδώ γιατί είναι concept: η επιλογή iframe δικαιολογείται από το κοινό.*
+
 **Μονόδρομο:** bot μέσα στο portal, ναι — portal μέσα στο bot, όχι. Ο bot μένει
 καθαρή διεπαφή, δεν γεμίζει με εμπόριο.
 
@@ -579,24 +650,38 @@ bot υπάρχει και ως *παράθυρο μέσα στο δωμάτιο*
 
 ## 17. Curation Roster (κλειδωμένο — input του Scan Layer)
 
-*Ο χάρτης του Nick. Θυμήσου §14.14: αυτά είναι **buckets εισαγωγής**· κάθε creator
-μπορεί να έχει register + topic + role, όχι ένα μόνο κουτί. Οι γυναίκες μπαίνουν με
-register **provisional** μέχρι ο Nick τις ακούσει (§14.11).*
+*Ο χάρτης του Nick. **Λίστα ΚΛΕΙΣΤΗ στους 27** (v3.1) — νέος μπαίνει μόνο αν είναι
+εξίσου σημαντικός, με κριτήριο δικό του· ποτέ με πρόταση δική μας. Θυμήσου §14.14:
+αυτά είναι **buckets εισαγωγής**· κάθε creator μπορεί να έχει register + topic +
+role, όχι ένα μόνο κουτί. Οι γυναίκες μπαίνουν με register **provisional** μέχρι ο
+Nick τις ακούσει (§14.11) — **εκτός από την Ede, που κλείδωσε**.*
+
+**Το mapping sheet υπάρχει:** πλήρης χαρτογράφηση **16 θέματα × 27 creators +
+channel handles**, γραμμένη από τον Nick. Αυτό γίνεται το `curation.json` — δεν
+είναι πια «να δοθεί», είναι «να μεταφερθεί σε αρχείο».
 
 **Register lean — Start with:** Ken Berry, Shawn Baker, Kelly Hogan, Judy Cho,
-Laura Spath, Lisa Wiedeman, Carnivore Teacher Alpha, Shapefixer.
+Laura Spath, Lisa Wiedeman, Carnivore Teacher Alpha, Shapefixer, **Sten Ekberg**
+(wellness/keto explainer — **DC, ΠΟΤΕ MD**, βλ. τον κανόνα παρακάτω).
 *(Shapefixer & Carnivore Teacher Alpha = ρητά «start-with level» — ο «συμπαθητικός
 θείος που εξηγεί».)*
 
 **Register lean — Go deep:** Bart Kay, Ben Bikman, Paul Mason, Robert Lustig,
-Georgia Ede, Robert Kiltz, Anthony Chaffee, Amber O'Hearn.
+Georgia Ede, Robert Kiltz, Anthony Chaffee, Amber O'Hearn, **Jason Fung**
+(fasting/metabolic authority), **Nick Norwitz** (Oxford PhD / Harvard MD,
+LMHR & lipid research).
 
 **Topic — Recipes:** Coach Carnivore Cam (Cameron, 100% carnivore — προτεραιότητα),
 Maria Emmerich (low-carb — δεύτερη).
 
 **Topic — Fertility:** Robert Kiltz, Elizabeth Bright.
 
-**Topic — Metabolic Health:** Robert Lustig, Philip Ovadia, Gary Fettke.
+**Topic — Metabolic Health:** Robert Lustig, Philip Ovadia, Gary Fettke,
+**Jason Fung**, **Nick Norwitz**.
+
+**Topic — Mental health & nutrition:** **Georgia Ede** (μοναδική — καλύπτει κενό
+που κανείς άλλος δεν έχει). Το πρώτο θέμα που γεννήθηκε από ένα πρόσωπο, όχι το
+αντίστροφο.
 
 **Role — Coaches:** Richard Smith (νεότερος, δυναμικός), Coach Stephen (χτισμένο
 κοινό), Shapefixer.
@@ -605,19 +690,17 @@ Maria Emmerich (low-carb — δεύτερη).
 buckets, δικός του άξονας (συνεντεύξεις καλεσμένων, λίστες «τι βελτίωσαν»). Δεν
 μπαίνει σε start/deep.
 
-**◻ Προστέθηκαν 17/08/2026 — ΧΩΡΙΣ bucket ακόμα:** **Dr. Sten Ekberg**, **Jason
-Fung**, **Nick Norwitz**. Μπήκαν ως κάρτες στο portal· εδώ **δεν** τους έβαλα σε
-register/topic/role, γιατί αυτό είναι editorial απόφαση του Nick (§14.3: εκείνος
-εγκρίνει τον creator-ανά-θέμα, ο αλγόριθμος διαλέγει βίντεο). Μέχρι να τους
-βαθμολογήσει, **δεν μπαίνουν στο `curation.json`** — άρα ο Scan Layer δεν θα τους
-δει και ο bot δεν θα τους σερβίρει.
+**Trusted host (guest εμφανίσεις):** `@DoctorsToTrust` — **global**, βλ. §14.12b.
 
-*Τι δείχνει το περιεχόμενο των καρτών τους, ως **πρόταση προς έγκριση**, όχι ως
-απόφαση:* Norwitz → cholesterol / metabolic, go-deep lean (Oxford PhD, LMHR
-research)· Fung → fasting / metabolic, go-deep lean (**όχι carnivore** — νηστεία
-και χαμηλοί υδατάνθρακες, «background/mechanisms, not a protocol»)· Ekberg →
-start-with lean, ευρύ keto-και-ευεξία (**και προσοχή: χειροπράκτης, ΠΟΤΕ MD** —
-ο κανόνας είναι γραμμένος και ως σχόλιο στην κάρτα του).
+**⚠ Sten Ekberg — hard rule:** είναι **χειροπράκτης (DC), όχι γιατρός**. Το «Dr.
+Ekberg» είναι δικό του branding. Καμία επιφάνειά μας — κάρτα, link label, copy —
+δεν τον περιγράφει ως MD ή ιατρό. Ο κανόνας ζει ήδη ως σχόλιο πάνω από τη γραμμή
+ρόλου του στο portal repo· εδώ ισχύει για τα link labels (§8) όταν μπει στο index.
+
+**Scope note (συνειδητά):** με Ekberg / Fung / Norwitz ο roster γέρνει προς
+**metabolic health / low-carb**, όχι strict carnivore. Απόφαση του Nick, και
+προσθέτει κύρος. Το framing rule (§8) το καλύπτει: τους *παρουσιάζει*, δεν τους
+*υπογράφει*.
 
 **Excluded (hard):** Paul Saladino (permanent, σε όλο το project)· Kelli Ritter
 (απορρίφθηκε).
@@ -626,13 +709,11 @@ start-with lean, ευρύ keto-και-ευεξία (**και προσοχή: χ�
 + fertility), Shapefixer (start-with + coach), Bright (fertility +
 γυναίκα-provisional).*
 
-**Ο roster είναι σχεδόν το directory του portal — αλλά όχι πια ένα προς ένα.**
-Μέχρι τις 17/08/2026 τα 24 ονόματα εδώ ήταν ακριβώς οι 24 κάρτες του
-`askcarnivores.com`. Πλέον το portal έχει **27 κάρτες** και ο roster **24
-bucketed + 3 χωρίς bucket** (βλ. παραπάνω): το directory είναι **τρία μπροστά**.
-Δεν είναι λάθος να διορθωθεί με sweep — είναι σειρά: ο Nick τους βαθμολογεί όταν
-τους ακούσει. Η λίστα creators πάντως δεν είναι πια «να δοθεί»: ο Scan Layer έχει
-το input του, και το portal έχει το τελικό του directory. Οι buckets όμως μένουν **δικοί μας** — το portal κρατάει τις
+**Ο roster ΕΙΝΑΙ το directory του portal, ξανά ένα προς ένα.** Έσπασε για λίγες
+ώρες στις 17/08 (27 κάρτες vs 24 bucketed ονόματα) και **αποκαταστάθηκε στο v3.1**:
+27 εδώ, 27 εκεί, κάθε όνομα κάρτα και κάθε κάρτα όνομα. Η λίστα creators δεν είναι
+πια «να δοθεί»: ο Scan Layer έχει το input του, και το portal έχει το τελικό του
+directory. Οι buckets όμως μένουν **δικοί μας** — το portal κρατάει τις
 κάρτες σε ένα επίπεδο αλφαβητικό grid, χωρίς register/topic/role.
 
 ---
@@ -1017,14 +1098,18 @@ Branch `scan-layer` → **architecture confirm ΠΡΩΤΑ** (οι τέσσερι
 structured data (creators + `channel_id` + `register_lean` + topics + roles +
 pins/blocklist), **συν δύο προσθήκες που αποφασίστηκαν 17/08/2026**:
 
-- **`trusted_sources`** — πεδίο που δεν υπάρχει στο spec v1 παραπάνω. Το σχήμα και
-  το τι ακριβώς σημαίνει (κανάλια εκτός roster; guest εμφανίσεις; conference
-  channels όπως το Low Carb Down Under;) **δεν έχουν οριστεί** — να οριστούν πριν
-  γραφτεί ο scanner, όχι μέσα σε αυτόν.
-- **Νέο θέμα «mental health & nutrition»** — με τη **Georgia Ede** ως τον προφανή
-  creator. Είναι το τρίτο θέμα μετά τα `getting-started` / `cholesterol` που είναι
-  ήδη live, και προσοχή: η Ede είναι στις γυναίκες με **provisional register lean**
-  (§14.11), οπότε το θέμα μπαίνει, ο βαθμός βάθους περιμένει.
+- ✅ **`trusted_sources` — ΟΡΙΣΤΗΚΕ στο v3.1 (§14.12b).** Σημαίνει: **κανάλι του
+  creator + trusted hosts**, με το **`@DoctorsToTrust` global**. Το scan τραβά
+  μόνο από αυτές τις πηγές, οπότε guest εμφανίσεις μπαίνουν και re-uploads /
+  clip channels μένουν έξω **χωρίς gate και χωρίς κρίση**. Ο caveat του §14.12b
+  ισχύει: εμπιστευόμαστε την *προέλευση*, όχι «κάθε βίντεο του host για κάθε
+  θέμα» — το ματσάρισμα μένει creator × θέμα.
+- ✅ **Θέμα «mental health & nutrition» — ΚΛΕΙΔΩΣΕ.** Η **Georgia Ede** το κρατάει
+  μόνη της και το **register lean της έπαψε να είναι provisional** (go-deep).
+  Είναι το τρίτο θέμα μετά τα `getting-started` / `cholesterol` που είναι ήδη live.
+- ✅ **Το mapping sheet υπάρχει** — 16 θέματα × 27 creators + channel handles,
+  γραμμένο από τον Nick. Το `curation.json` δεν περιμένει πια *απόφαση*, περιμένει
+  *μεταφορά σε αρχείο*.
 
 *Τα channel_ids τα βρίσκει ο agent αν δοθούν links στα κανάλια.* Το **YouTube API
 key έχει ήδη δοθεί** ως Cloudflare secret.
@@ -1165,13 +1250,13 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       **αχρησιμοποίητο** μέχρι να γραφτεί ο scanner. Κανένας κώδικας δεν το
       διαβάζει σήμερα.
 - [ ] **`src/curation.json`** — ο roster του §17 ως structured data: creators +
-      `channel_id` + `register_lean` + topics + roles + pins/blocklist. Το γράφει
-      ο Nick· τα `channel_id` τα βρίσκει ο agent αν δοθούν links στα κανάλια.
-      **Ανθρώπινο αρχείο, git-versioned** — δεν το πειράζει ποτέ το cron.
-      **Δύο προσθήκες της 17/08/2026:** πεδίο **`trusted_sources`** (σχήμα και
-      σημασία αόριστα ακόμα — ορίζονται πριν τον scanner) και **νέο θέμα «mental
-      health & nutrition»** με τη Georgia Ede, της οποίας το register lean μένει
-      provisional (§14.11).
+      `channel_id` + `register_lean` + topics + roles + `trusted_sources` +
+      pins/blocklist. **Ανθρώπινο αρχείο, git-versioned** — δεν το πειράζει ποτέ
+      το cron. **Το περιεχόμενο δεν λείπει πια:** το v3.1 λέει ότι υπάρχει
+      mapping sheet **16 θέματα × 27 creators + channel handles**, γραμμένο από
+      τον Nick. Μένει η *μεταφορά* του σε αρχείο και η εύρεση των `channel_id`
+      από τα handles. Το `trusted_sources` **ορίστηκε** (§14.12b): κανάλι creator
+      + trusted hosts, με `@DoctorsToTrust` global.
 - [ ] **ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής** (recency formula, split rule,
       cron συχνότητα, KV layout) — προτάσεις έτοιμες στο τέλος του spec· το spec
       ζητά ρητά έγκριση **πριν** γραφτεί κώδικας.
@@ -1208,7 +1293,9 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       πλέγματος. Μην προσπαθήσεις να μαντέψεις το register από τη διατύπωση — το
       μοντέλο το πιάνει αναξιόπιστα, γι' αυτό ρωτάμε. **Το μόνο v3 κομμάτι του UI
       που λείπει.** Σειρά: **μετά** τον Scan Layer — τα δύο κουμπιά διαβάζουν από
-      τα δύο κουτιά του πλέγματος, οπότε πρώτα υπάρχει το πλέγμα.
+      τα δύο κουτιά του πλέγματος, οπότε πρώτα υπάρχει το πλέγμα. **Μεγάλα
+      κουμπιά και μεγάλα tap targets** (§16, UX για 50+): το κοινό είναι 50+, οι
+      περισσότεροι με ιατρικά.
 - [x] ~~Intent classifier (personal-medical / quick-practical / testimonial /
       conceptual)~~ ✅ **live**. Το personal-medical **δεν** μένει στο
       μοντέλο: ο worker κόβει τα links (§ Δομή, κανόνας 2). *Delta v3:* το
@@ -1251,9 +1338,10 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       dismissable, ξεχωριστό από το disclaimer· λεπτομέρειες και οι δύο
       υλοποιήσεις στην ενότητα «In-development banner» παραπάνω.
 - [x] ~~**Mistral credit**~~ ✅ 17/08/2026 — footer + `/embed`, **μόνο στον bot**.
-- [ ] **Register tags γυναικών** — παραμένουν **provisional** (§14.11) μέχρι ο
-      Nick ακούσει τα κανάλια τους. Δεν μπλοκάρει τίποτα: προτεραιότητα creator
-      στη λίστα, όχι προϋπόθεση.
+- [ ] **Register tags γυναικών** — **Ede: κλείδωσε** (go-deep + mental health,
+      v3.1). Bright / O'Hearn / Wiedeman παραμένουν **provisional** (§14.11)
+      μέχρι ο Nick ακούσει τα κανάλια τους. Δεν μπλοκάρει τίποτα: προτεραιότητα
+      creator στη λίστα, όχι προϋπόθεση.
 - [x] ~~Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`~~ ✅ 14/08/2026
 
 ### Portal (`askcarnivores.com`) — v1, στατικό
@@ -1478,6 +1566,29 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
   - **Ekberg = χειροπράκτης, ποτέ MD.** Ο κανόνας ζει και ως σχόλιο πάνω από τη
     γραμμή ρόλου του, στο portal repo — αν κάποτε μπει στο index του bot, ισχύει
     και στα δικά μας link labels (§8).
+
+- **2026-08-17** — **Concept Base v3.1** αντικατέστησε το v3 μέσα σε αυτό το
+  αρχείο. Τι άλλαξε ουσιαστικά:
+  - **Ο roster έκλεισε στους 27** και οι τρεις νέοι πήραν buckets: Ekberg
+    start-with, Fung go-deep + metabolic, Norwitz go-deep + metabolic. Η
+    αντιστοιχία roster ↔ directory **αποκαταστάθηκε** — είχε σπάσει το πρωί.
+  - **Νέο §14.12b — trusted hosts vs re-uploads.** Το φιλτράρισμα των re-uploads
+    έπαψε να είναι θέμα προσοχής και έγινε **δομή**: κάθε creator σκανάρεται μόνο
+    από το κανάλι του + trusted hosts, με **global το `@DoctorsToTrust`**. Guest
+    εμφανίσεις μέσα, clip channels έξω, χωρίς gate. Γεννήθηκε από το πραγματικό
+    λάθος της 16/08 (Martin Silva / CarnivoreTribe).
+  - **Το `trusted_sources` έπαψε να είναι αόριστο** — ήταν σημειωμένο ως ανοιχτό
+    το πρωί, τώρα έχει ορισμό.
+  - **Νέο θέμα «mental health & nutrition»** με τη Georgia Ede, της οποίας το
+    register **βγήκε από το provisional**. Το πρώτο θέμα που γεννήθηκε από
+    πρόσωπο, όχι το αντίστροφο.
+  - **Το curation seed υπάρχει:** 16 θέματα × 27 creators + channel handles. Το
+    `curation.json` δεν περιμένει απόφαση, περιμένει μεταφορά.
+  - **§16: γιατί iframe και όχι redirect** — το κοινό είναι 50+, οι περισσότεροι
+    με ιατρικά· το redirect είναι *περισσότερη* τριβή, όχι λιγότερη. Μαζί,
+    κανόνες UX (λεκτικός launcher, μεγάλα targets, full panel σε mobile).
+  - **Sten Ekberg = χειροπράκτης, ποτέ MD** — γραμμένο πλέον ως hard rule στο §17,
+    όχι μόνο ως σχόλιο σε μια κάρτα του portal.
 
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
 > έγιναν μέσα σε **μία νύχτα** (13→14/08/2026). Ο bot που απαντάει ήρθε δύο μέρες
