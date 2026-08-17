@@ -13,14 +13,59 @@
    --------------------------------------------------------------------------- */
 
 import indexFile from '../../src/index.json';
+import curation from '../../src/curation.json';
 import { buildSystemPrompt } from '../../src/prompt.js';
 import { loadIndex, resolveModelOutput } from '../../src/router.js';
+import { META_KEY, gridKey } from '../../src/scan/scan.js';
 
 /* Built once per isolate. buildSystemPrompt() depends only on the index file,
    so this string is identical on every request — which is the whole point: the
    provider's prefix cache keeps hitting and we pay for the index once. */
-const INDEX = loadIndex(indexFile);
-const SYSTEM_PROMPT = buildSystemPrompt(INDEX);
+const BUNDLED = {
+  source: 'bundled',
+  version: 'bundled',
+  index: loadIndex(indexFile),
+  prompt: buildSystemPrompt(loadIndex(indexFile)),
+};
+
+/* The scan-layer grid, once it exists, is the index (§14.13). Cached per
+   isolate and keyed on the scan timestamp, so the system prompt stays
+   BYTE-IDENTICAL between scans and the provider's prefix cache keeps hitting —
+   it changes exactly when the grid changes, once a week, and not per request.
+
+   No YouTube call happens here or anywhere near here. The grid is already
+   written; this only reads it. */
+let cachedGrid = null;
+
+async function getIndex(env) {
+  if (!env.GRID) return BUNDLED;
+
+  let meta;
+  try {
+    meta = await env.GRID.get(META_KEY, 'json');
+  } catch (error) {
+    console.warn('grid meta unreadable, serving the bundled index:', error);
+    return BUNDLED;
+  }
+  if (!meta?.topics?.length) return BUNDLED; // scan has never run
+  if (cachedGrid?.version === meta.lastScan) return cachedGrid;
+
+  const videos = [];
+  for (const topic of meta.topics) {
+    for (const register of ['start', 'deep']) {
+      const box = await env.GRID.get(gridKey(topic, register), 'json');
+      for (const entry of box ?? []) videos.push({ ...entry, register });
+    }
+  }
+  if (!videos.length) return BUNDLED;
+
+  // Aliases live in curation.json, not in the grid: the grid is what the scan
+  // produced, the aliases are what a person might say. Both are needed to build
+  // the same shape the router already reads.
+  const index = loadIndex({ status: 'CURATED', topics: curation.topics, videos });
+  cachedGrid = { source: 'kv', version: meta.lastScan, index, prompt: buildSystemPrompt(index) };
+  return cachedGrid;
+}
 
 const MODEL = 'mistral-small-latest';
 const MODEL_TIMEOUT_MS = 20_000;
@@ -108,14 +153,14 @@ async function checkRateLimit(env, request) {
  * more" has something concrete to avoid repeating. That list IS the session
  * state (§14.7) — we keep none of our own.
  */
-function toProviderMessages(messages) {
+function toProviderMessages(messages, index) {
   const turns = [];
   for (const message of messages.slice(-MAX_TURNS)) {
     const role = message?.role === 'assistant' ? 'assistant' : 'user';
     const content = String(message?.content ?? '').slice(0, MAX_CHARS_PER_TURN).trim();
     if (!content) continue;
     const shown = Array.isArray(message?.shown)
-      ? message.shown.filter((id) => typeof id === 'string' && INDEX.byId.has(id))
+      ? message.shown.filter((id) => typeof id === 'string' && index.byId.has(id))
       : [];
     turns.push({
       role,
@@ -128,7 +173,7 @@ function toProviderMessages(messages) {
   return turns;
 }
 
-async function askModel(env, turns) {
+async function askModel(env, turns, systemPrompt) {
   const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -140,7 +185,7 @@ async function askModel(env, turns) {
       temperature: 0.2,
       max_tokens: 700,
       response_format: { type: 'json_object' },
-      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...turns],
+      messages: [{ role: 'system', content: systemPrompt }, ...turns],
     }),
     signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
   });
@@ -178,15 +223,19 @@ export async function onRequestPost(context) {
     return json({ error: 'rate_limited' }, 429, { 'retry-after': String(limit.retryAfter) });
   }
 
+  // The grid if the scan has filled it, the bundled index if it has not. Read
+  // after the rate limit so a flood cannot turn into KV reads.
+  const active = await getIndex(env);
+
   let raw;
   try {
-    raw = await askModel(env, toProviderMessages(messages));
+    raw = await askModel(env, toProviderMessages(messages, active.index), active.prompt);
   } catch (error) {
     console.error('model call failed:', error);
     return json({ error: 'upstream_unavailable' }, 502);
   }
 
-  const result = resolveModelOutput({ raw, index: INDEX });
+  const result = resolveModelOutput({ raw, index: active.index });
 
   return json({
     intent: result.intent,
@@ -198,7 +247,8 @@ export async function onRequestPost(context) {
     meta: {
       // The client turns this into the banner that stops placeholder content
       // being mistaken for a real source.
-      index_status: INDEX.status,
+      index_status: active.index.status,
+      index_source: active.source,
       rate_limit: limit.enforced ? 'on' : 'off',
       // Kept for the preview review; drop or keep behind a flag once live.
       notes: result.notes,

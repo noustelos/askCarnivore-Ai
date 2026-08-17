@@ -47,7 +47,7 @@
     { "id": "bloodwork-panic", "label": "Bloodwork panic (high LDL, τι σημαίνει)",
       "aliases": ["bloodwork","blood test","lab results","high ldl meaning","my results","test results","αιματολογικές","εξετάσεις αίματος","αποτελέσματα εξετάσεων"] },
     { "id": "fasting", "label": "Fasting / intermittent fasting",
-      "aliases": ["fasting","intermittent fasting","if","omad","extended fast","time restricted eating","νηστεία","διαλείπουσα νηστεία","αποχή τροφής"] },
+      "aliases": ["fasting","intermittent fasting","omad","extended fast","time restricted eating","νηστεία","διαλείπουσα νηστεία","αποχή τροφής"] },
     { "id": "mental-health", "label": "Mental health & nutrition",
       "aliases": ["mental health","depression","anxiety","brain fog","mood","cognitive","psychiatry","bipolar","ψυχική υγεία","κατάθλιψη","άγχος","διάθεση","εγκεφαλική ομίχλη","νοητική υγεία"] },
     { "id": "fertility", "label": "Fertility / hormones",

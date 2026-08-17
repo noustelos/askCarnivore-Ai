@@ -1030,8 +1030,19 @@ write grid:* σε KV
 
 ### Cron & quota
 
-- **Cloudflare Cron Trigger** → scheduled worker. Αραιή συχνότητα — τα βίντεο δεν
-  αλλάζουν ώρα-ώρα.
+- ⚠ **ΤΟ PAGES ΔΕΝ ΚΑΝΕΙ CRON.** Επαληθεύτηκε στα docs της Cloudflare
+  (18/08/2026): τα Cron Triggers είναι feature **των Workers** — ζευγαρώνουν
+  cron expression με `scheduled()` handler δηλωμένο σε Worker. Τα Pages
+  Functions τρέχουν **μόνο** `onRequest*`, και το Wrangler config των Pages δεν
+  έχει `triggers` block. (Ίδιου σχήματος περιορισμός με το «δεν φτιάχνεις
+  Durable Object μέσα σε Pages project».)
+
+  **Άρα:** το scan είναι **endpoint** (`POST /api/scan`, token-guarded) και το
+  *χρονόμετρο* είναι εξωτερικό. Δύο δρόμοι, χωρίς να αλλάξει ο χαρακτήρας του
+  repo: (α) **GitHub Actions cron** που κάνει ένα `curl` — μηδέν νέα υποδομή,
+  και το πρόγραμμα ζει versioned στο repo· (β) **μικρός ξεχωριστός Worker** με
+  cron trigger που μόνο καλεί το endpoint — θέλει `wrangler.toml` και δεύτερο
+  deploy target, που το repo σκόπιμα δεν έχει. *Πρόταση: (α).*
 - **Quota discipline** (YouTube API = ημερήσιο όριο units): incremental
   `publishedAfter`, cache channel/playlist IDs στο curation, batch requests,
   αποθήκευση `lastScan`.
@@ -1177,14 +1188,28 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 ├── chat.js           # ο client — κοινός και στις δύο σελίδες
 ├── _headers          # CSP, frame-ancestors
 ├── functions/
-│   └── api/ask.js    # Ο worker: μία ροή
+│   └── api/
+│       ├── ask.js    # Ο worker: μία ροή
+│       └── scan.js   # POST /api/scan — γεμίζει το πλέγμα (token-guarded)
 ├── src/
-│   ├── index.json    # το index — θέμα → creator → register → βίντεο
+│   ├── index.json    # το bundled index — fallback όταν το KV είναι άδειο
+│   ├── curation.json # ΑΝΘΡΩΠΙΝΟ: 16 θέματα × 27 creators (input του scan)
 │   ├── prompt.js     # το system prompt (index μέσα, URLs ποτέ)
-│   └── router.js     # validation & gating της απάντησης του μοντέλου
+│   ├── router.js     # validation & gating της απάντησης του μοντέλου
+│   └── scan/
+│       ├── match.js    # normalize + whole-word topic matching + guest rule
+│       ├── rank.js     # recency score, median register split, pins, cap
+│       ├── youtube.js  # ο API client (ποτέ στο request path)
+│       └── scan.js     # η ροή: curation + API → grid
+├── tools/
+│   └── resolve-channels.mjs  # one-off: @handle → channel_id, με το χέρι
 └── test/
-    └── router.test.mjs
+    ├── router.test.mjs
+    └── scan.test.mjs
 ```
+
+*Τρέξιμο tests:* `node --test test/router.test.mjs test/scan.test.mjs` (το
+`node --test test/` δεν δουλεύει σε αυτό το Node — θέλει αρχεία, όχι φάκελο).
 
 **Δύο ιδιότητες που δεν είναι refactorable** (Bot v0 spec §4) — αν κάποιο επόμενο
 πέρασμα τις «τακτοποιήσει», έσπασε τον bot, δεν τον καθάρισε:
