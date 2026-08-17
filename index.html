@@ -167,6 +167,19 @@
   .contact:hover,
   .contact:focus-visible { opacity: 1; }
 
+  /* Provider attribution: the quietest line of the three, and the only one
+     that is not a link — it states a fact, it does not send anyone anywhere.
+     Ordering in the footer is ascending weight: this, then the address, then
+     the signature, which stays last. */
+  .powered {
+    margin: 0 0 .5rem;
+    color: var(--fg-soft);
+    font-size: clamp(.58rem, 2.2vw, .68rem);
+    letter-spacing: .02em;
+    line-height: 1;
+    opacity: .5;
+  }
+
   .contact:focus-visible {
     border-radius: .35rem;
     outline: 2px solid hsl(0 0% 100% / .75);
@@ -358,6 +371,12 @@
   </main>
 
   <footer>
+    <!-- Which model does the routing, and where it is hosted. Plain text, no
+         link and no logo: this is disclosure, not a partnership badge, and a
+         provider mark would need permission we have not asked for. Mirrored by
+         hand into askcarnivores.com's footer — copied, never shared. -->
+    <p class="powered">Routing powered by Mistral · EU-based AI</p>
+
     <!-- Contact. COPIED BY HAND from askcarnivores.com, not shared and not
          imported — the siloing rule duplicates shared elements across the two
          repos and accepts the double maintenance. Change it here too if it
