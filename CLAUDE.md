@@ -11,7 +11,7 @@
 | **Επιστρέφει** | **βίντεο** του index, cross-creator | directory, testimonials, tools, προϊόντα |
 | **Πρόσβαση** | χωρίς λογαριασμό, χωρίς app | ελεύθερη· λογαριασμοί μόνο αν/όταν χρειαστούν |
 | **Εμπόριο** | **κανένα** | affiliate, προϊόντα, tools |
-| **Στάδιο** | Under Construction — **live**· ο κώδικας v0 έτοιμος στο branch `bot-v0`, **όχι merged** | **live** — στατικό, 24 κάρτες directory, χωρίς tools |
+| **Στάδιο** | **LIVE και απαντάει** (16/08/2026) — 12 βίντεο, 2 θέματα, χειροκίνητο index | **live** — στατικό, 24 κάρτες directory, χωρίς tools |
 
 Το ζευγάρι ενικός/πληθυντικός λειτουργεί υπέρ μας: το `askcarnivore` ρωτάει *το πράγμα*
 (τη μηχανή), το `askcarnivores` δείχνει *τους ανθρώπους*. Η διάκριση πρέπει να είναι
@@ -53,8 +53,10 @@ views· creator-λίστα ιεραρχικά· **scan-to-grid** (το μοντ�
 Ό,τι από το v2 δεν αναφέρεται εδώ ως αλλαγή, **μένει ως έχει** — το §16 (embed
 model) ειδικά ήρθε αυτούσιο.
 
-**Τρέχουσα κατάσταση:** `askcarnivore.com` (bot) — κώδικας v0 έτοιμος στο branch
-`bot-v0` (**όχι merged**), pending index content + Mistral key + KV + coffee link.
+**Τρέχουσα κατάσταση (17/08/2026):** `askcarnivore.com` (bot) — **LIVE στο `main`**·
+ο v0 έγινε merge στις 16/08 (`4b15301`) με πραγματικό index. Το `bot-v0` **δεν
+υπάρχει πια**: ήταν πλήρως merged και διαγράφηκε τοπικά και στο origin (17/08).
+*Recovery, αν ποτέ χρειαστεί:* `git branch bot-v0 49efece`.
 `askcarnivores.com` (portal) **live** — στατικό, directory 24 κάρτες. Siloing:
 ξεχωριστά repos / Pages / secrets, hard rules στο Claude Code memory.
 
@@ -100,9 +102,11 @@ model) ειδικά ήρθε αυτούσιο.
 - **Register tags για τις γυναίκες** — εκκρεμεί ώσπου ο Nick ακούσει τα κανάλια
   τους (§14.11). Άντρες: πλήρως tagged.
 - **Scan Layer** — το spec του δόθηκε 16/08/2026 και είναι καταγεγραμμένο
-  ολόκληρο παρακάτω («Scan Layer — build spec v1»). **Δεν έχει ξεκινήσει:**
-  λείπουν YouTube API key, περιεχόμενο `curation.json`, και ΟΚ στις τέσσερις
-  αποφάσεις αρχιτεκτονικής. Αντικαθιστά το χειροκίνητο `src/index.json` του v0.
+  ολόκληρο παρακάτω («Scan Layer — build spec v1»). **Μηδέν κώδικας ακόμα.**
+  Το YouTube API key **υπάρχει** πλέον ως Cloudflare secret, αχρησιμοποίητο·
+  λείπουν το περιεχόμενο του `curation.json` και το ΟΚ στις τέσσερις αποφάσεις
+  αρχιτεκτονικής. Αντικαθιστά το χειροκίνητο `src/index.json` που είναι σήμερα
+  live.
 - **RAG/KB/vector** — μπαίνει όταν το πλέγμα ξεπεράσει το cached prompt (§14.9).
 - Ποιο portal tool πρώτο (πρόταση: Get Started 7 μερών).
 - Self-submission form για events — v-next (§13).
@@ -620,12 +624,37 @@ roster είναι κάρτα, κάθε κάρτα είναι όνομα του r
 
 ## Τρέχουσα κατάσταση
 
-**Live (`main`):** στατική σελίδα "Coming Soon".
-**Branch `bot-v0` (σε review, ΟΧΙ merged):** ο thin slice του bot — ask box πάνω στο
-landing, ένας worker, χειροκίνητο index. Το index είναι ακόμα **PLACEHOLDER**: όσο
-το `status` του `src/index.json` λέει `PLACEHOLDER`, η σελίδα δείχνει κίτρινο banner
-ότι τα links δεν είναι πραγματικές πηγές. Ο Nick αντικαθιστά περιεχόμενο και
-`status` **στο ίδιο commit** — ποτέ χωριστά.
+**Live (`main`) από 16/08/2026:** ο bot απαντάει. Ask box πάνω στο landing, ένας
+worker, χειροκίνητο index — ο thin slice του v0 με πραγματικό περιεχόμενο. Δεν
+υπάρχει πια branch `bot-v0`· ό,τι γράφεται, γράφεται πάνω στο **live `main`**, με
+ό,τι προσοχή συνεπάγεται αυτό.
+
+**Τι είναι live, συγκεκριμένα:**
+
+| | |
+|---|---|
+| Index | **12 βίντεο, 2 θέματα** (`getting-started`, `cholesterol`), χειροκίνητο |
+| `status` | `CURATED` → **κανένα κίτρινο banner** |
+| Rate limit | **on** — KV namespace + binding `RATE_LIMIT` υπάρχουν |
+| Μοντέλο | `mistral-small-latest`· το `MISTRAL_API_KEY` υπάρχει σε production *και* preview |
+| Banner ωριμότητας | ναι, dismissable — βλ. «In-development banner» |
+| Mistral credit | footer + `/embed`, **όχι** στο portal |
+
+Το `status` του `src/index.json` παραμένει ο διακόπτης του κίτρινου banner: αν
+ξαναγυρίσει σε `PLACEHOLDER`, η σελίδα ξαναλέει ότι τα links δεν είναι πραγματικές
+πηγές. Περιεχόμενο και `status` αλλάζουν **στο ίδιο commit** — ποτέ χωριστά.
+
+**Το σχήμα του index είναι πλέον αυτό που θα βγάζει ο Scan Layer**, όχι το v0:
+aliases μία φορά πάνω στο topic, επίπεδη λίστα `videos`, `register: start|deep`.
+Το νεκρό enum του v2 (`depth/breadth/layman/persona`) έφυγε από παντού — δεδομένα,
+prompt και `chat.js`. Ο loader διαβάζει `videos` + top-level `topics`, και θέμα
+χωρίς δικό του βίντεο δεν φτάνει ποτέ στο prompt.
+
+**Κανόνας curation που πληρώθηκε με λάθος:** δεν αρκεί να ζει το URL — ο
+**uploader πρέπει να είναι το κανάλι του ίδιου του creator**. Στην πρώτη εκδοχή
+του index δύο entries έδειχναν σε re-uploads (Martin Silva, CarnivoreTribe): το
+traffic πήγαινε σε τρίτο κανάλι αντί στον creator, κόντρα στο §6, και τα clip
+channels σαπίζουν πρώτα. Ελέγχεται με ένα `oembed` κάλεσμα ανά βίντεο.
 
 Χωρίς build step και χωρίς dependencies, όπως πριν. Το `chat.css` / `chat.js` είναι
 πλέον ξεχωριστά αρχεία αντί για inline: είναι **κοινά** για `/` και `/embed`, και ο
@@ -711,6 +740,57 @@ markers λύνουν το θέμα και στις δύο περιπτώσεις
 «A NOUSTELOS_STUDIO PROJECT». Το footer είναι επίσης η θέση όπου θα μπει αργότερα το
 buy-me-a-coffee (§3) — **ποτέ μέσα στη ροή ερώτησης/απάντησης.**
 
+### In-development banner (17/08/2026 — και στα δύο sites)
+
+Λεπτή λωρίδα στην κορυφή, non-blocking, dismissable με ×. **Λέει ωριμότητα, όχι
+ιατρική ευθύνη.**
+
+| | |
+|---|---|
+| Bot EN | «In development — live and growing. We're adding topics and sources often. If your question isn't covered yet, it soon will be.» |
+| Bot EL | ίδιο μήνυμα στα ελληνικά, βλ. `index.html` |
+| Portal EN / EL | «…The directory is here; tools and events are on the way.» / «…Ο κατάλογος είναι εδώ· εργαλεία και events έρχονται.» |
+
+**ΜΗΝ το ενώσεις ποτέ με το medical disclaimer.** Το banner κλείνει με ×· το
+disclaimer δεν κλείνει ποτέ. Ενωμένα, ένα κλικ θα έσβηνε και τα δύο. Το
+disclaimer μένει ακριβώς εκεί που είναι — μόνιμα ορατό κάτω από το ask box (και
+στο footer του portal).
+
+**Δύο διαφορετικές υλοποιήσεις, επίτηδες** — ίδιο στοιχείο, διαφορετικοί
+περιορισμοί ανά repo:
+
+- **Bot:** inline script (το CSP εδώ επιτρέπει `'unsafe-inline'`). Τα αγγλικά
+  είναι στο markup ώστε η σελίδα να διαβάζεται και χωρίς JavaScript· τα ελληνικά
+  μπαίνουν όταν ο browser ζητάει ελληνικά — ο bot **δεν έχει language toggle**,
+  οπότε το `navigator.language` είναι η πιο τίμια ανάγνωση του «ανά γλώσσα». Το ×
+  το φτιάχνει το script, ώστε χωρίς JS να μη φαίνεται κουμπί που δεν κάνει τίποτα.
+  Το κλείσιμο θυμάται σε `localStorage` (τυλιγμένο σε `try`: κλειδωμένος browser
+  πετάει exception αντί για `null`).
+- **Portal:** **καθαρό CSS**, checkbox + label, μηδέν JavaScript — το portal
+  σερβίρει `default-src 'none'`, που μπλοκάρει κάθε script, και αυτό αξίζει
+  περισσότερο από το να επιβιώνει το × σε reload. Εκεί **κλείνει για την
+  επίσκεψη**, όχι μόνιμα.
+
+⚠ **Το grid του landing.** Το `body` έχει τώρα **τρεις σειρές** και **κάθε παιδί
+δηλώνει τη δική του** (`grid-row: 1|2|3`). Δεν είναι διακοσμητικό: όταν κλείσει η
+λωρίδα φεύγει από το grid, και με auto-placement το `main` θα γλιστρούσε στην
+πάνω σειρά και θα έπαυε να είναι κεντραρισμένο.
+
+### Mistral credit (footer + `/embed`)
+
+`Routing powered by Mistral · EU-based AI` — σκέτο κείμενο, **χωρίς link και
+χωρίς logo**: είναι disclosure, όχι partnership badge, και το σήμα του παρόχου
+θέλει άδεια που δεν ζητήθηκε.
+
+**Πού ζει:** στο footer του landing (πάνω από το contact — η σειρά του footer
+είναι αύξουσα βαρύτητα: πάροχος, διεύθυνση, υπογραφή) **και στο `/embed`**, που
+φραμαρισμένο μέσα στο portal είναι η μόνη επιφάνεια που βλέπει ο άνθρωπος.
+
+**ΟΧΙ στο `askcarnivores.com`.** Μπήκε εκεί στις 16/08 και **αφαιρέθηκε στις
+17/08**: το portal είναι στατικό και δεν καλεί κανένα μοντέλο, οπότε η πρόταση θα
+ήταν ισχυρισμός για λογισμικό που δεν τρέχει. Είναι από τα λίγα κοινά στοιχεία
+που **δεν** αντιγράφονται — η ακρίβεια νικάει τη συμμετρία.
+
 ### Visual identity (landing)
 
 Full-bleed background που κυλάει αργά ανάμεσα σε τρία χρώματα, με ένα λευκό σχήμα
@@ -778,14 +858,20 @@ document. Αν προστεθεί άλλο SMIL, θέλει και αυτό κά
 Πηγή: «ASKCARNIVORE.COM — Scan Layer Spec v1», δοσμένο 16/08/2026. Repo:
 **bot μόνο**.*
 
-**Καμία γραμμή δεν έχει γραφτεί, και δεν γράφεται ακόμα.** Λείπουν: (α) YouTube
-Data API key, (β) το περιεχόμενο του `curation.json`, (γ) ΟΚ στις τέσσερις
-αποφάσεις αρχιτεκτονικής στο τέλος της ενότητας. Ό,τι ακολουθεί είναι **brief +
-οδηγίες**, όχι υλοποίηση.
+**Καμία γραμμή δεν έχει γραφτεί, και δεν γράφεται ακόμα.** Κατάσταση 17/08/2026:
 
-**Προϋπόθεση:** ο bot v0 (branch `bot-v0`) υπάρχει — worker / prompt / gates /
+- ✅ **YouTube Data API key** — υπάρχει ως Cloudflare secret. **Αχρησιμοποίητο**:
+  κανένας κώδικας δεν το διαβάζει ακόμα.
+- ◻ **Περιεχόμενο `curation.json`** — το γράφει ο Nick.
+- ◻ **ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής** στο τέλος της ενότητας.
+
+Ό,τι ακολουθεί είναι **brief + οδηγίες**, όχι υλοποίηση.
+
+**Προϋπόθεση:** ο bot v0 είναι **live στο `main`** — worker / prompt / gates /
 embed. Αυτό το layer **δεν τα ξαναγράφει**· αλλάζει μόνο *από πού διαβάζει το
-index ο worker* (χειροκίνητο JSON → παραγόμενο πλέγμα).
+index ο worker* (χειροκίνητο JSON → παραγόμενο πλέγμα). Επειδή πλέον δεν υπάρχει
+staging branch, το scan-layer δουλεύεται σε δικό του branch και μπαίνει στο `main`
+μόνο μετά από preview — **το `main` σερβίρει κοινό**.
 
 ### Δύο data αρχεία — ξεχωριστές ευθύνες
 
@@ -864,20 +950,21 @@ write grid:* σε KV
 - **Register buttons:** το frontend ζητά «Start here / Go deeper» *μετά* το
   topic-match· ο worker σερβίρει από `grid:{topic}:{register}`.
 
-### ⚠ Ασυμφωνίες με το v0 schema — να λυθούν **πριν** γραφτεί κώδικας
+### ⚠ Ασυμφωνίες με το v0 schema — δύο λύθηκαν, δύο μένουν
 
-Το spec δεν τις αναφέρει, αλλά το `src/index.json` του `bot-v0` τις έχει ήδη:
+*Ενημέρωση 16/08/2026: το πρώτο πραγματικό index έλυσε τις μισές στην πράξη.*
 
-- **`register` enum.** Το v0 γράφει `depth | breadth | layman | persona | pending`
-  (μοντέλο v2, ετικέτα πάνω στον creator). Το πλέγμα του v3 έχει **δύο** κουτιά:
-  `start | deep`. Το v0 enum είναι νεκρό — μεταφράζεται, δεν συνυπάρχει.
-- **`label` (§8).** Στο v0 είναι δικό μας κείμενο ανά entry· ένα αυτόματο scan δεν
+- ✅ **`register` enum — ΛΥΘΗΚΕ.** Το v0 έγραφε `depth | breadth | layman |
+  persona | pending` (μοντέλο v2, ετικέτα πάνω στον creator). Το live index
+  γράφει πλέον **`start | deep`**, και το νεκρό enum έφυγε από δεδομένα, prompt
+  και `chat.js`. Δεν μεταφράζεται πια τίποτα — δεν υπάρχει.
+- ✅ **`flagship` — ΛΥΘΗΚΕ.** Έφυγε από το schema· τη θέση του παίρνουν τα `pins`
+  του curation. Μία θέση για editorial override, όχι δύο.
+- ◻ **`label` (§8).** Στο v0 είναι δικό μας κείμενο ανά entry· ένα αυτόματο scan δεν
   παράγει labels. Default `null` (το μοντέλο το γράφει υπό τους link-label
   κανόνες)· αν θέλουμε curated label σε ευαίσθητο θέμα, η θέση του είναι το
   `curation.json`, όχι το παραγόμενο πλέγμα.
-- **`flagship`.** Αντικαθίσταται από τα `pins` του curation — μία θέση για
-  editorial override, όχι δύο.
-- **`type`** (`conceptual | testimonial | practical`). Το v3 έκοψε το
+- ◻ **`type`** (`conceptual | testimonial | practical`). Το v3 έκοψε το
   quick-practical ως ξεχωριστή κατηγορία (§14.6)· το `testimonial` ζει ακόμα
   (άξονας Dave Mac, §17). Να αποφασιστεί αν το πεδίο συρρικνώνεται ή φεύγει.
 
@@ -905,13 +992,25 @@ viral)· incremental scan (δεν ξανασκανάρει όλο το catalog)�
 ### Workflow & τι δίνει ο Nick
 
 Branch `scan-layer` → **architecture confirm ΠΡΩΤΑ** (οι τέσσερις αποφάσεις
-παρακάτω) → preview → review → merge. Ίδια πειθαρχία με το `bot-v0`: τίποτα δεν
-πάει στο `main` πριν το εγκρίνει ο Nick.
+παρακάτω) → preview → review → merge. Ίδια πειθαρχία με το v0: τίποτα δεν πάει
+στο `main` πριν το εγκρίνει ο Nick — και **τώρα μετράει περισσότερο**, γιατί το
+`main` δεν είναι πια σελίδα αναμονής αλλά ζωντανός bot με κοινό.
 
-**Ο Nick δίνει:** (1) το περιεχόμενο του `curation.json` — ο roster του §17 ως
+**Ο Nick δίνει:** το περιεχόμενο του `curation.json` — ο roster του §17 ως
 structured data (creators + `channel_id` + `register_lean` + topics + roles +
-pins/blocklist)· *τα channel_ids τα βρίσκει ο agent αν δοθούν links στα κανάλια*·
-(2) **YouTube Data API key** ως Cloudflare secret.
+pins/blocklist), **συν δύο προσθήκες που αποφασίστηκαν 17/08/2026**:
+
+- **`trusted_sources`** — πεδίο που δεν υπάρχει στο spec v1 παραπάνω. Το σχήμα και
+  το τι ακριβώς σημαίνει (κανάλια εκτός roster; guest εμφανίσεις; conference
+  channels όπως το Low Carb Down Under;) **δεν έχουν οριστεί** — να οριστούν πριν
+  γραφτεί ο scanner, όχι μέσα σε αυτόν.
+- **Νέο θέμα «mental health & nutrition»** — με τη **Georgia Ede** ως τον προφανή
+  creator. Είναι το τρίτο θέμα μετά τα `getting-started` / `cholesterol` που είναι
+  ήδη live, και προσοχή: η Ede είναι στις γυναίκες με **provisional register lean**
+  (§14.11), οπότε το θέμα μπαίνει, ο βαθμός βάθους περιμένει.
+
+*Τα channel_ids τα βρίσκει ο agent αν δοθούν links στα κανάλια.* Το **YouTube API
+key έχει ήδη δοθεί** ως Cloudflare secret.
 
 ### ◻ Τέσσερις αποφάσεις αρχιτεκτονικής — προτάσεις, περιμένουν ΟΚ
 
@@ -934,8 +1033,16 @@ pins/blocklist)· *τα channel_ids τα βρίσκει ο agent αν δοθού
 
 ## Deployment
 
-**Live από 14/08/2026.** Cloudflare Pages, project `askcarnivore`, συνδεδεμένο στο
-GitHub repo. Κάθε push στο `main` κάνει auto-deploy.
+**Live από 14/08/2026** (ο bot απαντάει από 16/08). Cloudflare Pages, project
+`askcarnivore`, συνδεδεμένο στο GitHub repo. Κάθε push στο `main` κάνει
+auto-deploy — μετρημένα **~20-40 δευτερόλεπτα** μέχρι να φανεί.
+
+⚠ **Δεν υπάρχει πια staging branch.** Το `bot-v0` διαγράφηκε ως πλήρως merged, άρα
+το `main` είναι ταυτόχρονα η δουλειά και το προϊόν. Ό,τι θέλει review πριν βγει,
+θέλει **δικό του branch** και preview URL — όχι commit στο `main` «και βλέπουμε».
+*Το παλιό preview `bot-v0.askcarnivore.pages.dev` σερβίρει ακόμα (`200`, με
+`x-robots-tag: noindex`) το build της 16/08: το Cloudflare δεν σβήνει deployments
+όταν φύγει το branch. Σβήνεται από το dashboard αν ενοχλήσει.*
 
 | | |
 |---|---|
@@ -943,7 +1050,8 @@ GitHub repo. Κάθε push στο `main` κάνει auto-deploy.
 | Framework preset | None |
 | Build command | *(κενό)* |
 | Build output directory | `/` |
-| Env vars | καμία |
+| Secrets | `MISTRAL_API_KEY` (production **και** preview) · **YouTube Data API key — δοθέν, αχρησιμοποίητο** |
+| KV | namespace + binding `RATE_LIMIT` — ενεργό |
 | Pages URL | `askcarnivore.pages.dev` |
 | Custom domains | `askcarnivore.com`, `www.askcarnivore.com` — και τα δύο Active με SSL |
 
@@ -1009,93 +1117,102 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 
 ### Bot (`askcarnivore.com`) — v1
 
-> **Πού σταματήσαμε (15/08/2026):** το `bot-v0` είναι parked σε preview, εγκεκριμένο,
-> **δεν γίνεται merge** μέχρι ο Nick να δώσει τα τέσσερα blockers παρακάτω. Δύο
-> σημειώσεις για την επιστροφή:
+> **Πού είμαστε (17/08/2026): ο bot είναι LIVE.** Τα τέσσερα blockers του v0
+> έκλεισαν, το `bot-v0` έγινε merge (`4b15301`) και διαγράφηκε. Δουλεύουμε πλέον
+> πάνω σε **παραγωγή**, όχι σε parked branch — κάθε push στο `main` βγαίνει στον
+> κόσμο σε ~20 δευτερόλεπτα.
 >
-> 1. **Το `MISTRAL_API_KEY` μπαίνει και στο preview environment**, όχι μόνο στο
->    production. Το Cloudflare Pages κρατάει χωριστά secrets ανά environment — αν
->    μπει μόνο στο production, το preview μένει στο `503 not_configured` και μοιάζει
->    με σπασμένος bot ενώ απλώς λείπει το key.
-> 2. **Το πρώτο πραγματικό end-to-end γίνεται στο preview URL μόλις μπει το key.**
->    Μέχρι στιγμής η ροή έχει τρέξει μόνο σε Node με stubbed Mistral (ο workerd δεν
->    τρέχει σε macOS 12.6 — θέλει 13.5+). Άρα *ο κώδικας* είναι επαληθευμένος, το
->    *live behaviour του μοντέλου* όχι: τα πρώτα πράγματα που ελέγχονται εκεί είναι
->    αν ο classifier πιάνει το personal-medical και αν το matching δουλεύει
->    ελληνικά/αγγλικά.
+> **Τι επαληθεύτηκε live, όχι σε Node:** ελληνική ερώτηση → σωστό θέμα και
+> ελληνική απάντηση, με cross-language σημείωση όταν το βίντεο είναι αγγλικό·
+> personal-medical → **μηδέν links** και redirect σε γιατρό· αίτημα με
+> `origin: askcarnivores.com` → **403**, δηλαδή το portal φτάνει ως iframe και
+> ποτέ ως client (§16). Το `MISTRAL_API_KEY` και το KV binding υπάρχουν **και στα
+> δύο environments** — αυτό ήταν η προειδοποίηση του 15/08 και δεν είναι πια θέμα.
 >
-> **Ενημέρωση 16/08/2026:** το πρώτο blocker άλλαξε σχήμα. Το πραγματικό index **δεν
-> γράφεται πια στο χέρι** — γίνεται *output* του Scan Layer, οπότε αυτό που δίνει ο
-> Nick είναι `curation.json` + YouTube API key. Ο μηχανισμός του v0 (worker, prompt,
-> gates, embed) μένει ως έχει· το `scan-layer` branch ξεκινά **από εδώ**, όχι από το
-> `main`.
+> **Τι ΔΕΝ έχει επαληθευτεί με browser:** το × του banner και η ελληνική εναλλαγή
+> στο landing. Το markup σερβίρεται σωστά και το script είναι συντακτικά έγκυρο —
+> η συμπεριφορά στο κλικ θέλει ανθρώπινο μάτι.
+>
+> **Ο επόμενος κύκλος είναι ο Scan Layer**, και μπλοκάρεται από περιεχόμενο +
+> τέσσερις αποφάσεις, όχι από κώδικα.
 
 - [ ] **Scan Layer — το επόμενο πράγμα που χτίζεται.** Το build spec δόθηκε
       16/08/2026 και είναι καταγεγραμμένο στην ενότητα «Scan Layer — build spec
       v1» παραπάνω· **καμία γραμμή κώδικα ακόμα**. Cron scan → **προ-υπολογισμένο
       πλέγμα** `θέμα × register → [ταξινομημένα βίντεο]` (§14.13). Input: ο roster
-      του §17. Το χειροκίνητο `src/index.json` του `bot-v0` **δεν πετιέται** —
-      γίνεται το *output* αυτού, με το schema να κερδίζει `duration`, `views`,
-      `published_at`. Ranking μηχανικό (§14.12). Μπλοκάρεται από τα τρία παρακάτω.
-- [ ] **YouTube Data API key** ως Cloudflare secret — ο Nick το παίρνει
-      (αναμένεται 16/08/2026, απόγευμα).
+      του §17. Το χειροκίνητο `src/index.json` που είναι **live** σήμερα **δεν
+      πετιέται** — γίνεται το *output* αυτού, με το schema να κερδίζει `duration`
+      (υπάρχει ήδη), `views`, `published_at`. Ranking μηχανικό (§14.12).
+      Μπλοκάρεται από τα δύο παρακάτω.
+- [x] ~~**YouTube Data API key** ως Cloudflare secret~~ ✅ **δόθηκε** — και μένει
+      **αχρησιμοποίητο** μέχρι να γραφτεί ο scanner. Κανένας κώδικας δεν το
+      διαβάζει σήμερα.
 - [ ] **`src/curation.json`** — ο roster του §17 ως structured data: creators +
       `channel_id` + `register_lean` + topics + roles + pins/blocklist. Το γράφει
       ο Nick· τα `channel_id` τα βρίσκει ο agent αν δοθούν links στα κανάλια.
       **Ανθρώπινο αρχείο, git-versioned** — δεν το πειράζει ποτέ το cron.
+      **Δύο προσθήκες της 17/08/2026:** πεδίο **`trusted_sources`** (σχήμα και
+      σημασία αόριστα ακόμα — ορίζονται πριν τον scanner) και **νέο θέμα «mental
+      health & nutrition»** με τη Georgia Ede, της οποίας το register lean μένει
+      provisional (§14.11).
 - [ ] **ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής** (recency formula, split rule,
       cron συχνότητα, KV layout) — προτάσεις έτοιμες στο τέλος του spec· το spec
       ζητά ρητά έγκριση **πριν** γραφτεί κώδικας.
-- [ ] **Ασυμφωνίες v0 schema ↔ v3 πλέγμα** — `register` enum (`depth/breadth/
-      layman/persona` → `start/deep`), `label`, `flagship` → `pins`, `type`.
-      Λύνονται πριν την πρώτη γραμμή του scan layer· λεπτομέρειες στο spec.
+- [x] ~~**Ασυμφωνίες v0 schema ↔ v3 πλέγμα**~~ — **λύθηκαν 16/08/2026, με το
+      πρώτο πραγματικό index.** Το `register` enum έγινε `start|deep` παντού
+      (δεδομένα, prompt, `chat.js`) και το `flagship` έφυγε από το schema — τη
+      θέση του παίρνουν τα `pins` του curation. Μένουν ανοιχτά μόνο δύο, και
+      αφορούν τον scanner όχι το σημερινό index: το **`label`** (default `null`,
+      curated labels στο `curation.json`) και το **`type`** (`conceptual` σε όλα
+      σήμερα· να αποφασιστεί αν συρρικνώνεται ή φεύγει).
 - [x] ~~**Register table** (θέμα → creator → register)~~ — **έπαψε να μπλοκάρει.**
       Το v3 το έλυσε μηχανικά: το register ζει **ανά βίντεο μέσω διάρκειας**, όχι
       ανά creator, οπότε δεν χρειάζεται πίνακας για να ξεκινήσει τίποτα. Μένει μόνο
       το **register lean** των γυναικών ως provisional (§14.11) — προτεραιότητα
       creator στη λίστα, όχι προϋπόθεση.
-- [ ] **Curated video core** σε ~5-8 marquee θέματα (cholesterol, keto flu, getting
-      started, insulin, electrolytes, fatty liver…) — ≥4 βίντεο ανά θέμα ώστε να
-      απαντιέται το «δώσε κι άλλα» (§14.2). Παράγεται από το Scan Layer + έτοιμα
-      playlists + creator-approval, με δικά μας link labels· **ποτέ** transcripts ή
-      rehost. *Το v0 έχει τον μηχανισμό, όχι το περιεχόμενο:* 3 θέματα × 4
-      placeholder entries με πλήρες schema στο [src/index.json](src/index.json),
-      ώστε να τρέχει η ροή όσο ετοιμάζονται τα πραγματικά. **Blocker για live.**
+- [ ] **Curated video core** σε ~5-8 marquee θέματα — **ξεκίνησε, δεν τελείωσε.**
+      Live σήμερα: **2 θέματα, 12 βίντεο** (`getting-started` 6, `cholesterol` 6),
+      χειροκίνητα, με δικά μας link labels. Λείπουν τα υπόλοιπα marquee θέματα
+      (keto flu, insulin, electrolytes, fatty liver…) και το νέο «mental health &
+      nutrition». Ο στόχος **≥4 βίντεο ανά θέμα** (§14.2) καλύπτεται και στα δύο
+      σημερινά. Παράγεται από εδώ και πέρα από τον Scan Layer· **ποτέ**
+      transcripts ή rehost. *Έπαψε να είναι blocker για live.*
 - [ ] **API quota strategy** για το scanning — σχεδιασμός, όχι brute-force (§14.10).
       Το scan-to-grid το μισολύνει από μόνο του: **καμία κλήση API ανά ερώτηση
       χρήστη**, μόνο στο cron.
 - [x] ~~System prompt: pure-router + framing rule + link-label discipline + ιατρικό
       redirect + **Route A** (§14.7) + «not a ranking, it's a match» (§14.5)~~
-      ✅ branch `bot-v0` — [src/prompt.js](src/prompt.js). *Θα ξαναπεραστεί όταν
-      μπει το πλέγμα:* το prompt σήμερα περιγράφει το bundled index, όχι τα
-      `grid:{topic}:{register}` κουτιά.
+      ✅ **live** — [src/prompt.js](src/prompt.js). Το λεξιλόγιο register είναι
+      πλέον `start|deep`. *Θα ξαναπεραστεί όταν μπει το πλέγμα:* το prompt σήμερα
+      περιγράφει το bundled index, όχι τα `grid:{topic}:{register}` κουτιά.
 - [ ] **[Start here | Go deeper] buttons** στο bot frontend **και στο `/embed`** —
       ο bot τα δείχνει *μετά* το topic-match και ο **χρήστης** διαλέγει register με
       ένα tap (§14.4). Τα δύο κουμπιά αντιστοιχούν ακριβώς στους δύο κάδους του
       πλέγματος. Μην προσπαθήσεις να μαντέψεις το register από τη διατύπωση — το
       μοντέλο το πιάνει αναξιόπιστα, γι' αυτό ρωτάμε. **Το μόνο v3 κομμάτι του UI
-      που λείπει από το v0.**
+      που λείπει.** Σειρά: **μετά** τον Scan Layer — τα δύο κουμπιά διαβάζουν από
+      τα δύο κουτιά του πλέγματος, οπότε πρώτα υπάρχει το πλέγμα.
 - [x] ~~Intent classifier (personal-medical / quick-practical / testimonial /
-      conceptual)~~ ✅ branch `bot-v0`. Το personal-medical **δεν** μένει στο
+      conceptual)~~ ✅ **live**. Το personal-medical **δεν** μένει στο
       μοντέλο: ο worker κόβει τα links (§ Δομή, κανόνας 2). *Delta v3:* το
       «quick-practical» έπαψε να είναι ξεχωριστή κατηγορία (§14.6) — μένουν
       conceptual/testimonial → routing και personal-medical → redirect. Μικρή
       αφαίρεση στον classifier όταν μπει το πλέγμα, όχι ξαναγράψιμο.
-- [x] ~~Session state: τι βίντεο δείχτηκαν ήδη~~ ✅ branch `bot-v0` — χωρίς μηχανή
+- [x] ~~Session state: τι βίντεο δείχτηκαν ήδη~~ ✅ **live** — χωρίς μηχανή
       session: κάθε assistant turn ξαναστέλνεται με `[already shown: …]`, το
       history *είναι* το state.
-- [x] ~~Mistral integration (Small/Flash), prompt caching~~ ✅ branch `bot-v0` —
+- [x] ~~Mistral integration (Small/Flash), prompt caching~~ ✅ **live** —
       `mistral-small-latest`, system prompt byte-identical ανά request ώστε να
-      πιάνει το prefix cache. **Λείπει το key** (Cloudflare secret
-      `MISTRAL_API_KEY`) → χωρίς αυτό το endpoint απαντά `503 not_configured`.
-- [x] ~~Rate limit (safety, όχι μονετοποίηση)~~ ✅ branch `bot-v0` — 8/λεπτό,
-      60/ώρα, KV, με hash της IP (δεν αποθηκεύουμε διεύθυνση). **Λείπει το KV
-      namespace + binding `RATE_LIMIT`** → χωρίς αυτό τρέχει με rate limit
-      **off** και το λέει στο `meta`. Blocker για live.
+      πιάνει το prefix cache. Το `MISTRAL_API_KEY` **υπάρχει σε production και
+      preview**· χωρίς αυτό το endpoint θα απαντούσε `503 not_configured`.
+- [x] ~~Rate limit (safety, όχι μονετοποίηση)~~ ✅ **live και ενεργό** — 8/λεπτό,
+      60/ώρα, KV, με hash της IP (δεν αποθηκεύουμε διεύθυνση). Το namespace και
+      το binding `RATE_LIMIT` υπάρχουν· το `meta.rate_limit` επιστρέφει `on`.
+      Χωρίς το binding θα έτρεχε **off**, και θα το έλεγε στο `meta`.
 - [x] ~~Chat UI πάνω στο υπάρχον landing· worker-based flow σε Cloudflare~~
-      ✅ branch `bot-v0`
+      ✅ **live**
 - [x] ~~**Public `/embed` view + `frame-ancestors https://askcarnivores.com`**~~
-      ✅ branch `bot-v0` — [embed.html](embed.html) + [_headers](_headers). Header
+      ✅ **live** — [embed.html](embed.html) + [_headers](_headers). Header
       δικός μας, όχι shared secret. Το `askcarnivores.com` είναι **σκόπιμα εκτός**
       του allow-list του `/api/ask`: το portal μας φτάνει ως iframe, όχι ως client
       (§16). Το portal βάζει το `frame-src` και το chrome από τη δική του μεριά.
@@ -1111,7 +1228,15 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
       gate** — σε σελίδα που πουλάει το «Just Ask», μια οθόνη-πύλη είναι τριβή.
       Μη το «αναβαθμίσεις» σε intro screen σε μελλοντικό πέρασμα.
 - [ ] Buy-me-a-coffee στο footer — **ποτέ** μέσα στη ροή ερώτησης/απάντησης
-      (το footer υπάρχει ήδη, με το studio credit). **Λείπει το link** από τον Nick.
+      (το footer υπάρχει ήδη, με το studio credit, την επικοινωνία και το Mistral
+      credit). **Λείπει το link** από τον Nick.
+- [x] ~~**In-development banner**~~ ✅ 17/08/2026, **και στα δύο sites** —
+      dismissable, ξεχωριστό από το disclaimer· λεπτομέρειες και οι δύο
+      υλοποιήσεις στην ενότητα «In-development banner» παραπάνω.
+- [x] ~~**Mistral credit**~~ ✅ 17/08/2026 — footer + `/embed`, **μόνο στον bot**.
+- [ ] **Register tags γυναικών** — παραμένουν **provisional** (§14.11) μέχρι ο
+      Nick ακούσει τα κανάλια τους. Δεν μπλοκάρει τίποτα: προτεραιότητα creator
+      στη λίστα, όχι προϋπόθεση.
 - [x] ~~Σύνδεση repo με Cloudflare Pages + custom domain `askcarnivore.com`~~ ✅ 14/08/2026
 
 ### Portal (`askcarnivores.com`) — v1, στατικό
@@ -1129,12 +1254,23 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
 - [x] ~~Επικοινωνία~~ ✅ 16/08/2026 — `info@askcarnivores.com` στο footer και των
       τριών σελίδων τους· ίδια διεύθυνση αντιγράφηκε και εδώ
 - [x] ~~Link-out testimonials (Dave Mac — Zero Carb)~~ ✅
+- [x] ~~In-development banner~~ ✅ 17/08/2026 — αντικατέστησε το «Under
+      construction», που έλεγε και ότι «το bot δεν λειτουργεί ακόμα». Το × εκεί
+      είναι **CSS, χωρίς JavaScript** (`default-src 'none'`), οπότε κλείνει για
+      την επίσκεψη και όχι μόνιμα. Το stylesheet πήγε σε `style.v2.css`: τα
+      assets τους είναι immutable-cached, και παλιό CSS με νέο markup θα έδειχνε
+      ένα ξεκρέμαστο checkbox.
 - [x] ~~Disclaimer~~ ✅ στο site, όχι σε intro screen — στατική σελίδα, δεν έχει «πριν
       την πρώτη ερώτηση»
 - [ ] Tools — **αναβλήθηκαν** από τον Nick (14/08/2026)· πρώτο όταν ξαναρχίσουν:
       **Get Started (7 μέρες)**. Μέχρι τότε το portal δεν έχει κανένα income path,
       άρα το Μοντέλο Α δεν έχει ακόμα ταμείο να επιδοτήσει τον bot.
-- [ ] Bot panel (§16) — περιμένει να ζήσει ο bot· δική τους η υλοποίηση
+- [ ] Bot panel (§16) — **ξεμπλόκαρε**: ο bot ζει και το `/embed` σερβίρεται με
+      `frame-ancestors` για το `askcarnivores.com`. Δική τους η υλοποίηση —
+      component γύρω από iframe, ποτέ `fetch` στον worker μας.
+- [x] ~~Mistral credit στο portal~~ — **μπήκε 16/08 και αφαιρέθηκε 17/08.** Το
+      portal δεν κάνει routing, οπότε ο ισχυρισμός ήταν ανακριβής εκεί. Μην το
+      ξαναβάλεις «για συμμετρία» με τον bot.
 
 ### Outreach
 
@@ -1277,5 +1413,40 @@ DNS: δύο auto-created CNAMEs προς `askcarnivore.pages.dev`. Δεν έχε
   Εκκρεμούν για live: πραγματικό index content, `MISTRAL_API_KEY`, KV binding,
   buy-me-a-coffee link.
 
+- **2026-08-16** — **Ο bot βγήκε live.** Δύο πράγματα συνέβησαν με τη σειρά:
+  - **Πρώτο πραγματικό index** — 12 βίντεο, 2 θέματα (`getting-started`,
+    `cholesterol`), `status: CURATED`, οπότε το κίτρινο banner έσβησε. Το αρχείο
+    ήρθε στο **σχήμα του Scan Layer** (aliases μία φορά στο topic, επίπεδη λίστα
+    `videos`, `register: start|deep`) και όχι στο v0 — άρα αντί να παραμορφωθεί το
+    curation για να χωρέσει σε νεκρό enum, μετακινήθηκε ο κώδικας: `loadIndex`,
+    prompt και `chat.js`. Το `depth/breadth/layman/persona` του v2 έπαψε να
+    υπάρχει, και το `flagship` έφυγε από το schema.
+  - **Έλεγχος curation που έπιασε λάθος:** τα 12 URLs επαληθεύτηκαν ένα-ένα, και
+    δύο από αυτά ήταν **re-uploads σε ξένα κανάλια** (Martin Silva, CarnivoreTribe)
+    αντί για τα κανάλια των Berry/Mason. Αντικαταστάθηκαν, μαζί με ένα entry που
+    ήταν keto guide κάτω από το carnivore getting-started. Ο κανόνας γράφτηκε μέσα
+    στο `src/index.json`: **δεν αρκεί να ζει το link — ο uploader πρέπει να είναι
+    ο ίδιος ο creator.**
+  Μετά το ΟΚ του Nick στο preview, merge `bot-v0` → `main` (`4b15301`) και deploy.
+  Επαληθεύτηκε live: ελληνικά→σωστό θέμα, personal-medical→μηδέν links,
+  `origin: askcarnivores.com`→403.
+
+- **2026-08-17** — **Δύο footers, ένα banner, και ένα branch λιγότερο.**
+  - **Mistral credit.** Μπήκε πρώτα **και στα δύο** sites· την επόμενη μέρα
+    αφαιρέθηκε από το portal και προστέθηκε στο `/embed`. Λόγος: το portal είναι
+    στατικό και δεν καλεί μοντέλο, άρα «Routing powered by Mistral» εκεί ήταν
+    ισχυρισμός για λογισμικό που δεν τρέχει. **Από τα λίγα κοινά στοιχεία που δεν
+    αντιγράφονται** — η ακρίβεια νικάει τη συμμετρία.
+  - **In-development banner** και στα δύο, dismissable, **ρητά ξεχωριστό από το
+    medical disclaimer** (το banner κλείνει, το disclaimer ποτέ). Δύο διαφορετικές
+    υλοποιήσεις επίτηδες: script + `localStorage` στον bot, **καθαρό CSS** στο
+    portal, που δεν έχει ούτε μία γραμμή JavaScript by CSP. Το portal πήγε σε
+    `style.v2.css` — τα assets του είναι immutable-cached.
+  - **Το `bot-v0` διαγράφηκε** (τοπικά + origin) ως πλήρως merged. Recovery:
+    `git branch bot-v0 49efece`. Από εδώ και πέρα **δεν υπάρχει staging branch**:
+    το `main` σερβίρει κοινό, οπότε ό,τι θέλει review παίρνει δικό του branch.
+  - **Reconciliation αυτού του αρχείου** με την πραγματικότητα — αυτό το πέρασμα.
+
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
-> έγιναν μέσα σε **μία νύχτα** (13→14/08/2026).
+> έγιναν μέσα σε **μία νύχτα** (13→14/08/2026). Ο bot που απαντάει ήρθε δύο μέρες
+> μετά (16/08).
