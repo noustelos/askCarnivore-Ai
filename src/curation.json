@@ -24,103 +24,662 @@
   ],
   "list_status": "CLOSED_AT_27",
   "trusted_hosts": [
-    { "handle": "@DoctorsToTrust", "channel_id": null, "scope": "global", "note": "Guest appearances of nearly everyone on the roster." }
+    {
+      "handle": "@DoctorsToTrust",
+      "channel_id": "UCYXGgZXyIypCbeDZllV8xRw",
+      "scope": "global",
+      "note": "Guest appearances of nearly everyone on the roster.",
+      "uploads_playlist_id": "UUYXGgZXyIypCbeDZllV8xRw"
+    }
   ],
   "pins": [],
   "blocklist": [],
-
   "topics": [
-    { "id": "getting-started", "label": "Getting started / πώς ξεκινάω",
-      "aliases": ["getting started","how to start","how do i start","beginner","beginner guide","start carnivore","first steps","new to carnivore","πώς ξεκινάω","ξεκίνημα","αρχάριος","πρώτες μέρες","πώς αρχίζω"] },
-    { "id": "cholesterol", "label": "Cholesterol / LDL",
-      "aliases": ["cholesterol","ldl","hdl","lipids","lipid panel","high cholesterol","heart disease","χοληστερίνη","χοληστερόλη","λιπίδια","καρδιά","έμφραγμα"] },
-    { "id": "electrolytes", "label": "Electrolytes / keto flu / adaptation",
-      "aliases": ["electrolytes","keto flu","adaptation","adapting","sodium","salt","magnesium","potassium","cramps","fatigue first weeks","ηλεκτρολύτες","κέτο γρίπη","προσαρμογή","αλάτι","μαγνήσιο","κάλιο","κράμπες","κόπωση"] },
-    { "id": "fat-loss-stall", "label": "Fat loss stall / πλατό",
-      "aliases": ["fat loss stall","stall","plateau","weight loss stall","not losing weight","stuck","πλατό","στασιμότητα","δεν χάνω βάρος","κόλλησε το βάρος","απώλεια βάρους"] },
-    { "id": "food-list", "label": "What to eat / food list / shopping",
-      "aliases": ["what to eat","food list","shopping list","what do i buy","grocery","what to buy","meats","τι τρώω","λίστα τροφών","ψώνια","τι αγοράζω","κρέατα","λίστα αγορών"] },
-    { "id": "insulin", "label": "Insulin / insulin resistance",
-      "aliases": ["insulin","insulin resistance","hyperinsulinemia","ινσουλίνη","αντίσταση στην ινσουλίνη","υπερινσουλιναιμία"] },
-    { "id": "diabetes", "label": "Diabetes / A1C / blood sugar",
-      "aliases": ["diabetes","type 2 diabetes","t2d","a1c","hba1c","blood sugar","blood glucose","prediabetes","διαβήτης","σάκχαρο","γλυκόζη","προδιαβήτης"] },
-    { "id": "bloodwork-panic", "label": "Bloodwork panic (high LDL, τι σημαίνει)",
-      "aliases": ["bloodwork","blood test","lab results","high ldl meaning","my results","test results","αιματολογικές","εξετάσεις αίματος","αποτελέσματα εξετάσεων"] },
-    { "id": "fasting", "label": "Fasting / intermittent fasting",
-      "aliases": ["fasting","intermittent fasting","omad","extended fast","time restricted eating","νηστεία","διαλείπουσα νηστεία","αποχή τροφής"] },
-    { "id": "mental-health", "label": "Mental health & nutrition",
-      "aliases": ["mental health","depression","anxiety","brain fog","mood","cognitive","psychiatry","bipolar","ψυχική υγεία","κατάθλιψη","άγχος","διάθεση","εγκεφαλική ομίχλη","νοητική υγεία"] },
-    { "id": "fertility", "label": "Fertility / hormones",
-      "aliases": ["fertility","hormones","ttc","conception","pcos","γονιμότητα","ορμόνες","σύλληψη"] },
-    { "id": "autoimmune", "label": "Autoimmune / inflammation",
-      "aliases": ["autoimmune","inflammation","rheumatoid","hashimoto","lupus","gut","ibs","αυτοάνοσα","φλεγμονή","αυτοάνοσο","έντερο"] },
-    { "id": "women", "label": "Women & carnivore (hormones, menopause)",
-      "aliases": ["women","menopause","perimenopause","female hormones","womens health","γυναίκες","εμμηνόπαυση","γυναικείες ορμόνες","κλιμακτήριος"] },
-    { "id": "exercise", "label": "Carnivore & exercise / performance",
-      "aliases": ["exercise","performance","workout","training","muscle","gym","athletic","άσκηση","προπόνηση","απόδοση","μυς","γυμναστήριο"] },
-    { "id": "seed-oils", "label": "Seed oils / what to avoid",
-      "aliases": ["seed oils","vegetable oils","industrial oils","canola","soybean oil","pufa","σπορέλαια","φυτικά έλαια","βιομηχανικά έλαια"] },
-    { "id": "upfs", "label": "Ultra-processed foods",
-      "aliases": ["ultra processed foods","upf","processed food","junk food","υπερεπεξεργασμένα","επεξεργασμένα τρόφιμα","βιομηχανικά τρόφιμα"] }
+    {
+      "id": "getting-started",
+      "label": "Getting started / πώς ξεκινάω",
+      "aliases": [
+        "getting started",
+        "how to start",
+        "how do i start",
+        "beginner",
+        "beginner guide",
+        "start carnivore",
+        "first steps",
+        "new to carnivore",
+        "πώς ξεκινάω",
+        "ξεκίνημα",
+        "αρχάριος",
+        "πρώτες μέρες",
+        "πώς αρχίζω"
+      ]
+    },
+    {
+      "id": "cholesterol",
+      "label": "Cholesterol / LDL",
+      "aliases": [
+        "cholesterol",
+        "ldl",
+        "hdl",
+        "lipids",
+        "lipid panel",
+        "high cholesterol",
+        "heart disease",
+        "χοληστερίνη",
+        "χοληστερόλη",
+        "λιπίδια",
+        "καρδιά",
+        "έμφραγμα"
+      ]
+    },
+    {
+      "id": "electrolytes",
+      "label": "Electrolytes / keto flu / adaptation",
+      "aliases": [
+        "electrolytes",
+        "keto flu",
+        "adaptation",
+        "adapting",
+        "sodium",
+        "salt",
+        "magnesium",
+        "potassium",
+        "cramps",
+        "fatigue first weeks",
+        "ηλεκτρολύτες",
+        "κέτο γρίπη",
+        "προσαρμογή",
+        "αλάτι",
+        "μαγνήσιο",
+        "κάλιο",
+        "κράμπες",
+        "κόπωση"
+      ]
+    },
+    {
+      "id": "fat-loss-stall",
+      "label": "Fat loss stall / πλατό",
+      "aliases": [
+        "fat loss stall",
+        "stall",
+        "plateau",
+        "weight loss stall",
+        "not losing weight",
+        "stuck",
+        "πλατό",
+        "στασιμότητα",
+        "δεν χάνω βάρος",
+        "κόλλησε το βάρος",
+        "απώλεια βάρους"
+      ]
+    },
+    {
+      "id": "food-list",
+      "label": "What to eat / food list / shopping",
+      "aliases": [
+        "what to eat",
+        "food list",
+        "shopping list",
+        "what do i buy",
+        "grocery",
+        "what to buy",
+        "meats",
+        "τι τρώω",
+        "λίστα τροφών",
+        "ψώνια",
+        "τι αγοράζω",
+        "κρέατα",
+        "λίστα αγορών"
+      ]
+    },
+    {
+      "id": "insulin",
+      "label": "Insulin / insulin resistance",
+      "aliases": [
+        "insulin",
+        "insulin resistance",
+        "hyperinsulinemia",
+        "ινσουλίνη",
+        "αντίσταση στην ινσουλίνη",
+        "υπερινσουλιναιμία"
+      ]
+    },
+    {
+      "id": "diabetes",
+      "label": "Diabetes / A1C / blood sugar",
+      "aliases": [
+        "diabetes",
+        "type 2 diabetes",
+        "t2d",
+        "a1c",
+        "hba1c",
+        "blood sugar",
+        "blood glucose",
+        "prediabetes",
+        "διαβήτης",
+        "σάκχαρο",
+        "γλυκόζη",
+        "προδιαβήτης"
+      ]
+    },
+    {
+      "id": "bloodwork-panic",
+      "label": "Bloodwork panic (high LDL, τι σημαίνει)",
+      "aliases": [
+        "bloodwork",
+        "blood test",
+        "lab results",
+        "high ldl meaning",
+        "my results",
+        "test results",
+        "αιματολογικές",
+        "εξετάσεις αίματος",
+        "αποτελέσματα εξετάσεων"
+      ]
+    },
+    {
+      "id": "fasting",
+      "label": "Fasting / intermittent fasting",
+      "aliases": [
+        "fasting",
+        "intermittent fasting",
+        "omad",
+        "extended fast",
+        "time restricted eating",
+        "νηστεία",
+        "διαλείπουσα νηστεία",
+        "αποχή τροφής"
+      ]
+    },
+    {
+      "id": "mental-health",
+      "label": "Mental health & nutrition",
+      "aliases": [
+        "mental health",
+        "depression",
+        "anxiety",
+        "brain fog",
+        "mood",
+        "cognitive",
+        "psychiatry",
+        "bipolar",
+        "ψυχική υγεία",
+        "κατάθλιψη",
+        "άγχος",
+        "διάθεση",
+        "εγκεφαλική ομίχλη",
+        "νοητική υγεία"
+      ]
+    },
+    {
+      "id": "fertility",
+      "label": "Fertility / hormones",
+      "aliases": [
+        "fertility",
+        "hormones",
+        "ttc",
+        "conception",
+        "pcos",
+        "γονιμότητα",
+        "ορμόνες",
+        "σύλληψη"
+      ]
+    },
+    {
+      "id": "autoimmune",
+      "label": "Autoimmune / inflammation",
+      "aliases": [
+        "autoimmune",
+        "inflammation",
+        "rheumatoid",
+        "hashimoto",
+        "lupus",
+        "gut",
+        "ibs",
+        "αυτοάνοσα",
+        "φλεγμονή",
+        "αυτοάνοσο",
+        "έντερο"
+      ]
+    },
+    {
+      "id": "women",
+      "label": "Women & carnivore (hormones, menopause)",
+      "aliases": [
+        "women",
+        "menopause",
+        "perimenopause",
+        "female hormones",
+        "womens health",
+        "γυναίκες",
+        "εμμηνόπαυση",
+        "γυναικείες ορμόνες",
+        "κλιμακτήριος"
+      ]
+    },
+    {
+      "id": "exercise",
+      "label": "Carnivore & exercise / performance",
+      "aliases": [
+        "exercise",
+        "performance",
+        "workout",
+        "training",
+        "muscle",
+        "gym",
+        "athletic",
+        "άσκηση",
+        "προπόνηση",
+        "απόδοση",
+        "μυς",
+        "γυμναστήριο"
+      ]
+    },
+    {
+      "id": "seed-oils",
+      "label": "Seed oils / what to avoid",
+      "aliases": [
+        "seed oils",
+        "vegetable oils",
+        "industrial oils",
+        "canola",
+        "soybean oil",
+        "pufa",
+        "σπορέλαια",
+        "φυτικά έλαια",
+        "βιομηχανικά έλαια"
+      ]
+    },
+    {
+      "id": "upfs",
+      "label": "Ultra-processed foods",
+      "aliases": [
+        "ultra processed foods",
+        "upf",
+        "processed food",
+        "junk food",
+        "υπερεπεξεργασμένα",
+        "επεξεργασμένα τρόφιμα",
+        "βιομηχανικά τρόφιμα"
+      ]
+    }
   ],
-
   "creators": [
-    { "id": "dave-mac", "name": "Dave Mac", "channel": "No Carb Life", "handle": "@zerocarb", "channel_id": null,
-      "topics": ["getting-started","electrolytes","autoimmune"],
-      "note": "Testimonials tier — playlists ανά πάθηση· relabel σε experience-framing, ΟΧΙ verbatim 'cured'." },
-    { "id": "amber-ohearn", "name": "Amber O'Hearn", "channel": "Amber O'Hearn", "handle": "@AmberOHearn", "channel_id": null,
-      "topics": ["cholesterol","electrolytes","autoimmune"] },
-    { "id": "anthony-chaffee", "name": "Dr. Anthony Chaffee", "channel": "Dr. Anthony Chaffee", "handle": "@anthonychaffeemd", "channel_id": null,
-      "topics": ["getting-started","cholesterol","bloodwork-panic","seed-oils","upfs"] },
-    { "id": "bart-kay", "name": "Bart Kay", "channel": "Bart Kay", "handle": "@bart-kay", "channel_id": null,
-      "topics": ["cholesterol","exercise","seed-oils","upfs"] },
-    { "id": "ben-bikman", "name": "Ben Bikman", "channel": "Ben Bikman", "handle": "@benbikman", "channel_id": null,
-      "topics": ["insulin","diabetes","fasting"] },
-    { "id": "carnivore-teacher", "name": "Carnivore Teacher Alpha", "channel": "Carnivore Teacher", "handle": "@CarnivoreteacherAlpha", "channel_id": null,
-      "topics": ["getting-started","electrolytes","food-list"] },
-    { "id": "coach-carnivore-cam", "name": "Coach Carnivore Cam", "channel": "Coach Carnivore Cam", "handle": "@coachcarnivorecam", "channel_id": null,
-      "topics": ["fat-loss-stall","food-list","exercise"] },
-    { "id": "coach-stephen", "name": "Coach Stephen", "channel": "The UK Carnivore", "handle": "@CoachStephen", "channel_id": null,
-      "topics": ["electrolytes","fat-loss-stall","bloodwork-panic","exercise"] },
-    { "id": "elizabeth-bright", "name": "Dr. Elizabeth Bright", "channel": "Dr. Elizabeth Bright", "handle": "@DrElizabethBright", "channel_id": null,
-      "topics": ["fertility","women"] },
-    { "id": "gary-fettke", "name": "Dr. Gary Fettke", "channel": "No Fructose / Gary Fettke", "handle": "@garyfettke3210", "channel_id": null,
-      "topics": ["diabetes","seed-oils","upfs"] },
-    { "id": "georgia-ede", "name": "Dr. Georgia Ede", "channel": "Dr. Georgia Ede", "handle": "@GeorgiaEdeMD", "channel_id": null,
-      "topics": ["mental-health"] },
-    { "id": "judy-cho", "name": "Judy Cho", "channel": "Nutrition with Judy", "handle": "@NutritionwithJudy", "channel_id": null,
-      "topics": ["getting-started","electrolytes","fat-loss-stall","food-list","fasting","autoimmune","women"] },
-    { "id": "kelly-hogan", "name": "Kelly Hogan", "channel": "Kelly Hogan", "handle": "@MyZeroCarbLife", "channel_id": null,
-      "topics": ["getting-started","fat-loss-stall"] },
-    { "id": "ken-berry", "name": "Dr. Ken Berry", "channel": "Dr. Ken Berry", "handle": "@KenDBerryMD", "channel_id": null,
-      "topics": ["getting-started","cholesterol","food-list","diabetes","bloodwork-panic","seed-oils"] },
-    { "id": "laura-spath", "name": "Laura Spath", "channel": "Laura Spath", "handle": "@LauraSpath", "channel_id": null,
-      "topics": ["getting-started","fat-loss-stall","food-list"] },
-    { "id": "lisa-wiedeman", "name": "Lisa Wiedeman", "channel": "CarnivoreDoctor", "handle": "@carnivoredoctor", "channel_id": null,
-      "topics": ["getting-started","fat-loss-stall","food-list"] },
-    { "id": "maria-emmerich", "name": "Maria Emmerich", "channel": "Maria Emmerich", "handle": "@MariaEmmerich", "channel_id": null,
-      "topics": ["food-list"] },
-    { "id": "paul-mason", "name": "Dr. Paul Mason", "channel": "Dr. Paul Mason", "handle": "@DrPaulMason", "channel_id": null,
-      "topics": ["cholesterol","insulin","bloodwork-panic"] },
-    { "id": "philip-ovadia", "name": "Dr. Philip Ovadia", "channel": "Ovadia Heart Health", "handle": "@IFixHearts", "channel_id": null,
-      "topics": ["cholesterol","insulin","diabetes","bloodwork-panic"] },
-    { "id": "richard-smith", "name": "Richard Smith", "channel": "Richard Smith", "handle": "@Richard-A-Smith", "channel_id": null,
-      "topics": ["fat-loss-stall","insulin","diabetes","exercise"] },
-    { "id": "robert-kiltz", "name": "Dr. Robert Kiltz", "channel": "Dr. Robert Kiltz", "handle": "@doctorkiltz", "channel_id": null,
-      "topics": ["fasting","fertility","women"] },
-    { "id": "robert-lustig", "name": "Robert Lustig", "channel": "Robert Lustig", "handle": "@RobertLustigMD", "channel_id": null,
-      "topics": ["insulin","diabetes","seed-oils","upfs"],
-      "note": "Λίγα στο δικό του κανάλι· τα καλά ως guest — βασίσου στο trusted host @DoctorsToTrust." },
-    { "id": "shapefixer", "name": "SHAPEFIXER", "channel": "SHAPEFIXER", "handle": "@shapefixer", "channel_id": null,
-      "topics": ["fat-loss-stall","bloodwork-panic","exercise"] },
-    { "id": "shawn-baker", "name": "Dr. Shawn Baker", "channel": "Dr. Shawn Baker", "handle": "@ShawnBakerMD", "channel_id": null,
-      "topics": ["getting-started","food-list","autoimmune","exercise"] },
-    { "id": "sten-ekberg", "name": "Dr. Sten Ekberg", "channel": "Dr. Sten Ekberg", "handle": "@drekberg", "channel_id": null,
-      "topics": ["getting-started","fat-loss-stall","food-list","insulin","diabetes","fasting","exercise","seed-oils","upfs"],
-      "note": "DC (chiropractor), ΟΧΙ MD — keto/wellness generalist. Καμία επιφάνειά μας δεν τον περιγράφει ως γιατρό (§17)." },
-    { "id": "jason-fung", "name": "Jason Fung", "channel": "Jason Fung", "handle": "@DrJasonFung", "channel_id": null,
-      "topics": ["getting-started","fat-loss-stall","insulin","diabetes","fasting","seed-oils","upfs"] },
-    { "id": "nick-norwitz", "name": "Nick Norwitz", "channel": "Nick Norwitz MD PhD", "handle": "@nicknorwitzMDPhD", "channel_id": null,
-      "topics": ["getting-started","cholesterol","insulin","bloodwork-panic","fasting"] }
+    {
+      "id": "dave-mac",
+      "name": "Dave Mac",
+      "channel": "No Carb Life",
+      "handle": "@zerocarb",
+      "channel_id": "UCzcoPGdDRiPiWZYV4_EkzPQ",
+      "topics": [
+        "getting-started",
+        "electrolytes",
+        "autoimmune"
+      ],
+      "note": "Testimonials tier — playlists ανά πάθηση· relabel σε experience-framing, ΟΧΙ verbatim 'cured'.",
+      "uploads_playlist_id": "UUzcoPGdDRiPiWZYV4_EkzPQ"
+    },
+    {
+      "id": "amber-ohearn",
+      "name": "Amber O'Hearn",
+      "channel": "Amber O'Hearn",
+      "handle": "@AmberOHearn",
+      "channel_id": "UCT0d5YidrWmbhBarIdCiecA",
+      "topics": [
+        "cholesterol",
+        "electrolytes",
+        "autoimmune"
+      ],
+      "uploads_playlist_id": "UUT0d5YidrWmbhBarIdCiecA"
+    },
+    {
+      "id": "anthony-chaffee",
+      "name": "Dr. Anthony Chaffee",
+      "channel": "Dr. Anthony Chaffee",
+      "handle": "@anthonychaffeemd",
+      "channel_id": "UCzoRyR_nlesKZuOlEjWRXQQ",
+      "topics": [
+        "getting-started",
+        "cholesterol",
+        "bloodwork-panic",
+        "seed-oils",
+        "upfs"
+      ],
+      "uploads_playlist_id": "UUzoRyR_nlesKZuOlEjWRXQQ"
+    },
+    {
+      "id": "bart-kay",
+      "name": "Bart Kay",
+      "channel": "Bart Kay",
+      "handle": "@bart-kay",
+      "channel_id": "UChi5M3k_K4yuRpWAp00xBQA",
+      "topics": [
+        "cholesterol",
+        "exercise",
+        "seed-oils",
+        "upfs"
+      ],
+      "uploads_playlist_id": "UUhi5M3k_K4yuRpWAp00xBQA"
+    },
+    {
+      "id": "ben-bikman",
+      "name": "Ben Bikman",
+      "channel": "Ben Bikman",
+      "handle": "@benbikman",
+      "channel_id": "UCblbxPFG0XAsQA2LwzT6xDQ",
+      "topics": [
+        "insulin",
+        "diabetes",
+        "fasting"
+      ],
+      "uploads_playlist_id": "UUblbxPFG0XAsQA2LwzT6xDQ"
+    },
+    {
+      "id": "carnivore-teacher",
+      "name": "Carnivore Teacher Alpha",
+      "channel": "Carnivore Teacher",
+      "handle": "@CarnivoreteacherAlpha",
+      "channel_id": "UCLoe46vokIWT50lOoqcr5kg",
+      "topics": [
+        "getting-started",
+        "electrolytes",
+        "food-list"
+      ],
+      "uploads_playlist_id": "UULoe46vokIWT50lOoqcr5kg"
+    },
+    {
+      "id": "coach-carnivore-cam",
+      "name": "Coach Carnivore Cam",
+      "channel": "Coach Carnivore Cam",
+      "handle": "@coachcarnivorecam",
+      "channel_id": "UC3vywUwv6B-JB4jmdhZnX7A",
+      "topics": [
+        "fat-loss-stall",
+        "food-list",
+        "exercise"
+      ],
+      "uploads_playlist_id": "UU3vywUwv6B-JB4jmdhZnX7A"
+    },
+    {
+      "id": "coach-stephen",
+      "name": "Coach Stephen",
+      "channel": "The UK Carnivore",
+      "handle": "@CoachStephen",
+      "channel_id": "UCHVQSc3rHY3EaeAhHxC6XBQ",
+      "topics": [
+        "electrolytes",
+        "fat-loss-stall",
+        "bloodwork-panic",
+        "exercise"
+      ],
+      "uploads_playlist_id": "UUHVQSc3rHY3EaeAhHxC6XBQ"
+    },
+    {
+      "id": "elizabeth-bright",
+      "name": "Dr. Elizabeth Bright",
+      "channel": "Dr. Elizabeth Bright",
+      "handle": "@DrElizabethBright",
+      "channel_id": "UCg2P30x_2cWeXbKfnLeLTWQ",
+      "topics": [
+        "fertility",
+        "women"
+      ],
+      "uploads_playlist_id": "UUg2P30x_2cWeXbKfnLeLTWQ"
+    },
+    {
+      "id": "gary-fettke",
+      "name": "Dr. Gary Fettke",
+      "channel": "No Fructose / Gary Fettke",
+      "handle": "@garyfettke3210",
+      "channel_id": "UCq-YFCkwsKtHkzlz1lk0ndw",
+      "topics": [
+        "diabetes",
+        "seed-oils",
+        "upfs"
+      ],
+      "uploads_playlist_id": "UUq-YFCkwsKtHkzlz1lk0ndw"
+    },
+    {
+      "id": "georgia-ede",
+      "name": "Dr. Georgia Ede",
+      "channel": "Dr. Georgia Ede",
+      "handle": "@GeorgiaEdeMD",
+      "channel_id": "UCtlGIM3YKoS4_YvFnw2WKrw",
+      "topics": [
+        "mental-health"
+      ],
+      "uploads_playlist_id": "UUtlGIM3YKoS4_YvFnw2WKrw"
+    },
+    {
+      "id": "judy-cho",
+      "name": "Judy Cho",
+      "channel": "Nutrition with Judy",
+      "handle": "@NutritionwithJudy",
+      "channel_id": "UCgXrNUokx_Zgprns3z6zqSg",
+      "topics": [
+        "getting-started",
+        "electrolytes",
+        "fat-loss-stall",
+        "food-list",
+        "fasting",
+        "autoimmune",
+        "women"
+      ],
+      "uploads_playlist_id": "UUgXrNUokx_Zgprns3z6zqSg"
+    },
+    {
+      "id": "kelly-hogan",
+      "name": "Kelly Hogan",
+      "channel": "Kelly Hogan",
+      "handle": "@MyZeroCarbLife",
+      "channel_id": "UCaKl8Lth6h6GWreFyeO1keA",
+      "topics": [
+        "getting-started",
+        "fat-loss-stall"
+      ],
+      "uploads_playlist_id": "UUaKl8Lth6h6GWreFyeO1keA",
+      "note": "Το κανάλι λέγεται «myzerocarblife», όχι «Kelly Hogan» — γι' αυτό ο resolver το σήμανε και ΔΕΝ το έγραψε μόνος του. Εγκρίθηκε από τον Nick 18/08/2026: η περιγραφή του καναλιού λέει «every episode is made and edited by Kelly Hogan», και το live βίντεο uScdcxgeMoM του index είναι ανεβασμένο από εκεί."
+    },
+    {
+      "id": "ken-berry",
+      "name": "Dr. Ken Berry",
+      "channel": "Dr. Ken Berry",
+      "handle": "@KenDBerryMD",
+      "channel_id": "UCIma2WOQs1Mz2AuOt6wRSUw",
+      "topics": [
+        "getting-started",
+        "cholesterol",
+        "food-list",
+        "diabetes",
+        "bloodwork-panic",
+        "seed-oils"
+      ],
+      "uploads_playlist_id": "UUIma2WOQs1Mz2AuOt6wRSUw"
+    },
+    {
+      "id": "laura-spath",
+      "name": "Laura Spath",
+      "channel": "Laura Spath",
+      "handle": "@LauraSpath",
+      "channel_id": "UCBT6FNxVkQFgudbJXomqveA",
+      "topics": [
+        "getting-started",
+        "fat-loss-stall",
+        "food-list"
+      ],
+      "uploads_playlist_id": "UUBT6FNxVkQFgudbJXomqveA"
+    },
+    {
+      "id": "lisa-wiedeman",
+      "name": "Lisa Wiedeman",
+      "channel": "CarnivoreDoctor",
+      "handle": "@carnivoredoctor",
+      "channel_id": "UCklE8NA93P7aU3bxM2BJlOg",
+      "topics": [
+        "getting-started",
+        "fat-loss-stall",
+        "food-list"
+      ],
+      "uploads_playlist_id": "UUklE8NA93P7aU3bxM2BJlOg"
+    },
+    {
+      "id": "maria-emmerich",
+      "name": "Maria Emmerich",
+      "channel": "Maria Emmerich",
+      "handle": "@MariaEmmerich",
+      "channel_id": "UCyZia0TtezGqjGcXwXJhDoQ",
+      "topics": [
+        "food-list"
+      ],
+      "uploads_playlist_id": "UUyZia0TtezGqjGcXwXJhDoQ"
+    },
+    {
+      "id": "paul-mason",
+      "name": "Dr. Paul Mason",
+      "channel": "Dr. Paul Mason",
+      "handle": "@DrPaulMason",
+      "channel_id": "UC3vzrYZcGqpgchc5sYM5Ybw",
+      "topics": [
+        "cholesterol",
+        "insulin",
+        "bloodwork-panic"
+      ],
+      "uploads_playlist_id": "UU3vzrYZcGqpgchc5sYM5Ybw"
+    },
+    {
+      "id": "philip-ovadia",
+      "name": "Dr. Philip Ovadia",
+      "channel": "Ovadia Heart Health",
+      "handle": "@IFixHearts",
+      "channel_id": "UCu8xppo0Y7mJz4uqkc7o7TQ",
+      "topics": [
+        "cholesterol",
+        "insulin",
+        "diabetes",
+        "bloodwork-panic"
+      ],
+      "uploads_playlist_id": "UUu8xppo0Y7mJz4uqkc7o7TQ"
+    },
+    {
+      "id": "richard-smith",
+      "name": "Richard Smith",
+      "channel": "Richard Smith",
+      "handle": "@Richard-A-Smith",
+      "channel_id": "UCD0szaevd4EkDx1A31kUfCQ",
+      "topics": [
+        "fat-loss-stall",
+        "insulin",
+        "diabetes",
+        "exercise"
+      ],
+      "uploads_playlist_id": "UUD0szaevd4EkDx1A31kUfCQ"
+    },
+    {
+      "id": "robert-kiltz",
+      "name": "Dr. Robert Kiltz",
+      "channel": "Dr. Robert Kiltz",
+      "handle": "@doctorkiltz",
+      "channel_id": "UCogDXio0z4rbQP9vTh2i8qg",
+      "topics": [
+        "fasting",
+        "fertility",
+        "women"
+      ],
+      "uploads_playlist_id": "UUogDXio0z4rbQP9vTh2i8qg"
+    },
+    {
+      "id": "robert-lustig",
+      "name": "Robert Lustig",
+      "channel": "Robert Lustig",
+      "handle": "@RobertLustigMD",
+      "channel_id": "UC0Rnz8dv1-25An6Q8DK5uLg",
+      "topics": [
+        "insulin",
+        "diabetes",
+        "seed-oils",
+        "upfs"
+      ],
+      "note": "Λίγα στο δικό του κανάλι· τα καλά ως guest — βασίσου στο trusted host @DoctorsToTrust.",
+      "uploads_playlist_id": "UU0Rnz8dv1-25An6Q8DK5uLg"
+    },
+    {
+      "id": "shapefixer",
+      "name": "SHAPEFIXER",
+      "channel": "SHAPEFIXER",
+      "handle": "@shapefixer",
+      "channel_id": "UCM1Va_ObWwANw1lrnUSQ6bw",
+      "topics": [
+        "fat-loss-stall",
+        "bloodwork-panic",
+        "exercise"
+      ],
+      "uploads_playlist_id": "UUM1Va_ObWwANw1lrnUSQ6bw"
+    },
+    {
+      "id": "shawn-baker",
+      "name": "Dr. Shawn Baker",
+      "channel": "Dr. Shawn Baker",
+      "handle": "@ShawnBakerMD",
+      "channel_id": "UC5apkKkeZQXRSDbqSalG8CQ",
+      "topics": [
+        "getting-started",
+        "food-list",
+        "autoimmune",
+        "exercise"
+      ],
+      "uploads_playlist_id": "UU5apkKkeZQXRSDbqSalG8CQ"
+    },
+    {
+      "id": "sten-ekberg",
+      "name": "Dr. Sten Ekberg",
+      "channel": "Dr. Sten Ekberg",
+      "handle": "@drekberg",
+      "channel_id": "UCIe2pR6PE0dae9BunJ38F7w",
+      "topics": [
+        "getting-started",
+        "fat-loss-stall",
+        "food-list",
+        "insulin",
+        "diabetes",
+        "fasting",
+        "exercise",
+        "seed-oils",
+        "upfs"
+      ],
+      "note": "DC (chiropractor), ΟΧΙ MD — keto/wellness generalist. Καμία επιφάνειά μας δεν τον περιγράφει ως γιατρό (§17).",
+      "uploads_playlist_id": "UUIe2pR6PE0dae9BunJ38F7w"
+    },
+    {
+      "id": "jason-fung",
+      "name": "Jason Fung",
+      "channel": "Jason Fung",
+      "handle": "@DrJasonFung",
+      "channel_id": "UCoyL4iGArWn5Hu0V_sAhK2w",
+      "topics": [
+        "getting-started",
+        "fat-loss-stall",
+        "insulin",
+        "diabetes",
+        "fasting",
+        "seed-oils",
+        "upfs"
+      ],
+      "uploads_playlist_id": "UUoyL4iGArWn5Hu0V_sAhK2w"
+    },
+    {
+      "id": "nick-norwitz",
+      "name": "Nick Norwitz",
+      "channel": "Nick Norwitz MD PhD",
+      "handle": "@nicknorwitzMDPhD",
+      "channel_id": "UCLTZUJSEulehPtF_ytFiU_A",
+      "topics": [
+        "getting-started",
+        "cholesterol",
+        "insulin",
+        "bloodwork-panic",
+        "fasting"
+      ],
+      "uploads_playlist_id": "UULTZUJSEulehPtF_ytFiU_A"
+    }
   ]
 }
