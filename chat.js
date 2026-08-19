@@ -80,10 +80,10 @@
     if (link.label) anchor.append(el('span', 'result__label', link.label));
 
     const meta = el('div', 'result__meta');
-    meta.append(el('span', null, link.creator));
+    meta.append(el('span', 'meta--creator', link.creator));
 
     const register = REGISTER[link.register];
-    if (register) meta.append(el('span', null, register));
+    if (register) meta.append(el('span', 'meta--register', register));
 
     if (link.crossLang) {
       meta.append(el('span', 'tag--lang', link.lang === 'el' ? 'in Greek' : 'in English'));
