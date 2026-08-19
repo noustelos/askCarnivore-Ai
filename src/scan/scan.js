@@ -181,8 +181,18 @@ export async function runScan({
     }
   }
 
+  // EVERY curated topic gets a key, empty ones included. Writing only the
+  // topics that happen to have entries leaves stale keys behind: when the
+  // duration floor emptied seed-oils, its old box — six Ken Berry Shorts —
+  // simply survived, because nothing overwrote it. An empty array is a fact
+  // about the topic and has to be written like any other.
   const grid = new Map();
   const counts = {};
+  for (const topic of curation.topics ?? []) {
+    grid.set(gridKey(topic.id, 'start'), []);
+    grid.set(gridKey(topic.id, 'deep'), []);
+    counts[topic.id] = { start: 0, deep: 0 };
+  }
 
   for (const [topic, perCreator] of byTopic) {
     const withRegister = assignRegisters(perCreator);

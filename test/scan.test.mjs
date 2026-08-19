@@ -425,3 +425,24 @@ test('the top of a box rotates creators instead of stacking one', () => {
   // Within one creator, score still decides the order.
   assert.deepEqual(start.filter((e) => e.creator_id === 'berry').map((e) => e.id), ['berry0', 'berry1', 'berry2']);
 });
+
+test('a topic that empties out is overwritten, not left behind', async () => {
+  // Found on the preview: the duration floor emptied seed-oils, the scan only
+  // wrote topics that had entries, and the previous box — six Shorts — stayed
+  // in KV looking current.
+  const testCuration = {
+    topics: [{ id: 'insulin', aliases: ['insulin'] }, { id: 'seed-oils', aliases: ['seed oils'] }],
+    trusted_hosts: [],
+    creators: [{ id: 'a', name: 'A', handle: '@a', channel_id: 'UC1', uploads_playlist_id: 'UU1', topics: ['insulin', 'seed-oils'] }],
+  };
+  const client = stubClient({
+    uploads: { UU1: ['ok'] },
+    videos: [{ id: 'ok', title: 'Insulin explained', description: '', published_at: monthsAgo(1), duration_iso: 'PT10M', views: 100, lang: 'en' }],
+  });
+
+  const { grid } = await runScan({ curation: testCuration, client, now: NOW });
+
+  assert.ok(grid.has(gridKey('seed-oils', 'start')), 'the empty topic still gets a key');
+  assert.deepEqual(grid.get(gridKey('seed-oils', 'start')), []);
+  assert.equal(grid.get(gridKey('insulin', 'start')).length, 1);
+});
