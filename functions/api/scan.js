@@ -51,6 +51,34 @@ export async function onRequestPost(context) {
   if (!env.GRID) return json({ error: 'not_configured', missing: 'GRID kv binding' }, 503);
 
   const url = new URL(request.url);
+
+  // ?inspect=topic:register — read one box back out of KV and return it with the
+  // numbers that decided the order. One KV read, no scanning, so it stays well
+  // inside the Free plan's 10ms of CPU. This exists because "why is this box
+  // three-quarters one creator" is a question that should be answerable with
+  // data rather than by re-deriving the ranking in your head.
+  const inspect = url.searchParams.get('inspect');
+  if (inspect) {
+    if (!env.GRID) return json({ error: 'not_configured', missing: 'GRID kv binding' }, 503);
+    const [topic, register = 'start'] = inspect.split(':');
+    const box = (await env.GRID.get(gridKey(topic, register), 'json')) ?? [];
+    return json({
+      key: gridKey(topic, register),
+      size: box.length,
+      entries: box.map((e, i) => ({
+        rank: i + 1,
+        creator: e.creator,
+        views: e.views,
+        published_at: e.published_at,
+        duration: e.duration,
+        score: Math.round(e.score ?? 0),
+        pinned: e.pinned ?? false,
+        source: e.source,
+        title: e.title,
+      })),
+    });
+  }
+
   // Batching: a full 28-channel pass can outlive a single invocation, so the
   // caller can walk the roster in slices and the state in KV makes each slice
   // resumable. No argument = everybody.
