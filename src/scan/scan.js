@@ -18,7 +18,14 @@
    --------------------------------------------------------------------------- */
 
 import { buildAliasIndex, matchTopics, isLikelySpeaker } from './match.js';
-import { assignRegisters, buildBoxes, parseDuration, formatDuration, MAX_PER_BOX } from './rank.js';
+import {
+  assignRegisters,
+  buildBoxes,
+  parseDuration,
+  formatDuration,
+  MAX_PER_BOX,
+  MIN_DURATION_SECONDS,
+} from './rank.js';
 
 export const SCHEMA_VERSION = 2;
 
@@ -111,7 +118,16 @@ export async function runScan({
   // scanning. Without that, an incremental run — or a batch narrowed with
   // `only` — would rebuild the grid out of this week's uploads alone and quietly
   // delete every video it did not just fetch.
-  const entriesByCreator = new Map(existing);
+  // Seeded from what is already known, MINUS anything now under the duration
+  // floor: the store is rewritten from this, so old Shorts leave for good
+  // rather than being filtered out of the grid on every future scan.
+  let droppedShort = 0;
+  const entriesByCreator = new Map();
+  for (const [creatorId, stored] of existing) {
+    const kept = stored.filter((entry) => (entry.duration_seconds ?? 0) >= MIN_DURATION_SECONDS);
+    droppedShort += stored.length - kept.length;
+    entriesByCreator.set(creatorId, kept);
+  }
   const nextState = new Map(state);
 
   for (const creator of creators) {
@@ -139,6 +155,10 @@ export async function runScan({
     const fresh = [];
     for (const { video, source } of [...own, ...guest]) {
       if (video.published_at && (!newest || video.published_at > newest)) newest = video.published_at;
+      // Too short to be a way into anything (§ MIN_DURATION_SECONDS). Dropped
+      // here so it never reaches the store, and again at grouping below so
+      // anything a previous scan already saved goes too.
+      if (parseDuration(video.duration_iso) < MIN_DURATION_SECONDS) continue;
       for (const { topic, matchedOn } of matchTopics(video, creator.topics, aliasesByTopic)) {
         fresh.push(toEntry(video, creator, topic, matchedOn, source));
       }
@@ -202,6 +222,8 @@ export async function runScan({
     topics: [...byTopic.keys()].sort(),
     counts,
     cap: MAX_PER_BOX,
+    min_duration_seconds: MIN_DURATION_SECONDS,
+    dropped_too_short: droppedShort,
     quota_units: client.unitsUsed,
     notes,
   };

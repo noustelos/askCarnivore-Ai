@@ -57,6 +57,22 @@ export async function onRequestPost(context) {
   // inside the Free plan's 10ms of CPU. This exists because "why is this box
   // three-quarters one creator" is a question that should be answerable with
   // data rather than by re-deriving the ranking in your head.
+  // ?reset=1 with ?only= — forget a creator's watermark and stored videos, so
+  // the next scan re-reads them from scratch. Needed when a RULE changes (the
+  // duration floor did) rather than the data: the incremental watermark would
+  // otherwise happily skip everything and leave the old decisions in place.
+  // Deletes only; no scanning, so it costs almost no CPU.
+  if (url.searchParams.get('reset') === '1') {
+    if (!env.GRID) return json({ error: 'not_configured', missing: 'GRID kv binding' }, 503);
+    const ids = url.searchParams.get('only')?.split(',').filter(Boolean) ?? [];
+    if (!ids.length) return json({ error: 'reset_needs_only' }, 400);
+    for (const id of ids) {
+      await env.GRID.delete(stateKey(id));
+      await env.GRID.delete(videosKey(id));
+    }
+    return json({ ok: true, reset: ids });
+  }
+
   const inspect = url.searchParams.get('inspect');
   if (inspect) {
     if (!env.GRID) return json({ error: 'not_configured', missing: 'GRID kv binding' }, 503);

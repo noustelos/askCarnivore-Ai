@@ -361,3 +361,67 @@ test('plurals match, but nothing is stemmed', () => {
   // collides with something else.
   assert.deepEqual(aliasVariants('gut'), ['gut']);
 });
+
+test('nothing under three minutes reaches the grid', async () => {
+  // The failure this prevents: cholesterol:start came back as twelve Shorts,
+  // 0:24 to 2:29, because register is duration and a Short is always shortest.
+  const testCuration = {
+    topics: [{ id: 'insulin', aliases: ['insulin'] }],
+    trusted_hosts: [],
+    creators: [{ id: 'a', name: 'A', handle: '@a', channel_id: 'UC1', uploads_playlist_id: 'UU1', topics: ['insulin'] }],
+  };
+  const client = stubClient({
+    uploads: { UU1: ['short', 'clip', 'real'] },
+    videos: [
+      { id: 'short', title: 'Insulin explained', description: '', published_at: monthsAgo(1), duration_iso: 'PT33S', views: 900_000, lang: 'en' },
+      { id: 'clip', title: 'Insulin in two minutes', description: '', published_at: monthsAgo(1), duration_iso: 'PT2M29S', views: 500_000, lang: 'en' },
+      { id: 'real', title: 'Insulin resistance explained', description: '', published_at: monthsAgo(1), duration_iso: 'PT12M', views: 1000, lang: 'en' },
+    ],
+  });
+
+  const { grid, meta } = await runScan({ curation: testCuration, client, now: NOW });
+  const ids = [...grid.values()].flat().map((e) => e.id);
+
+  // The 900k-view Short would have topped the box on score alone.
+  assert.deepEqual([...new Set(ids)], ['real']);
+  assert.equal(meta.min_duration_seconds, 180);
+});
+
+test('an entry already stored from an earlier scan is dropped too', async () => {
+  const testCuration = {
+    topics: [{ id: 'insulin', aliases: ['insulin'] }],
+    trusted_hosts: [],
+    creators: [{ id: 'a', name: 'A', handle: '@a', channel_id: 'UC1', uploads_playlist_id: 'UU1', topics: ['insulin'] }],
+  };
+  const existing = new Map([
+    ['a', [
+      { id: 'legacy-short', topic: 'insulin', creator: 'A', creator_id: 'a', duration_seconds: 40, views: 999_999, published_at: monthsAgo(2) },
+      { id: 'legacy-real', topic: 'insulin', creator: 'A', creator_id: 'a', duration_seconds: 900, views: 100, published_at: monthsAgo(2) },
+    ]],
+  ]);
+  const { grid, meta } = await runScan({
+    curation: testCuration,
+    client: stubClient({ uploads: {}, videos: [] }),
+    existing,
+    now: NOW,
+    only: [],
+  });
+
+  assert.deepEqual([...new Set([...grid.values()].flat().map((e) => e.id))], ['legacy-real']);
+  assert.equal(meta.dropped_too_short, 1);
+});
+
+test('the top of a box rotates creators instead of stacking one', () => {
+  // Berry outscores everyone three times over; the box must still open with
+  // three different people, because the model routes from the top.
+  const entries = [
+    ...[9000, 8000, 7000].map((v, i) => ({ id: `berry${i}`, creator_id: 'berry', register: 'start', views: v, published_at: monthsAgo(1) })),
+    ...[600, 500, 400].map((v, i) => ({ id: `mason${i}`, creator_id: 'mason', register: 'start', views: v, published_at: monthsAgo(1) })),
+    ...[300, 200, 100].map((v, i) => ({ id: `cho${i}`, creator_id: 'cho', register: 'start', views: v, published_at: monthsAgo(1) })),
+  ];
+  const { start } = buildBoxes({ entries, topic: 'insulin', now: NOW });
+
+  assert.deepEqual(start.slice(0, 3).map((e) => e.creator_id), ['berry', 'mason', 'cho']);
+  // Within one creator, score still decides the order.
+  assert.deepEqual(start.filter((e) => e.creator_id === 'berry').map((e) => e.id), ['berry0', 'berry1', 'berry2']);
+});

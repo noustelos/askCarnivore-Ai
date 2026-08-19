@@ -23,6 +23,17 @@ export const MAX_PER_BOX = 12;
     at least four different people rather than the tail of one catalogue. */
 export const MAX_PER_CREATOR_PER_BOX = 3;
 
+/** Nothing under three minutes enters the grid at all (19/08/2026).
+    The first real scan filled "start here" for cholesterol with twelve videos
+    running 0:24 to 2:29 — every one a Short — because register comes from
+    duration and a Short is always the shortest thing a creator posts. A
+    33-second clip is a trailer, not a way into a subject.
+
+    Deliberately a DURATION rule and not a "is this a Short" flag: a two-minute
+    podcast clip has exactly the same problem and is not a Short. Three minutes
+    rather than five, so genuinely short explainers survive. */
+export const MIN_DURATION_SECONDS = 180;
+
 const MS_PER_MONTH = 30 * 24 * 60 * 60 * 1000;
 
 /** `views / (months_since_published + 6)` (§0.1). Views-per-month, softened. */
@@ -90,6 +101,40 @@ export function assignRegisters(entriesByCreator) {
 }
 
 /**
+ * Deal the box out one creator at a time instead of three-in-a-row.
+ *
+ * The cap already guarantees four or more people are IN a box; it does not
+ * guarantee they are visible. Ranked purely by score, cholesterol:start opened
+ * with three Ken Berrys, and since the model routes from the top of the list,
+ * the person asking got three Ken Berrys. Same twelve videos, different order,
+ * and now the first four answers come from four different people.
+ *
+ * Score still decides everything WITHIN a creator, and a creator's position in
+ * the rotation is their own best score — so this reorders, it never re-ranks.
+ * Pins stay exactly where pins go: first.
+ */
+function interleaveByCreator(entries, pinnedIds = []) {
+  const pinned = entries.filter((entry) => pinnedIds.includes(entry.id));
+  const rest = entries.filter((entry) => !pinnedIds.includes(entry.id));
+
+  const queues = new Map();
+  for (const entry of rest) {
+    const key = entry.creator_id ?? entry.creator ?? '?';
+    if (!queues.has(key)) queues.set(key, []);
+    queues.get(key).push(entry);
+  }
+
+  // Creators take their turn in order of their strongest video.
+  const order = [...queues.values()].sort((a, b) => (b[0]?.score ?? 0) - (a[0]?.score ?? 0));
+
+  const dealt = [];
+  for (let round = 0; dealt.length < rest.length; round += 1) {
+    for (const queue of order) if (queue[round]) dealt.push(queue[round]);
+  }
+  return [...pinned, ...dealt];
+}
+
+/**
  * One topic's entries → the two ranked boxes that get written to KV.
  *
  * Ordering is recency-weighted views and nothing else. §14.12 also asks for
@@ -151,7 +196,7 @@ export function buildBoxes({
 
     // A short box is the correct outcome when a topic has few creators. Padding
     // it with a fifth video from the same person would be filling, not routing.
-    boxes[register] = chosen;
+    boxes[register] = interleaveByCreator(chosen, pinnedIds);
   }
 
   return boxes;
