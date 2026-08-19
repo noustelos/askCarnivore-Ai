@@ -20,6 +20,11 @@
     "                is identifiably the speaker AND the topic matches.",
     "  pins          force to the top of a box. blocklist: exclude a video id.",
     "",
+    "  excluded_from_scan  ΣΤΟΝ ROSTER, ΕΚΤΟΣ SCANNER. Παραμένουν κάρτες στο",
+    "                portal και μέλη των 27 — απλώς το alias-matching δεν τους",
+    "                ταιριάζει (συνεντεύξεις, συνταγές, ανενεργό κανάλι). Ο λόγος",
+    "                είναι γραμμένος σε κάθε εγγραφή ώστε να μην ξανα-ανοίξει.",
+    "",
     "Rules that outlive this file: link-out only, never rehost, never transcripts."
   ],
   "list_status": "CLOSED_AT_27",
@@ -306,33 +311,6 @@
   ],
   "creators": [
     {
-      "id": "dave-mac",
-      "name": "Dave Mac",
-      "channel": "No Carb Life",
-      "handle": "@zerocarb",
-      "channel_id": "UCzcoPGdDRiPiWZYV4_EkzPQ",
-      "topics": [
-        "getting-started",
-        "electrolytes",
-        "autoimmune"
-      ],
-      "note": "Testimonials tier — playlists ανά πάθηση· relabel σε experience-framing, ΟΧΙ verbatim 'cured'.",
-      "uploads_playlist_id": "UUzcoPGdDRiPiWZYV4_EkzPQ"
-    },
-    {
-      "id": "amber-ohearn",
-      "name": "Amber O'Hearn",
-      "channel": "Amber O'Hearn",
-      "handle": "@AmberOHearn",
-      "channel_id": "UCT0d5YidrWmbhBarIdCiecA",
-      "topics": [
-        "cholesterol",
-        "electrolytes",
-        "autoimmune"
-      ],
-      "uploads_playlist_id": "UUT0d5YidrWmbhBarIdCiecA"
-    },
-    {
       "id": "anthony-chaffee",
       "name": "Dr. Anthony Chaffee",
       "channel": "Dr. Anthony Chaffee",
@@ -386,19 +364,6 @@
         "food-list"
       ],
       "uploads_playlist_id": "UULoe46vokIWT50lOoqcr5kg"
-    },
-    {
-      "id": "coach-carnivore-cam",
-      "name": "Coach Carnivore Cam",
-      "channel": "Coach Carnivore Cam",
-      "handle": "@coachcarnivorecam",
-      "channel_id": "UC3vywUwv6B-JB4jmdhZnX7A",
-      "topics": [
-        "fat-loss-stall",
-        "food-list",
-        "exercise"
-      ],
-      "uploads_playlist_id": "UU3vywUwv6B-JB4jmdhZnX7A"
     },
     {
       "id": "coach-stephen",
@@ -521,17 +486,6 @@
         "food-list"
       ],
       "uploads_playlist_id": "UUklE8NA93P7aU3bxM2BJlOg"
-    },
-    {
-      "id": "maria-emmerich",
-      "name": "Maria Emmerich",
-      "channel": "Maria Emmerich",
-      "handle": "@MariaEmmerich",
-      "channel_id": "UCyZia0TtezGqjGcXwXJhDoQ",
-      "topics": [
-        "food-list"
-      ],
-      "uploads_playlist_id": "UUyZia0TtezGqjGcXwXJhDoQ"
     },
     {
       "id": "paul-mason",
@@ -680,6 +634,63 @@
         "fasting"
       ],
       "uploads_playlist_id": "UULTZUJSEulehPtF_ytFiU_A"
+    }
+  ],
+  "excluded_from_scan": [
+    {
+      "id": "dave-mac",
+      "name": "Dave Mac",
+      "channel": "No Carb Life",
+      "handle": "@zerocarb",
+      "channel_id": "UCzcoPGdDRiPiWZYV4_EkzPQ",
+      "topics": [
+        "getting-started",
+        "electrolytes",
+        "autoimmune"
+      ],
+      "note": "Testimonials tier — playlists ανά πάθηση· relabel σε experience-framing, ΟΧΙ verbatim 'cured'.",
+      "uploads_playlist_id": "UUzcoPGdDRiPiWZYV4_EkzPQ",
+      "excluded_reason": "ΕΚΤΟΣ SCAN 19/08/2026. Testimonials tier (§17) — οι τίτλοι του είναι ονόματα και ιστορίες ανθρώπων, όχι θέματα, οπότε το alias-matching βγάζει 0/300 στο dry run. Χειρίζεται με τις playlists του ανά πάθηση, όχι με τον scanner. ΜΗΝ τον ξαναβάλεις στους creators περιμένοντας διαφορετικό αποτέλεσμα."
+    },
+    {
+      "id": "amber-ohearn",
+      "name": "Amber O'Hearn",
+      "channel": "Amber O'Hearn",
+      "handle": "@AmberOHearn",
+      "channel_id": "UCT0d5YidrWmbhBarIdCiecA",
+      "topics": [
+        "cholesterol",
+        "electrolytes",
+        "autoimmune"
+      ],
+      "uploads_playlist_id": "UUT0d5YidrWmbhBarIdCiecA",
+      "excluded_reason": "ΕΚΤΟΣ SCAN 19/08/2026. Το κανάλι δεν έχει ανέβασμα από Απρίλιο 2025 και οι τίτλοι είναι τίτλοι ομιλιών· 0 matches. Απόφαση του Nick."
+    },
+    {
+      "id": "coach-carnivore-cam",
+      "name": "Coach Carnivore Cam",
+      "channel": "Coach Carnivore Cam",
+      "handle": "@coachcarnivorecam",
+      "channel_id": "UC3vywUwv6B-JB4jmdhZnX7A",
+      "topics": [
+        "fat-loss-stall",
+        "food-list",
+        "exercise"
+      ],
+      "uploads_playlist_id": "UU3vywUwv6B-JB4jmdhZnX7A",
+      "excluded_reason": "ΕΚΤΟΣ SCAN 19/08/2026. Recipes — οι τίτλοι είναι ονόματα πιάτων («what I eat in a day»), όχι θέματα· 0 matches στο dry run."
+    },
+    {
+      "id": "maria-emmerich",
+      "name": "Maria Emmerich",
+      "channel": "Maria Emmerich",
+      "handle": "@MariaEmmerich",
+      "channel_id": "UCyZia0TtezGqjGcXwXJhDoQ",
+      "topics": [
+        "food-list"
+      ],
+      "uploads_playlist_id": "UUyZia0TtezGqjGcXwXJhDoQ",
+      "excluded_reason": "ΕΚΤΟΣ SCAN 19/08/2026. Recipes, ίδιος λόγος με τον Cam — 2 matches μόνο, και τα δύο οριακά."
     }
   ]
 }

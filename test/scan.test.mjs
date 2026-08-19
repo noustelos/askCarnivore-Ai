@@ -20,6 +20,7 @@ import {
   splitByRegister,
   buildBoxes,
   MAX_PER_BOX,
+  MAX_PER_CREATOR_PER_BOX,
 } from '../src/scan/rank.js';
 import { runScan, gridKey } from '../src/scan/scan.js';
 
@@ -30,7 +31,14 @@ const aliases = buildAliasIndex(curation.topics);
 
 test('curation.json is coherent: closed list, known topics, a handle each', () => {
   assert.equal(curation.list_status, 'CLOSED_AT_27');
-  assert.equal(curation.creators.length, 27);
+  // 27 on the roster, but four are excluded from the SCAN — interviews,
+  // recipes and a dormant channel, none of which alias-matching can read. They
+  // stay in the file with a reason rather than being deleted.
+  assert.equal(curation.creators.length + curation.excluded_from_scan.length, 27);
+  assert.equal(curation.excluded_from_scan.length, 4);
+  for (const excluded of curation.excluded_from_scan) {
+    assert.match(excluded.excluded_reason, /ΕΚΤΟΣ SCAN/, `${excluded.id} has no reason`);
+  }
   assert.equal(curation.topics.length, 16);
 
   const topicIds = new Set(curation.topics.map((t) => t.id));
@@ -71,16 +79,18 @@ test('a video is only ever tested against ITS creator’s topics', () => {
   );
 });
 
-test('a title match beats a description match, and says which it was', () => {
+test('the description is not a matching source — title or nothing', () => {
   const byTitle = matchTopics({ title: 'Insulin resistance explained', description: '' }, ['insulin'], aliases);
   assert.deepEqual(byTitle, [{ topic: 'insulin', matchedOn: 'title' }]);
 
-  const byDescription = matchTopics(
-    { title: 'My Tuesday', description: 'we talk about insulin resistance' },
-    ['insulin'],
-    aliases,
-  );
-  assert.deepEqual(byDescription, [{ topic: 'insulin', matchedOn: 'description' }]);
+  // This is the boilerplate case that produced 975 matches for one creator in
+  // the 18/08 dry run: a description that lists every subject the channel ever
+  // covers. It must match nothing.
+  const boilerplate = {
+    title: 'My Tuesday vlog',
+    description: 'In this channel we cover insulin, diabetes, exercise and what to eat. #insulin',
+  };
+  assert.deepEqual(matchTopics(boilerplate, ['insulin', 'diabetes', 'exercise'], aliases), []);
 });
 
 test('one video can land in several topics', () => {
@@ -174,10 +184,49 @@ test('a box is ranked by score, capped, and never drops a pin', () => {
     now: NOW,
   });
 
-  assert.equal(start.length, MAX_PER_BOX);
+  // Twenty videos, all from one creator: the per-creator share now decides the
+  // size, not the box ceiling.
+  assert.equal(start.length, 3);
   assert.equal(start[0].id, 'v0');
   assert.equal(start[0].pinned, true);
   assert.ok(start[1].views > start[2].views, 'the rest are ranked by score');
+});
+
+test('a box is cross-creator: no one may take more than their share', () => {
+  // A dominant creator (huge view counts) against four modest ones. Without the
+  // per-creator cap the whole box would be the first creator's tail.
+  const loud = Array.from({ length: 20 }, (_, i) => ({
+    id: `loud${i}`,
+    creator_id: 'ekberg',
+    register: 'start',
+    views: 1_000_000 - i,
+    published_at: monthsAgo(2),
+  }));
+  const others = ['berry', 'mason', 'cho', 'bikman'].map((who, i) => ({
+    id: `q${i}`,
+    creator_id: who,
+    register: 'start',
+    views: 1000,
+    published_at: monthsAgo(2),
+  }));
+
+  const { start } = buildBoxes({ entries: [...loud, ...others], topic: 'insulin', now: NOW });
+  const perCreator = start.reduce((acc, e) => ({ ...acc, [e.creator_id]: (acc[e.creator_id] ?? 0) + 1 }), {});
+
+  assert.equal(perCreator.ekberg, MAX_PER_CREATOR_PER_BOX);
+  assert.equal(Object.keys(perCreator).length, 5, 'every creator with something is represented');
+});
+
+test('a short box is fine — padding it from one creator is not', () => {
+  const entries = Array.from({ length: 9 }, (_, i) => ({
+    id: `v${i}`,
+    creator_id: 'only-one',
+    register: 'deep',
+    views: 1000 * (9 - i),
+    published_at: monthsAgo(3),
+  }));
+  const { deep } = buildBoxes({ entries, topic: 'women', now: NOW });
+  assert.equal(deep.length, MAX_PER_CREATOR_PER_BOX);
 });
 
 test('a blocklisted video is gone from every box', () => {

@@ -16,6 +16,13 @@ export const RECENCY_MONTHS_OFFSET = 6;
     tokens to pay for on every cold cache. */
 export const MAX_PER_BOX = 12;
 
+/** Cross-creator is the product (§14.2), and pure view-ranking is not
+    cross-anything: the 18/08 dry run had Sten Ekberg producing 975 matches to
+    Maria Emmerich's 2, and a box of twelve would simply have been twelve
+    Ekbergs. Applied BEFORE the cap, so the twelve that survive are twelve from
+    at least four different people rather than the tail of one catalogue. */
+export const MAX_PER_CREATOR_PER_BOX = 3;
+
 const MS_PER_MONTH = 30 * 24 * 60 * 60 * 1000;
 
 /** `views / (months_since_published + 6)` (§0.1). Views-per-month, softened. */
@@ -94,7 +101,15 @@ export function assignRegisters(entriesByCreator) {
  * Pins go on top and blocklisted ids are gone, both before the cap, so an
  * editorial pin can never be pushed out by the ceiling.
  */
-export function buildBoxes({ entries, topic, pins = [], blocklist = [], now, cap = MAX_PER_BOX }) {
+export function buildBoxes({
+  entries,
+  topic,
+  pins = [],
+  blocklist = [],
+  now,
+  cap = MAX_PER_BOX,
+  perCreatorCap = MAX_PER_CREATOR_PER_BOX,
+}) {
   const blocked = new Set(blocklist);
   const boxes = { start: [], deep: [] };
 
@@ -113,8 +128,30 @@ export function buildBoxes({ entries, topic, pins = [], blocklist = [], now, cap
       .filter(Boolean)
       .map((entry) => ({ ...entry, pinned: true }));
 
-    const rest = scored.filter((entry) => !pinnedIds.includes(entry.id));
-    boxes[register] = [...pinned, ...rest].slice(0, cap);
+    // Diversity first, then the ceiling. A pin counts against its creator's
+    // share like anything else — an editorial choice spends the budget, it does
+    // not sit outside it — but a pin is placed before the loop, so it can never
+    // be the thing that gets dropped.
+    const chosen = [...pinned];
+    const perCreator = new Map();
+    const bump = (entry) => {
+      const key = entry.creator_id ?? entry.creator ?? '?';
+      perCreator.set(key, (perCreator.get(key) ?? 0) + 1);
+    };
+    chosen.forEach(bump);
+
+    for (const entry of scored) {
+      if (chosen.length >= cap) break;
+      if (pinnedIds.includes(entry.id)) continue;
+      const key = entry.creator_id ?? entry.creator ?? '?';
+      if ((perCreator.get(key) ?? 0) >= perCreatorCap) continue;
+      chosen.push(entry);
+      bump(entry);
+    }
+
+    // A short box is the correct outcome when a topic has few creators. Padding
+    // it with a fifth video from the same person would be filling, not routing.
+    boxes[register] = chosen;
   }
 
   return boxes;

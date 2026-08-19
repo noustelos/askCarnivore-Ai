@@ -14,6 +14,13 @@
      2. Matching is whole-word, never substring. "gut" must not match "August",
         "salt" must not match "assault". This is the entire reason the alias
         lists can stay short and readable.
+     3. TITLE ONLY. Descriptions are not a matching source and must not become
+        one again. The 18/08 dry run settled it with numbers: 73% of matches
+        came from descriptions, and Sten Ekberg alone produced 975 of them —
+        roughly every one of his videos landing in exercise AND food-list AND
+        diabetes at once, because his description boilerplate names all three.
+        A description says what a channel is about; a title says what a video
+        is about, and the grid is made of videos.
    --------------------------------------------------------------------------- */
 
 /** Lowercase, strip Greek/Latin accents, flatten punctuation to spaces.
@@ -47,23 +54,16 @@ function containsPhrase(haystack, phrase) {
  */
 export function matchTopics(video, creatorTopics, aliasesByTopic) {
   const title = normalize(video?.title);
-  const description = normalize(video?.description);
   const hits = [];
 
   for (const topic of creatorTopics ?? []) {
     const aliases = aliasesByTopic.get(topic);
     if (!aliases) continue; // a topic id with no entry is a curation bug, not a match
-
     if (aliases.some((alias) => containsPhrase(title, alias))) {
+      // matched_on stays in the shape even though it is now always "title" —
+      // the field is what let us measure the description experiment and kill
+      // it, and it should stay measurable if a second source is ever proposed.
       hits.push({ topic, matchedOn: 'title' });
-      continue;
-    }
-    // Description is a fallback, and it is RECORDED as one. A title match is
-    // what the §14.8 "titles here are very descriptive" assumption rests on;
-    // a description-only match is weaker, and we want to be able to see how
-    // many of those the grid is carrying instead of guessing later.
-    if (aliases.some((alias) => containsPhrase(description, alias))) {
-      hits.push({ topic, matchedOn: 'description' });
     }
   }
 
@@ -80,6 +80,9 @@ export function matchTopics(video, creatorTopics, aliasesByTopic) {
  * their name on it.
  */
 export function isLikelySpeaker(video, creatorName) {
+  // This one DOES read the description, and should: "who is in this video" is
+  // the thing a description states plainly. It is an attribution check, not a
+  // topic match — the topic still has to come from the title.
   const haystack = `${normalize(video?.title)} ${normalize(video?.description)}`;
   const full = normalize(String(creatorName).replace(/^(dr|doctor|coach)\.?\s+/i, ''));
   if (!full) return false;
