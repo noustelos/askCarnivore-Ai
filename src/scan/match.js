@@ -94,6 +94,49 @@ export function isLikelySpeaker(video, creatorName) {
   return surname.length >= 5 && containsPhrase(haystack, surname);
 }
 
+/**
+ * Plural variants of a single word. Deliberately NOT a stemmer.
+ *
+ * A stemmer would take "fasting" to "fast" and then match "breakfast", which is
+ * the exact class of false positive the title-only rule was brought in to stop.
+ * This only ever goes the safe direction — singular to plural — and only with
+ * rules that cannot produce a shorter or more generic word.
+ *
+ * Irregular plurals (γυναίκα → γυναίκες is regular here, but εξέταση →
+ * εξετάσεις is not) belong in the alias list by hand. This covers the common
+ * case, not every case, and the alias list is where the exceptions live.
+ */
+function pluralVariants(word) {
+  const out = new Set();
+  if (word.length < 4) return out; // "if", "gut", "upf" — too short to be safe
+
+  if (/[a-z]$/.test(word)) {
+    if (/(s|x|z|ch|sh)$/.test(word)) out.add(`${word}es`);
+    else if (/[^aeiou]y$/.test(word)) out.add(`${word.slice(0, -1)}ies`);
+    else out.add(`${word}s`);
+  }
+
+  // Greek, the two endings that are regular enough to automate. Anything else
+  // (and every genitive) goes in the alias list explicitly.
+  if (/[αη]$/.test(word)) out.add(`${word.slice(0, -1)}ες`);
+  else if (/ος$/.test(word)) out.add(`${word.slice(0, -2)}οι`);
+
+  return out;
+}
+
+/** An alias plus its plural forms. Only the LAST word is pluralised: that is
+    where an English plural lands ("beginner guide" → "beginner guides"), and
+    pluralising the middle of a phrase produces nothing a human would type. */
+export function aliasVariants(alias) {
+  const words = alias.split(' ');
+  const last = words.at(-1);
+  const variants = new Set([alias]);
+  for (const plural of pluralVariants(last)) {
+    variants.add([...words.slice(0, -1), plural].join(' '));
+  }
+  return [...variants];
+}
+
 /** curation.topics → the normalized lookup the matcher wants. Aliases are
     normalized once here rather than per video: this runs across thousands of
     titles per scan. */
@@ -101,10 +144,11 @@ export function buildAliasIndex(topics) {
   const byTopic = new Map();
   for (const topic of topics ?? []) {
     if (!topic?.id) continue;
-    const aliases = new Set([normalize(topic.id.replace(/-/g, ' '))]);
-    for (const alias of topic.aliases ?? []) {
+    const aliases = new Set();
+    for (const alias of [topic.id.replace(/-/g, ' '), ...(topic.aliases ?? [])]) {
       const normalized = normalize(alias);
-      if (normalized) aliases.add(normalized);
+      if (!normalized) continue;
+      for (const variant of aliasVariants(normalized)) aliases.add(variant);
     }
     byTopic.set(topic.id, [...aliases]);
   }

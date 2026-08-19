@@ -12,7 +12,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { normalize, matchTopics, isLikelySpeaker, buildAliasIndex } from '../src/scan/match.js';
+import { normalize, matchTopics, isLikelySpeaker, buildAliasIndex, aliasVariants } from '../src/scan/match.js';
 import {
   recencyScore,
   parseDuration,
@@ -343,4 +343,21 @@ test('an incremental run keeps what earlier runs found', async () => {
   assert.ok(ids.includes('new-a'), 'the new video is added');
   assert.ok(ids.includes('old-a'), "creator A's earlier videos survive");
   assert.ok(ids.includes('old-b'), 'a creator outside the batch is not wiped');
+});
+
+test('plurals match, but nothing is stemmed', () => {
+  // The whole point: "beginner" should find "Beginners", and "fasting" must
+  // never become "fast" and start matching "breakfast".
+  assert.deepEqual(
+    matchTopics({ title: 'Carnivore Diet FAQ for Beginners' }, ['getting-started'], aliases).map((h) => h.topic),
+    ['getting-started'],
+  );
+  assert.deepEqual(matchTopics({ title: 'What I eat for breakfast' }, ['fasting'], aliases), []);
+  assert.deepEqual(matchTopics({ title: 'My breakfast routine' }, ['fasting'], aliases), []);
+
+  // Greek: regular α/η → ες only.
+  assert.deepEqual(aliasVariants('ορμόνη'), ['ορμόνη', 'ορμόνες']);
+  // Too short to pluralise safely — "gut"/"upf" must not grow an "s" that
+  // collides with something else.
+  assert.deepEqual(aliasVariants('gut'), ['gut']);
 });
