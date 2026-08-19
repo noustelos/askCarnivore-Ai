@@ -22,6 +22,24 @@ import { assignRegisters, buildBoxes, parseDuration, formatDuration, MAX_PER_BOX
 
 export const SCHEMA_VERSION = 2;
 
+/** First-scan ceiling per creator, agreed 18/08/2026. Dave Mac alone has 2,699
+    uploads; pulling every one of them to keep twelve per box is quota we never
+    get back. The most recent 300 is six playlist pages, and the weekly
+    incremental picks up everything after that. */
+export const INITIAL_INGEST_CAP = 300;
+
+/** Per-creator store, so a batch never has to re-read what it already knows. */
+export const videosKey = (creatorId) => `scan:videos:${creatorId}`;
+
+/** Merge what we had with what we just fetched. Keyed on id+topic because one
+    video legitimately appears under several topics, and freshly-fetched wins so
+    view counts move. */
+function mergeEntries(previous, fresh) {
+  const byKey = new Map(previous.map((entry) => [`${entry.id}:${entry.topic}`, entry]));
+  for (const entry of fresh) byKey.set(`${entry.id}:${entry.topic}`, entry);
+  return [...byKey.values()];
+}
+
 export const gridKey = (topic, register) => `grid:${topic}:${register}`;
 export const stateKey = (creatorId) => `scan:state:${creatorId}`;
 export const META_KEY = 'grid:_meta';
@@ -59,7 +77,14 @@ function toEntry(video, creator, topic, matchedOn, source) {
  * @param {number}   args.now        Date.now(), injected for testability
  * @param {string[]} [args.only]     limit to these creator ids (batching)
  */
-export async function runScan({ curation, client, state = new Map(), now = Date.now(), only = null }) {
+export async function runScan({
+  curation,
+  client,
+  state = new Map(),
+  existing = new Map(),
+  now = Date.now(),
+  only = null,
+}) {
   const aliasesByTopic = buildAliasIndex(curation.topics);
   const creators = (curation.creators ?? []).filter((c) => !only || only.includes(c.id));
   const notes = [];
@@ -73,14 +98,20 @@ export async function runScan({ curation, client, state = new Map(), now = Date.
       notes.push(`trusted-host-unresolved:${host?.handle ?? '?'}`);
       continue;
     }
+    const hostWatermark = state.get(`host:${host.handle}`)?.lastPublishedAt ?? null;
     const ids = await client.listUploads(host.uploads_playlist_id, {
-      since: state.get(`host:${host.handle}`)?.lastPublishedAt ?? null,
+      since: hostWatermark,
+      maxVideos: hostWatermark ? Infinity : INITIAL_INGEST_CAP,
     });
     hostVideos.push(...(await client.listVideos(ids)));
   }
 
   // ---- per creator: gather, attribute, match -------------------------------
-  const byTopic = new Map(); // topic → Map(creatorId → entry[])
+  // Seeded with everything already known, INCLUDING creators this run is not
+  // scanning. Without that, an incremental run — or a batch narrowed with
+  // `only` — would rebuild the grid out of this week's uploads alone and quietly
+  // delete every video it did not just fetch.
+  const entriesByCreator = new Map(existing);
   const nextState = new Map(state);
 
   for (const creator of creators) {
@@ -90,7 +121,11 @@ export async function runScan({ curation, client, state = new Map(), now = Date.
     }
 
     const watermark = state.get(creator.id)?.lastPublishedAt ?? null;
-    const ownIds = await client.listUploads(creator.uploads_playlist_id, { since: watermark });
+    const ownIds = await client.listUploads(creator.uploads_playlist_id, {
+      since: watermark,
+      // First pass is capped; after that the watermark makes the cap moot.
+      maxVideos: watermark ? Infinity : INITIAL_INGEST_CAP,
+    });
     const own = (await client.listVideos(ownIds)).map((video) => ({ video, source: 'own' }));
 
     // Guest appearances: a trusted host's video counts for this creator only
@@ -101,17 +136,14 @@ export async function runScan({ curation, client, state = new Map(), now = Date.
       .map((video) => ({ video, source: 'trusted-host' }));
 
     let newest = watermark;
+    const fresh = [];
     for (const { video, source } of [...own, ...guest]) {
       if (video.published_at && (!newest || video.published_at > newest)) newest = video.published_at;
-
       for (const { topic, matchedOn } of matchTopics(video, creator.topics, aliasesByTopic)) {
-        const perCreator = byTopic.get(topic) ?? new Map();
-        const list = perCreator.get(creator.id) ?? [];
-        list.push(toEntry(video, creator, topic, matchedOn, source));
-        perCreator.set(creator.id, list);
-        byTopic.set(topic, perCreator);
+        fresh.push(toEntry(video, creator, topic, matchedOn, source));
       }
     }
+    entriesByCreator.set(creator.id, mergeEntries(existing.get(creator.id) ?? [], fresh));
 
     nextState.set(creator.id, {
       lastPublishedAt: newest,
@@ -120,6 +152,15 @@ export async function runScan({ curation, client, state = new Map(), now = Date.
   }
 
   // ---- per topic: register split, then rank --------------------------------
+  const byTopic = new Map(); // topic → Map(creatorId → entry[])
+  for (const [creatorId, entries] of entriesByCreator) {
+    for (const entry of entries) {
+      const perCreator = byTopic.get(entry.topic) ?? new Map();
+      perCreator.set(creatorId, [...(perCreator.get(creatorId) ?? []), entry]);
+      byTopic.set(entry.topic, perCreator);
+    }
+  }
+
   const grid = new Map();
   const counts = {};
 
@@ -139,6 +180,7 @@ export async function runScan({ curation, client, state = new Map(), now = Date.
 
   const meta = {
     schema_version: SCHEMA_VERSION,
+    scanned: creators.map((c) => c.id),
     lastScan: new Date(now).toISOString(),
     topics: [...byTopic.keys()].sort(),
     counts,
@@ -147,7 +189,19 @@ export async function runScan({ curation, client, state = new Map(), now = Date.
     notes,
   };
 
-  return { grid, meta, state: nextState };
+  // matched_on breakdown, so the quality of title-matching is visible instead
+  // of assumed (§14.8 rests on "titles here are very descriptive").
+  const allEntries = [...grid.values()].flat();
+  meta.matched_on = {
+    title: allEntries.filter((e) => e.matched_on === 'title').length,
+    description: allEntries.filter((e) => e.matched_on === 'description').length,
+  };
+  meta.sources = {
+    own: allEntries.filter((e) => e.source === 'own').length,
+    trusted_host: allEntries.filter((e) => e.source === 'trusted-host').length,
+  };
+
+  return { grid, meta, state: nextState, entriesByCreator };
 }
 
 /**

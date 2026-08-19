@@ -77,11 +77,12 @@ export function createClient(apiKey, { fetchImpl = fetch } = {}) {
      * stop". That is what keeps a weekly scan at a handful of units instead of
      * re-reading a whole catalogue (brief §5).
      */
-    async listUploads(playlistId, { since = null, maxPages = 20 } = {}) {
+    async listUploads(playlistId, { since = null, maxVideos = Infinity, maxPages = 20 } = {}) {
       const ids = [];
       let pageToken;
+      const pageBudget = Math.min(maxPages, Math.ceil(maxVideos / 50) || maxPages);
 
-      for (let page = 0; page < maxPages; page += 1) {
+      for (let page = 0; page < pageBudget; page += 1) {
         const data = await call(
           'playlistItems',
           { part: 'contentDetails', playlistId, maxResults: 50, pageToken },
@@ -99,10 +100,10 @@ export function createClient(apiKey, { fetchImpl = fetch } = {}) {
         }
 
         pageToken = data?.nextPageToken;
-        if (crossedWatermark || !pageToken) break;
+        if (crossedWatermark || !pageToken || ids.length >= maxVideos) break;
       }
 
-      return ids;
+      return ids.slice(0, maxVideos === Infinity ? undefined : maxVideos);
     },
 
     /** Video ids → the metadata the grid needs. 1 unit per 50 ids. */

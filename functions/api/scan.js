@@ -24,7 +24,7 @@
 
 import curation from '../../src/curation.json';
 import { createClient, QuotaError } from '../../src/scan/youtube.js';
-import { runScan, pruneDeadLinks, gridKey, stateKey, META_KEY } from '../../src/scan/scan.js';
+import { runScan, pruneDeadLinks, gridKey, stateKey, videosKey, META_KEY } from '../../src/scan/scan.js';
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body, null, 2), {
@@ -72,11 +72,23 @@ export async function onRequestPost(context) {
     if (raw) state.set(`host:${host.handle}`, raw);
   }
 
+  // Everything already known, for EVERY creator — not just this batch. The grid
+  // is rebuilt from the union each run, so a narrow batch adds to the picture
+  // instead of replacing it.
+  const existing = new Map();
+  for (const creator of curation.creators) {
+    const stored = await env.GRID.get(videosKey(creator.id), 'json');
+    if (stored?.length) existing.set(creator.id, stored);
+  }
+
   const client = createClient(env.YOUTUBE_API_KEY);
   let result;
   try {
-    result = await runScan({ curation, client, state, now: Date.now(), only });
-    await pruneDeadLinks({ grid: result.grid, client });
+    result = await runScan({ curation, client, state, existing, now: Date.now(), only });
+    // Link rot only needs asking about entries this run did not just fetch —
+    // videos.list already dropped anything non-public. Skipped on a dry run,
+    // where every extra call eats the Free plan's 50-subrequest ceiling.
+    if (!dryRun) await pruneDeadLinks({ grid: result.grid, client });
   } catch (error) {
     if (error instanceof QuotaError) {
       // Stop, keep whatever is already in KV, and say so. A half-written grid
@@ -93,6 +105,9 @@ export async function onRequestPost(context) {
 
   for (const [key, entries] of result.grid) await env.GRID.put(key, JSON.stringify(entries));
   for (const [id, value] of result.state) await env.GRID.put(stateKey(id), JSON.stringify(value));
+  for (const [id, entries] of result.entriesByCreator) {
+    await env.GRID.put(videosKey(id), JSON.stringify(entries));
+  }
   await env.GRID.put(META_KEY, JSON.stringify(result.meta));
 
   return json({ ok: true, meta: result.meta, written: result.grid.size + result.state.size + 1 });

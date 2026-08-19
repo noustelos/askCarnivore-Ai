@@ -263,3 +263,35 @@ test('end to end: a trusted-host video is credited only to the named speaker', a
   assert.equal(box[0].creator, 'Robert Lustig');
   assert.equal(box[0].source, 'trusted-host');
 });
+
+test('an incremental run keeps what earlier runs found', async () => {
+  // The failure this guards against: a weekly scan only fetches new uploads, so
+  // rebuilding the grid from that alone would silently delete the whole back
+  // catalogue. Same shape of bug when a batch narrows the run with `only`.
+  const testCuration = {
+    topics: [{ id: 'insulin', aliases: ['insulin'] }],
+    trusted_hosts: [],
+    creators: [
+      { id: 'a', name: 'Creator A', handle: '@a', channel_id: 'UC1', uploads_playlist_id: 'UU1', topics: ['insulin'] },
+      { id: 'b', name: 'Creator B', handle: '@b', channel_id: 'UC2', uploads_playlist_id: 'UU2', topics: ['insulin'] },
+    ],
+  };
+  const existing = new Map([
+    ['a', [{ id: 'old-a', topic: 'insulin', creator: 'Creator A', duration_seconds: 600, views: 5000, published_at: monthsAgo(10), url: 'u', title: 't' }]],
+    ['b', [{ id: 'old-b', topic: 'insulin', creator: 'Creator B', duration_seconds: 600, views: 5000, published_at: monthsAgo(10), url: 'u', title: 't' }]],
+  ]);
+  const client = stubClient({
+    uploads: { UU1: ['new-a'] },
+    videos: [
+      { id: 'new-a', title: 'Insulin update', description: '', published_at: monthsAgo(1), duration_iso: 'PT20M', views: 9000, lang: 'en' },
+    ],
+  });
+
+  // Only creator "a" is scanned — b is not touched this run.
+  const { grid } = await runScan({ curation: testCuration, client, existing, now: NOW, only: ['a'] });
+  const ids = [...grid.values()].flat().map((e) => e.id);
+
+  assert.ok(ids.includes('new-a'), 'the new video is added');
+  assert.ok(ids.includes('old-a'), "creator A's earlier videos survive");
+  assert.ok(ids.includes('old-b'), 'a creator outside the batch is not wiped');
+});
