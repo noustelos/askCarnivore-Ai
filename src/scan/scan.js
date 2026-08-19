@@ -178,9 +178,26 @@ export async function runScan({
     counts[topic] = { start: boxes.start.length, deep: boxes.deep.length };
   }
 
+  // Per-creator and pre-cap numbers, so a dry run can show WHY a topic is thin:
+  // "nobody matched" and "twelve matched and the cap took the rest" look
+  // identical in the final counts and mean opposite things.
+  const perCreator = {};
+  for (const creator of creators) {
+    const entries = entriesByCreator.get(creator.id) ?? [];
+    const topics = {};
+    for (const entry of entries) topics[entry.topic] = (topics[entry.topic] ?? 0) + 1;
+    perCreator[creator.id] = { matched: entries.length, topics };
+  }
+  const preCap = {};
+  for (const [topic, byCreator] of byTopic) {
+    preCap[topic] = [...byCreator.values()].reduce((n, list) => n + list.length, 0);
+  }
+
   const meta = {
     schema_version: SCHEMA_VERSION,
     scanned: creators.map((c) => c.id),
+    per_creator: perCreator,
+    pre_cap: preCap,
     lastScan: new Date(now).toISOString(),
     topics: [...byTopic.keys()].sort(),
     counts,
