@@ -17,6 +17,7 @@ import curation from '../../src/curation.json';
 import { buildSystemPrompt } from '../../src/prompt.js';
 import { loadIndex, resolveModelOutput } from '../../src/router.js';
 import { META_KEY, gridKey } from '../../src/scan/scan.js';
+import { parseSheet, applyOverride, DEFAULT_CSV_URL, CACHE_TTL_SECONDS } from '../../src/sheet.js';
 
 /* Built once per isolate. buildSystemPrompt() depends only on the index file,
    so this string is identical on every request — which is the whole point: the
@@ -37,7 +38,85 @@ const BUNDLED = {
    written; this only reads it. */
 let cachedGrid = null;
 
-async function getIndex(env) {
+const OVERRIDE_KEY = 'override:sheet';
+const SHEET_TIMEOUT_MS = 8000;
+let refreshing = false; // per-isolate guard, so one stale window fetches once
+
+/**
+ * The Sheet override (Sheet Override Brief §0), read from KV — never from
+ * Google on the user's clock.
+ *
+ * A stale copy is served AS IS and the refresh happens after the response via
+ * waitUntil. The worst case is an answer built from data a few minutes old;
+ * the case we refuse is a person waiting on docs.google.com before the bot
+ * says anything.
+ *
+ * If the fetch fails, the last good copy stays. If there has never been one,
+ * the scan grid serves the whole index, exactly as it does today: the Sheet is
+ * an override, not a dependency (§2 of the brief).
+ */
+async function fetchSheet(env) {
+  const url = env.SHEET_CSV_URL || DEFAULT_CSV_URL;
+  const response = await fetch(url, {
+    headers: { accept: 'text/csv' },
+    signal: AbortSignal.timeout(SHEET_TIMEOUT_MS),
+    cf: { cacheTtl: 60 },
+  });
+  if (!response.ok) throw new Error(`sheet ${response.status}`);
+
+  const text = await response.text();
+  // A login page is HTML and would parse into nonsense rows rather than fail,
+  // so it is caught by shape before it is parsed by content.
+  if (/^\s*</.test(text)) throw new Error('sheet returned HTML, not CSV');
+
+  const parsed = parseSheet(text, { knownTopics: new Set(curation.topics.map((t) => t.id)) });
+  return {
+    fetchedAt: Date.now(),
+    version: parsed.version,
+    rows: parsed.rows,
+    notes: parsed.notes,
+    byTopic: Object.fromEntries(parsed.byTopic),
+  };
+}
+
+async function refreshSheet(env) {
+  if (refreshing) return null;
+  refreshing = true;
+  try {
+    const fresh = await fetchSheet(env);
+    await env.GRID.put(OVERRIDE_KEY, JSON.stringify(fresh));
+    return fresh;
+  } catch (error) {
+    console.warn('sheet refresh failed, keeping what we have:', error);
+    return null;
+  } finally {
+    refreshing = false;
+  }
+}
+
+async function getOverride(env, ctx) {
+  if (!env.GRID) return null;
+
+  let stored = null;
+  try {
+    stored = await env.GRID.get(OVERRIDE_KEY, 'json');
+  } catch (error) {
+    console.warn('override unreadable:', error);
+  }
+
+  const age = stored ? (Date.now() - stored.fetchedAt) / 1000 : Infinity;
+  if (stored && age < CACHE_TTL_SECONDS) return stored;
+
+  // Stale: answer from what we have and refresh behind the response. Nothing
+  // to answer from at all (first ever request): pay for one fetch, once.
+  if (stored) {
+    ctx?.waitUntil?.(refreshSheet(env));
+    return stored;
+  }
+  return refreshSheet(env);
+}
+
+async function getIndex(env, ctx) {
   if (!env.GRID) return BUNDLED;
 
   let meta;
@@ -48,7 +127,13 @@ async function getIndex(env) {
     return BUNDLED;
   }
   if (!meta?.topics?.length) return BUNDLED; // scan has never run
-  if (cachedGrid?.version === meta.lastScan) return cachedGrid;
+
+  // Two cheap reads decide whether anything has to be rebuilt: when the scan
+  // ran, and which version of the sheet we hold. The thirty-odd box reads below
+  // only happen when one of them has actually moved.
+  const override = await getOverride(env, ctx);
+  const version = `${meta.lastScan}|${override?.version ?? 'none'}`;
+  if (cachedGrid?.version === version) return cachedGrid;
 
   const videos = [];
   for (const topic of meta.topics) {
@@ -57,13 +142,26 @@ async function getIndex(env) {
       for (const entry of box ?? []) videos.push({ ...entry, register });
     }
   }
-  if (!videos.length) return BUNDLED;
+  if (!videos.length && !override?.rows) return BUNDLED;
 
-  // Aliases live in curation.json, not in the grid: the grid is what the scan
-  // produced, the aliases are what a person might say. Both are needed to build
-  // the same shape the router already reads.
-  const index = loadIndex({ status: 'CURATED', topics: curation.topics, videos });
-  cachedGrid = { source: 'kv', version: meta.lastScan, index, prompt: buildSystemPrompt(index) };
+  // The Sheet owns the topics it lists; the grid keeps every other one (§0 of
+  // the override brief). One owner per topic, never a mix.
+  const parsedOverride = override?.byTopic
+    ? { byTopic: new Map(Object.entries(override.byTopic)) }
+    : null;
+  const { videos: merged, overriddenTopics } = applyOverride({ gridVideos: videos, override: parsedOverride });
+
+  // Aliases live in curation.json, not in the grid or the sheet: those hold
+  // what we serve, aliases hold what a person might type.
+  const index = loadIndex({ status: 'CURATED', topics: curation.topics, videos: merged });
+  cachedGrid = {
+    source: overriddenTopics.length ? 'kv+sheet' : 'kv',
+    version,
+    index,
+    prompt: buildSystemPrompt(index),
+    overriddenTopics,
+    sheetNotes: override?.notes ?? [],
+  };
   return cachedGrid;
 }
 
@@ -225,7 +323,7 @@ export async function onRequestPost(context) {
 
   // The grid if the scan has filled it, the bundled index if it has not. Read
   // after the rate limit so a flood cannot turn into KV reads.
-  const active = await getIndex(env);
+  const active = await getIndex(env, context);
 
   let raw;
   try {
@@ -249,6 +347,8 @@ export async function onRequestPost(context) {
       // being mistaken for a real source.
       index_status: active.index.status,
       index_source: active.source,
+      override_topics: active.overriddenTopics ?? [],
+      sheet_notes: active.sheetNotes ?? [],
       rate_limit: limit.enforced ? 'on' : 'off',
       // Kept for the preview review; drop or keep behind a flag once live.
       notes: result.notes,
