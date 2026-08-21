@@ -297,6 +297,26 @@ async function askModel(env, turns, systemPrompt) {
   return JSON.parse(content); // throws on garbage — handled by the caller
 }
 
+/**
+ * ?debug=1 plus the scan token. The flag alone is not a gate — anyone can type
+ * it — so the same bearer that guards /api/scan guards this. Without the token
+ * the parameter is simply ignored, with no hint that it means anything, and the
+ * answer a visitor gets is byte-identical either way.
+ *
+ * Compared the same constant-time-ish way as in scan.js rather than imported,
+ * because the two endpoints should stay independently readable; this is four
+ * lines, not a shared module.
+ */
+function debugRequested(request, env) {
+  if (new URL(request.url).searchParams.get('debug') !== '1') return false;
+  const provided = (request.headers.get('authorization') ?? '').replace(/^Bearer\s+/i, '');
+  const expected = env.SCAN_TOKEN;
+  if (!provided || !expected || provided.length !== expected.length) return false;
+  let diff = 0;
+  for (let i = 0; i < provided.length; i += 1) diff |= provided.charCodeAt(i) ^ expected.charCodeAt(i);
+  return diff === 0;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -348,10 +368,12 @@ export async function onRequestPost(context) {
       index_status: active.index.status,
       index_source: active.source,
       override_topics: active.overriddenTopics ?? [],
-      sheet_notes: active.sheetNotes ?? [],
       rate_limit: limit.enforced ? 'on' : 'off',
-      // Kept for the preview review; drop or keep behind a flag once live.
-      notes: result.notes,
+      // The two note lists are diagnostics, not an answer: which sheet rows were
+      // refused and why, which ids the model asked for and did not get. Useful
+      // to us, meaningless to a visitor, and a free readout of our internals to
+      // anyone else — so they ship only when asked for AND authenticated.
+      ...(debugRequested(request, env) ? { notes: result.notes, sheet_notes: active.sheetNotes ?? [] } : {}),
     },
   });
 }
