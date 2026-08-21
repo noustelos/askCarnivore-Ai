@@ -13,14 +13,157 @@
    --------------------------------------------------------------------------- */
 
 import indexFile from '../../src/index.json';
+import curation from '../../src/curation.json';
 import { buildSystemPrompt } from '../../src/prompt.js';
 import { loadIndex, resolveModelOutput } from '../../src/router.js';
+import { META_KEY, gridKey } from '../../src/scan/scan.js';
+import { parseSheet, applyOverride, DEFAULT_CSV_URL, CACHE_TTL_SECONDS } from '../../src/sheet.js';
 
 /* Built once per isolate. buildSystemPrompt() depends only on the index file,
    so this string is identical on every request — which is the whole point: the
    provider's prefix cache keeps hitting and we pay for the index once. */
-const INDEX = loadIndex(indexFile);
-const SYSTEM_PROMPT = buildSystemPrompt(INDEX);
+const BUNDLED = {
+  source: 'bundled',
+  version: 'bundled',
+  index: loadIndex(indexFile),
+  prompt: buildSystemPrompt(loadIndex(indexFile)),
+};
+
+/* The scan-layer grid, once it exists, is the index (§14.13). Cached per
+   isolate and keyed on the scan timestamp, so the system prompt stays
+   BYTE-IDENTICAL between scans and the provider's prefix cache keeps hitting —
+   it changes exactly when the grid changes, once a week, and not per request.
+
+   No YouTube call happens here or anywhere near here. The grid is already
+   written; this only reads it. */
+let cachedGrid = null;
+
+const OVERRIDE_KEY = 'override:sheet';
+const SHEET_TIMEOUT_MS = 8000;
+let refreshing = false; // per-isolate guard, so one stale window fetches once
+
+/**
+ * The Sheet override (Sheet Override Brief §0), read from KV — never from
+ * Google on the user's clock.
+ *
+ * A stale copy is served AS IS and the refresh happens after the response via
+ * waitUntil. The worst case is an answer built from data a few minutes old;
+ * the case we refuse is a person waiting on docs.google.com before the bot
+ * says anything.
+ *
+ * If the fetch fails, the last good copy stays. If there has never been one,
+ * the scan grid serves the whole index, exactly as it does today: the Sheet is
+ * an override, not a dependency (§2 of the brief).
+ */
+async function fetchSheet(env) {
+  const url = env.SHEET_CSV_URL || DEFAULT_CSV_URL;
+  const response = await fetch(url, {
+    headers: { accept: 'text/csv' },
+    signal: AbortSignal.timeout(SHEET_TIMEOUT_MS),
+    cf: { cacheTtl: 60 },
+  });
+  if (!response.ok) throw new Error(`sheet ${response.status}`);
+
+  const text = await response.text();
+  // A login page is HTML and would parse into nonsense rows rather than fail,
+  // so it is caught by shape before it is parsed by content.
+  if (/^\s*</.test(text)) throw new Error('sheet returned HTML, not CSV');
+
+  const parsed = parseSheet(text, { knownTopics: new Set(curation.topics.map((t) => t.id)) });
+  return {
+    fetchedAt: Date.now(),
+    version: parsed.version,
+    rows: parsed.rows,
+    notes: parsed.notes,
+    byTopic: Object.fromEntries(parsed.byTopic),
+  };
+}
+
+async function refreshSheet(env) {
+  if (refreshing) return null;
+  refreshing = true;
+  try {
+    const fresh = await fetchSheet(env);
+    await env.GRID.put(OVERRIDE_KEY, JSON.stringify(fresh));
+    return fresh;
+  } catch (error) {
+    console.warn('sheet refresh failed, keeping what we have:', error);
+    return null;
+  } finally {
+    refreshing = false;
+  }
+}
+
+async function getOverride(env, ctx) {
+  if (!env.GRID) return null;
+
+  let stored = null;
+  try {
+    stored = await env.GRID.get(OVERRIDE_KEY, 'json');
+  } catch (error) {
+    console.warn('override unreadable:', error);
+  }
+
+  const age = stored ? (Date.now() - stored.fetchedAt) / 1000 : Infinity;
+  if (stored && age < CACHE_TTL_SECONDS) return stored;
+
+  // Stale: answer from what we have and refresh behind the response. Nothing
+  // to answer from at all (first ever request): pay for one fetch, once.
+  if (stored) {
+    ctx?.waitUntil?.(refreshSheet(env));
+    return stored;
+  }
+  return refreshSheet(env);
+}
+
+async function getIndex(env, ctx) {
+  if (!env.GRID) return BUNDLED;
+
+  let meta;
+  try {
+    meta = await env.GRID.get(META_KEY, 'json');
+  } catch (error) {
+    console.warn('grid meta unreadable, serving the bundled index:', error);
+    return BUNDLED;
+  }
+  if (!meta?.topics?.length) return BUNDLED; // scan has never run
+
+  // Two cheap reads decide whether anything has to be rebuilt: when the scan
+  // ran, and which version of the sheet we hold. The thirty-odd box reads below
+  // only happen when one of them has actually moved.
+  const override = await getOverride(env, ctx);
+  const version = `${meta.lastScan}|${override?.version ?? 'none'}`;
+  if (cachedGrid?.version === version) return cachedGrid;
+
+  const videos = [];
+  for (const topic of meta.topics) {
+    for (const register of ['start', 'deep']) {
+      const box = await env.GRID.get(gridKey(topic, register), 'json');
+      for (const entry of box ?? []) videos.push({ ...entry, register });
+    }
+  }
+  if (!videos.length && !override?.rows) return BUNDLED;
+
+  // The Sheet owns the topics it lists; the grid keeps every other one (§0 of
+  // the override brief). One owner per topic, never a mix.
+  const parsedOverride = override?.byTopic
+    ? { byTopic: new Map(Object.entries(override.byTopic)) }
+    : null;
+  const { videos: merged, overriddenTopics } = applyOverride({ gridVideos: videos, override: parsedOverride });
+
+  // Aliases live in curation.json, not in the grid or the sheet: those hold
+  // what we serve, aliases hold what a person might type.
+  const index = loadIndex({ status: 'CURATED', topics: curation.topics, videos: merged });
+  cachedGrid = {
+    source: overriddenTopics.length ? 'kv+sheet' : 'kv',
+    version,
+    index,
+    prompt: buildSystemPrompt(index),
+    overriddenTopics,
+    sheetNotes: override?.notes ?? [],
+  };
+  return cachedGrid;
+}
 
 const MODEL = 'mistral-small-latest';
 const MODEL_TIMEOUT_MS = 20_000;
@@ -108,14 +251,14 @@ async function checkRateLimit(env, request) {
  * more" has something concrete to avoid repeating. That list IS the session
  * state (§14.7) — we keep none of our own.
  */
-function toProviderMessages(messages) {
+function toProviderMessages(messages, index) {
   const turns = [];
   for (const message of messages.slice(-MAX_TURNS)) {
     const role = message?.role === 'assistant' ? 'assistant' : 'user';
     const content = String(message?.content ?? '').slice(0, MAX_CHARS_PER_TURN).trim();
     if (!content) continue;
     const shown = Array.isArray(message?.shown)
-      ? message.shown.filter((id) => typeof id === 'string' && INDEX.byId.has(id))
+      ? message.shown.filter((id) => typeof id === 'string' && index.byId.has(id))
       : [];
     turns.push({
       role,
@@ -128,7 +271,7 @@ function toProviderMessages(messages) {
   return turns;
 }
 
-async function askModel(env, turns) {
+async function askModel(env, turns, systemPrompt) {
   const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -140,7 +283,7 @@ async function askModel(env, turns) {
       temperature: 0.2,
       max_tokens: 700,
       response_format: { type: 'json_object' },
-      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...turns],
+      messages: [{ role: 'system', content: systemPrompt }, ...turns],
     }),
     signal: AbortSignal.timeout(MODEL_TIMEOUT_MS),
   });
@@ -178,15 +321,19 @@ export async function onRequestPost(context) {
     return json({ error: 'rate_limited' }, 429, { 'retry-after': String(limit.retryAfter) });
   }
 
+  // The grid if the scan has filled it, the bundled index if it has not. Read
+  // after the rate limit so a flood cannot turn into KV reads.
+  const active = await getIndex(env, context);
+
   let raw;
   try {
-    raw = await askModel(env, toProviderMessages(messages));
+    raw = await askModel(env, toProviderMessages(messages, active.index), active.prompt);
   } catch (error) {
     console.error('model call failed:', error);
     return json({ error: 'upstream_unavailable' }, 502);
   }
 
-  const result = resolveModelOutput({ raw, index: INDEX });
+  const result = resolveModelOutput({ raw, index: active.index });
 
   return json({
     intent: result.intent,
@@ -198,7 +345,10 @@ export async function onRequestPost(context) {
     meta: {
       // The client turns this into the banner that stops placeholder content
       // being mistaken for a real source.
-      index_status: INDEX.status,
+      index_status: active.index.status,
+      index_source: active.source,
+      override_topics: active.overriddenTopics ?? [],
+      sheet_notes: active.sheetNotes ?? [],
       rate_limit: limit.enforced ? 'on' : 'off',
       // Kept for the preview review; drop or keep behind a flag once live.
       notes: result.notes,

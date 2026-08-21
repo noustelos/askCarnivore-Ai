@@ -64,7 +64,7 @@
 
 .result {
   display: block;
-  padding: .7rem .9rem;
+  padding: .95rem 1.05rem;
   border: 1px solid hsl(0 0% 100% / .16);
   border-radius: .8rem;
   background: hsl(0 0% 0% / .26);
@@ -87,20 +87,26 @@
   outline-offset: 2px;
 }
 
-/* Spans, so they need saying: the anchor's children are inline by default and
-   the label would otherwise run on from the end of the title. */
+/* Three separate things, and they have to LOOK like three separate things.
+   They were technically stacked before — display:block, a 4px gap — but at
+   .92 / .82 / .7rem they were near enough in size to read as one paragraph,
+   which is what an English title above a Greek label actually did. The
+   audience is 50+ (§16), so the fix is hierarchy and air, not more rules. */
 .result__title {
   display: block;
-  font-size: .92rem;
-  font-weight: 600;
+  font-size: 1.02rem;
+  font-weight: 650;
   line-height: 1.35;
+  letter-spacing: -.005em;
 }
 
 .result__label {
   display: block;
-  margin-top: .25rem;
-  font-size: .82rem;
-  line-height: 1.45;
+  margin-top: .45rem;
+  padding-left: .7rem;
+  border-left: 2px solid hsl(0 0% 100% / .22);
+  font-size: .88rem;
+  line-height: 1.5;
   color: var(--fg-soft, hsl(0 0% 100% / .82));
 }
 
@@ -108,21 +114,33 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: .45rem;
-  margin-top: .45rem;
-  font-size: .7rem;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  color: hsl(0 0% 100% / .62);
+  gap: .4rem;
+  margin-top: .7rem;
 }
 
-.result__meta span::after {
-  content: "·";
-  margin-left: .45rem;
-  opacity: .55;
+/* Chips rather than a dot-separated run. Three short facts side by side are
+   scannable; the same three joined by middots are a sentence you have to read.
+   Each also gets a real edge, which matters on a background that shifts hue. */
+.result__meta span {
+  padding: .2rem .55rem;
+  border: 1px solid hsl(0 0% 100% / .2);
+  border-radius: 999px;
+  font-size: .76rem;
+  line-height: 1.35;
+  white-space: nowrap;
 }
 
-.result__meta span:last-child::after { content: none; }
+.result__meta .meta--creator {
+  border-color: hsl(0 0% 100% / .34);
+  font-weight: 600;
+}
+
+/* Cross-language is the one that changes what a person will experience when
+   they click, so it is the one allowed to stand out. */
+.result__meta .tag--lang {
+  border-color: hsl(45 90% 70% / .5);
+  background: hsl(45 90% 60% / .12);
+}
 
 /* Cross-language is stated, never hidden — and never a reason to drop a link. */
 .tag--lang {

@@ -2,3 +2,11 @@ node_modules/
 .DS_Store
 .env
 .env.local
+
+# Local secrets for `wrangler dev` — YOUTUBE_API_KEY, MISTRAL_API_KEY.
+# The real ones live as Cloudflare secrets; this file must never be committed.
+.dev.vars
+.dev.vars.*
+
+# Local analysis cache (fetched titles). Not source, not shipped.
+.cache/
