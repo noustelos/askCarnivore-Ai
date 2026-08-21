@@ -197,3 +197,101 @@ test('an empty model answer still produces a usable response', () => {
   assert.equal(result.copy, '');
   assert.ok(result.fallback);
 });
+
+/* ---- the register toggle: two lists out of one turn (§14.4) -------------- */
+
+test('the deep list is resolved by the same gate as the one above it', () => {
+  const result = resolveModelOutput({
+    index,
+    raw: {
+      intent: 'conceptual',
+      topic: 'cholesterol',
+      answer_lang: 'en',
+      video_ids: ['berry-cholesterol-1', 'cho-cholesterol-1'],
+      deep_video_ids: ['bikman-cholesterol-1', 'not-a-real-id', 'mason-cholesterol-deep'],
+      labels: { 'bikman-cholesterol-1': 'what this doctor says about LDL' },
+      copy: 'Two ways in.',
+    },
+  });
+
+  assert.deepEqual(result.links.map((link) => link.id), ['berry-cholesterol-1', 'cho-cholesterol-1']);
+  assert.deepEqual(
+    result.deepLinks.map((link) => link.id),
+    ['bikman-cholesterol-1', 'mason-cholesterol-deep'],
+    'an invented id is dropped from the deep list exactly as from the first one',
+  );
+  assert.ok(result.notes.some((note) => note === 'unknown-id-deep:not-a-real-id'));
+  assert.ok(
+    result.deepLinks.every((link) => link.url.startsWith('https://www.youtube.com/watch?v=')),
+    'deep links are rebuilt from the index too, never from the model',
+  );
+});
+
+test('personal-medical empties the deep list as well — the gate has one door', () => {
+  const result = resolveModelOutput({
+    index,
+    raw: {
+      intent: 'personal-medical',
+      answer_lang: 'el',
+      video_ids: ['berry-cholesterol-1'],
+      deep_video_ids: ['bikman-cholesterol-1', 'mason-cholesterol-deep'],
+      copy: 'Ρωτήστε τον γιατρό σας.',
+    },
+  });
+
+  assert.deepEqual(result.links, []);
+  assert.deepEqual(result.deepLinks, []);
+});
+
+test('a deep list that is the same set again is no deep list at all (§14.16)', () => {
+  const same = resolveModelOutput({
+    index,
+    raw: {
+      intent: 'conceptual',
+      answer_lang: 'en',
+      video_ids: ['berry-cholesterol-1', 'cho-cholesterol-1'],
+      deep_video_ids: ['cho-cholesterol-1', 'berry-cholesterol-1'], // same set, other order
+      copy: 'x',
+    },
+  });
+
+  assert.deepEqual(same.deepLinks, [], 'no button rather than a button that changes nothing');
+
+  const overlapping = resolveModelOutput({
+    index,
+    raw: {
+      intent: 'conceptual',
+      answer_lang: 'en',
+      video_ids: ['berry-cholesterol-1', 'mason-cholesterol-start'],
+      deep_video_ids: ['berry-cholesterol-1', 'mason-cholesterol-deep'],
+      copy: 'x',
+    },
+  });
+
+  assert.equal(overlapping.deepLinks.length, 2, 'a partial overlap is still a different answer');
+});
+
+test('no deep ids at all is simply no deep list', () => {
+  const result = resolveModelOutput({
+    index,
+    raw: { intent: 'conceptual', answer_lang: 'en', video_ids: ['berry-cholesterol-1'], copy: 'x' },
+  });
+
+  assert.deepEqual(result.deepLinks, []);
+});
+
+test('the deep list obeys the link cap on its own', () => {
+  const result = resolveModelOutput({
+    index,
+    raw: {
+      intent: 'conceptual',
+      answer_lang: 'en',
+      video_ids: ['berry-cholesterol-1'],
+      deep_video_ids: ids.slice(0, MAX_LINKS + 2),
+      copy: 'x',
+    },
+  });
+
+  assert.equal(result.deepLinks.length, MAX_LINKS);
+  assert.ok(result.notes.some((note) => note.startsWith('over-cap-deep:')));
+});
