@@ -104,6 +104,25 @@ function normalizeLang(value) {
 }
 
 /**
+ * Is the deep view worth offering at all?
+ *
+ * Register lives per video via duration (§14.4), so a topic holding one video
+ * — or one creator's single video mirrored into both boxes (§14.16) — produces
+ * a "deep" list that is the same list again. Offering "show me the deep dive"
+ * there is a promise of more that is answered with the same three links, which
+ * reads as a broken button rather than an honest edge case.
+ *
+ * Decided here rather than in the client, so the landing page and the framed
+ * /embed cannot drift into two different answers to the same question.
+ */
+function keepIfDistinct(links, deepLinks) {
+  if (!deepLinks.length) return [];
+  const shown = new Set(links.map((link) => link.id));
+  const sameSet = deepLinks.length === shown.size && deepLinks.every((link) => shown.has(link.id));
+  return sameSet ? [] : deepLinks;
+}
+
+/**
  * Take the model's raw JSON, return what the client is allowed to see.
  *
  * Note there is no session machinery here on purpose (spec §4): "give me more"
@@ -138,49 +157,62 @@ export function resolveModelOutput({ raw, index }) {
       answerLang,
       copy,
       links: [],
+      // The gate closes on both views at once. A "show me the deep dive" button
+      // that produced videos here would be the medical redirect with a way
+      // around it — the rule does not have a second door.
+      deepLinks: [],
       fallback: null, // a doctor is the answer here; not the directory
       notes,
     };
   }
 
   // ---- gate 2: ids must exist in the index --------------------------------
-  const requested = Array.isArray(raw?.video_ids) ? raw.video_ids : [];
+  // Both views go through this, called twice. One resolver, so "deep" can never
+  // become a second, laxer path into the same output: whatever is true of the
+  // list a person sees first is true of the one behind the button.
   const labels = raw?.labels && typeof raw.labels === 'object' ? raw.labels : {};
-  const seen = new Set();
-  const links = [];
+  const resolve = (requested, tag) => {
+    const seen = new Set();
+    const links = [];
 
-  for (const id of requested) {
-    if (typeof id !== 'string' || seen.has(id)) continue;
-    seen.add(id);
+    for (const id of Array.isArray(requested) ? requested : []) {
+      if (typeof id !== 'string' || seen.has(id)) continue;
+      seen.add(id);
 
-    const entry = index.byId.get(id);
-    if (!entry) {
-      notes.push(`unknown-id:${id}`);
-      continue;
+      const entry = index.byId.get(id);
+      if (!entry) {
+        notes.push(`unknown-id${tag}:${id}`);
+        continue;
+      }
+      if (links.length >= MAX_LINKS) {
+        notes.push(`over-cap${tag}:${id}`);
+        continue;
+      }
+
+      const entryLang = normalizeLang(entry.lang);
+      links.push({
+        id: entry.id,
+        // Rebuilt from the index — never from the model.
+        url: entry.url,
+        title: entry.title,
+        creator: entry.creator,
+        register: entry.register ?? 'pending',
+        type: entry.type ?? 'conceptual',
+        lang: entryLang,
+        // Cross-language is surfaced, never hidden and never a reason to drop a
+        // link: if the only source for a Greek question is in English, we serve
+        // it and say so.
+        crossLang: entryLang !== answerLang,
+        label: clean(entry.label ?? labels[id] ?? '', MAX_LABEL_CHARS) || null,
+        curatedLabel: Boolean(entry.label),
+      });
     }
-    if (links.length >= MAX_LINKS) {
-      notes.push(`over-cap:${id}`);
-      continue;
-    }
 
-    const entryLang = normalizeLang(entry.lang);
-    links.push({
-      id: entry.id,
-      // Rebuilt from the index — never from the model.
-      url: entry.url,
-      title: entry.title,
-      creator: entry.creator,
-      register: entry.register ?? 'pending',
-      type: entry.type ?? 'conceptual',
-      lang: entryLang,
-      // Cross-language is surfaced, never hidden and never a reason to drop a
-      // link: if the only source for a Greek question is in English, we serve
-      // it and say so.
-      crossLang: entryLang !== answerLang,
-      label: clean(entry.label ?? labels[id] ?? '', MAX_LABEL_CHARS) || null,
-      curatedLabel: Boolean(entry.label),
-    });
-  }
+    return links;
+  };
+
+  const links = resolve(raw?.video_ids, '');
+  const deepLinks = keepIfDistinct(links, resolve(raw?.deep_video_ids, '-deep'));
 
   const topic = index.topics.has(raw?.topic) ? raw.topic : null;
 
@@ -190,6 +222,7 @@ export function resolveModelOutput({ raw, index }) {
     answerLang,
     copy,
     links,
+    deepLinks,
     // Honest unmatched: no invented source, one real place to go next.
     fallback: links.length
       ? null

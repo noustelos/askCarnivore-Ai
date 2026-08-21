@@ -212,6 +212,44 @@
   outline-offset: 2px;
 }
 
+/* ---- the register toggle: the person picks the depth (§14.4) ---- */
+
+/* Deliberately NOT a small chat-bubble affordance. The audience is 50+, often
+   reading with fatigue (§16), so this is a full-width target with words on it
+   — 3.25rem tall, the same reading size as a result title. It sits under the
+   list it swaps, because that is the thing it acts on. */
+.deeper {
+  display: block;
+  width: 100%;
+  min-height: 3.25rem;
+  margin-top: .7rem;
+  padding: .85rem 1.1rem;
+  border: 1px solid hsl(0 0% 100% / .38);
+  border-radius: .8rem;
+  background: hsl(0 0% 0% / .2);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 650;
+  text-align: center;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.deeper:hover,
+.deeper:focus-visible {
+  border-color: hsl(0 0% 100% / .6);
+  background: hsl(0 0% 0% / .34);
+  transform: translateY(-1px);
+}
+
+.deeper:focus-visible {
+  outline: 2px solid hsl(0 0% 100% / .75);
+  outline-offset: 2px;
+}
+
 /* ---- notes: disclaimer, waiting state, warnings ---- */
 
 .chat__note {
@@ -277,5 +315,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .turn, .waiting i { animation: none !important; }
-  .result:hover, .chat__send:hover:not(:disabled) { transform: none; }
+  .result:hover, .chat__send:hover:not(:disabled), .deeper:hover { transform: none; }
 }

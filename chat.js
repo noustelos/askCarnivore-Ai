@@ -22,13 +22,38 @@
   let busy = false;
   let warned = false;
 
-  const REGISTER = {
-    start: 'start here',
-    deep: 'in depth',
-    // `pending` says nothing: we have not judged that creator's level yet, so
-    // the UI does not put words in our mouth (§14.11).
-    pending: '',
+  /* Everything the interface says, in both languages. The key is the language
+     of the ANSWER (data.lang — the language the person asked in), decided per
+     turn rather than per page: a Greek speaker on an English browser asking in
+     Greek must not get a Greek answer with an English button under it. */
+  const UI = {
+    en: {
+      register: {
+        start: 'start here',
+        deep: 'in depth',
+        // `pending` says nothing: we have not judged that creator's level yet,
+        // so the UI does not put words in our mouth (§14.11).
+        pending: '',
+      },
+      deeper: 'Show me the deep dive',
+      basics: 'Back to basics',
+      inGreek: 'in Greek',
+      inEnglish: 'in English',
+    },
+    el: {
+      register: {
+        start: 'για αρχή',
+        deep: 'σε βάθος',
+        pending: '',
+      },
+      deeper: 'Θέλω πιο αναλυτικά',
+      basics: 'Πίσω στα βασικά',
+      inGreek: 'στα ελληνικά',
+      inEnglish: 'στα αγγλικά',
+    },
   };
+
+  const strings = (lang) => (lang === 'el' ? UI.el : UI.en);
 
   const ERRORS = {
     rate_limited: 'That is a lot of questions at once — give it a minute and ask again.',
@@ -69,7 +94,7 @@
     thread.prepend(notice);
   }
 
-  function renderLink(link) {
+  function renderLink(link, t) {
     const item = document.createElement('li');
     const anchor = el('a', 'result');
     anchor.href = link.url;
@@ -82,11 +107,11 @@
     const meta = el('div', 'result__meta');
     meta.append(el('span', 'meta--creator', link.creator));
 
-    const register = REGISTER[link.register];
+    const register = t.register[link.register];
     if (register) meta.append(el('span', 'meta--register', register));
 
     if (link.crossLang) {
-      meta.append(el('span', 'tag--lang', link.lang === 'el' ? 'in Greek' : 'in English'));
+      meta.append(el('span', 'tag--lang', link.lang === 'el' ? t.inGreek : t.inEnglish));
     }
 
     anchor.append(meta);
@@ -94,7 +119,34 @@
     return item;
   }
 
-  function renderAnswer(turn, data) {
+  /**
+   * The register toggle (§14.4): the person picks the depth, not the model.
+   *
+   * Both lists arrived with the answer, so this swaps what is on screen and
+   * touches the network never — a tap costs nothing and cannot fail halfway.
+   * It REPLACES the list rather than appending: "more detail" means a different
+   * shelf, not a longer one.
+   */
+  function addToggle(turn, list, data, t, remember) {
+    const button = el('button', 'deeper', t.deeper);
+    button.type = 'button';
+    let deep = false;
+
+    button.addEventListener('click', () => {
+      deep = !deep;
+      const links = deep ? data.deep_links : data.links;
+      list.replaceChildren(...links.map((link) => renderLink(link, t)));
+      button.textContent = deep ? t.basics : t.deeper;
+      // Only once it has actually been on screen does it count as shown.
+      if (deep) remember(data.deep_links.map((link) => link.id));
+      list.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+
+    turn.append(button);
+  }
+
+  function renderAnswer(turn, data, remember) {
+    const t = strings(data.lang);
     turn.replaceChildren();
     warnPlaceholder(data.meta?.index_status);
 
@@ -102,8 +154,12 @@
 
     if (data.links?.length) {
       const list = el('ul', 'results');
-      for (const link of data.links) list.append(renderLink(link));
+      for (const link of data.links) list.append(renderLink(link, t));
       turn.append(list);
+
+      // No deep_links field means the worker judged the deep view to be the
+      // same answer again, or empty. No button, and nothing said about it.
+      if (data.deep_links?.length) addToggle(turn, list, data, t, remember);
     }
 
     // Honest unmatched: no source of ours, one real place to go next.
@@ -162,13 +218,19 @@
         return;
       }
 
-      renderAnswer(answer, data);
-      history.push({
+      // What was SEEN, so "give me more" can move past it — the deep list is
+      // added by the toggle if and when the person opens it, not because it
+      // was delivered. Sending ids nobody looked at would teach the model to
+      // skip them.
+      const turnState = {
         role: 'assistant',
         content: data.copy || '(no answer)',
-        // What was served, so "give me more" can move past it.
         shown: (data.links ?? []).map((link) => link.id),
+      };
+      renderAnswer(answer, data, (ids) => {
+        turnState.shown = [...new Set([...turnState.shown, ...ids])];
       });
+      history.push(turnState);
     } catch {
       fail(answer, 'offline');
       history.pop();

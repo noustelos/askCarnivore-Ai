@@ -361,6 +361,11 @@ export async function onRequestPost(context) {
     lang: result.answerLang,
     copy: result.copy,
     links: result.links,
+    // Present only when the deep view is a different answer from the one above
+    // it (src/router.js). Its absence IS the instruction to the client: no
+    // field, no button — so the landing page and the framed /embed cannot end
+    // up offering different things.
+    ...(result.deepLinks?.length ? { deep_links: result.deepLinks } : {}),
     fallback: result.fallback,
     meta: {
       // The client turns this into the banner that stops placeholder content
