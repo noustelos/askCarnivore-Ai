@@ -11,7 +11,7 @@
 | **Επιστρέφει** | **βίντεο** του index, cross-creator | directory, testimonials, tools, προϊόντα |
 | **Πρόσβαση** | χωρίς λογαριασμό, χωρίς app | ελεύθερη· λογαριασμοί μόνο αν/όταν χρειαστούν |
 | **Εμπόριο** | **κανένα** | affiliate, προϊόντα, tools |
-| **Στάδιο** | **LIVE και απαντάει** (16/08/2026) — 12 βίντεο, 2 θέματα, χειροκίνητο index | **live** — στατικό, 27 κάρτες directory, χωρίς tools |
+| **Στάδιο** | **LIVE** (16/08/2026) — από 21/08 σερβίρει το **προ-υπολογισμένο πλέγμα** (16 θέματα, KV) + Sheet override, με register toggle | **live** — στατικό, 27 κάρτες directory, χωρίς tools |
 
 Το ζευγάρι ενικός/πληθυντικός λειτουργεί υπέρ μας: το `askcarnivore` ρωτάει *το πράγμα*
 (τη μηχανή), το `askcarnivores` δείχνει *τους ανθρώπους*. Η διάκριση πρέπει να είναι
@@ -117,12 +117,11 @@ model) ειδικά ήρθε αυτούσιο.
 - **Register tags για τις γυναίκες** — εκκρεμεί ώσπου ο Nick ακούσει τα κανάλια
   τους (§14.11). Άντρες: πλήρως tagged. **Εξαίρεση: η Georgia Ede κλείδωσε**
   (go-deep + δικό της topic «mental health & nutrition») στο v3.1.
-- **Scan Layer** — το spec του δόθηκε 16/08/2026 και είναι καταγεγραμμένο
-  ολόκληρο παρακάτω («Scan Layer — build spec v1»). **Μηδέν κώδικας ακόμα.**
-  Το YouTube API key **υπάρχει** πλέον ως Cloudflare secret, αχρησιμοποίητο·
-  λείπουν το περιεχόμενο του `curation.json` και το ΟΚ στις τέσσερις αποφάσεις
-  αρχιτεκτονικής. Αντικαθιστά το χειροκίνητο `src/index.json` που είναι σήμερα
-  live.
+- **Εξωτερικό χρονόμετρο για το scan** — το `POST /api/scan` είναι live και
+  token-guarded, αλλά **κανείς δεν το καλεί προγραμματισμένα**. Το Pages δεν
+  κάνει cron (§ Cron & quota), οπότε μένει το GitHub Actions cron. Το μόνο
+  secret που χρειάζεται το Action είναι το `SCAN_TOKEN` — **όχι** Cloudflare API
+  token, γιατί το KV write το κάνει ο ίδιος ο worker μέσω του `GRID` binding.
 - **RAG/KB/vector** — μπαίνει όταν το πλέγμα ξεπεράσει το cached prompt (§14.9).
 - Ποιο portal tool πρώτο (πρόταση: Get Started 7 μερών).
 - Self-submission form για events — v-next (§13).
@@ -722,19 +721,27 @@ directory. Οι buckets όμως μένουν **δικοί μας** — το por
 
 ## Τρέχουσα κατάσταση
 
-**Live (`main`) από 16/08/2026:** ο bot απαντάει. Ask box πάνω στο landing, ένας
-worker, χειροκίνητο index — ο thin slice του v0 με πραγματικό περιεχόμενο. Δεν
-υπάρχει πια branch `bot-v0`· ό,τι γράφεται, γράφεται πάνω στο **live `main`**, με
-ό,τι προσοχή συνεπάγεται αυτό.
+**Live (`main`) από 16/08/2026:** ο bot απαντάει. Από τις **21/08/2026** δεν
+σερβίρει πια χειροκίνητο index: διαβάζει το **προ-υπολογισμένο πλέγμα από KV**,
+με το **Sheet override** από πάνω, και ο χρήστης διαλέγει βάθος με **κουμπί**.
+**Δεν υπάρχει κανένα branch** — ούτε `bot-v0`, ούτε `scan-layer`, ούτε
+`register-ui`· όλα merged και διαγραμμένα. Ό,τι γράφεται, γράφεται πάνω στο
+**live `main`**, με ό,τι προσοχή συνεπάγεται αυτό.
+
+*Recovery hashes, αν ποτέ χρειαστεί ένα από αυτά πίσω:*
+`git branch bot-v0 49efece` · `git branch scan-layer 9617888` ·
+`git branch register-ui f0427fb`.
 
 **Τι είναι live, συγκεκριμένα:**
 
 | | |
 |---|---|
-| Index | **12 βίντεο, 2 θέματα** (`getting-started`, `cholesterol`), χειροκίνητο |
+| Index | **KV πλέγμα** από τον Scan Layer (16 θέματα) **+ Sheet override**· το χειροκίνητο `src/index.json` έμεινε ως **fallback** |
+| Register | **[Θέλω πιο αναλυτικά / Show me the deep dive]** — δύο λίστες σε μία απάντηση, ο χρήστης διαλέγει |
 | `status` | `CURATED` → **κανένα κίτρινο banner** |
 | Rate limit | **on** — KV namespace + binding `RATE_LIMIT` υπάρχουν |
 | Μοντέλο | `mistral-small-latest`· το `MISTRAL_API_KEY` υπάρχει σε production *και* preview |
+| Scan | `POST /api/scan`, token-guarded — **χωρίς χρονόμετρο ακόμα**, καλείται με το χέρι |
 | Banner ωριμότητας | ναι, dismissable — βλ. «In-development banner» |
 | Mistral credit | footer + `/embed`, **όχι** στο portal |
 
@@ -949,21 +956,36 @@ document. Αν προστεθεί άλλο SMIL, θέλει και αυτό κά
 
 ---
 
-## Scan Layer — build spec v1 (**δεν έχει ξεκινήσει**)
+## Scan Layer — build spec v1 (**χτίστηκε, live από 21/08/2026**)
 
 *Δεύτερο build spec του bot, μετά το v0. Χτίζει το layer που παράγει το
 προ-υπολογισμένο πλέγμα `θέμα × register → ταξινομημένα βίντεο` (§14.12–14.16).
 Πηγή: «ASKCARNIVORE.COM — Scan Layer Spec v1», δοσμένο 16/08/2026. Repo:
 **bot μόνο**.*
 
-**Καμία γραμμή δεν έχει γραφτεί, και δεν γράφεται ακόμα.** Κατάσταση 17/08/2026:
+**Χτίστηκε στο branch `scan-layer` (18-20/08) και μπήκε στο `main` 21/08.**
+Ό,τι ακολουθεί ήταν το brief· κρατιέται γιατί εξηγεί **γιατί** ο κώδικας είναι
+έτσι, αλλά δεν είναι πια λίστα εργασιών. Κατάσταση 21/08/2026:
 
-- ✅ **YouTube Data API key** — υπάρχει ως Cloudflare secret. **Αχρησιμοποίητο**:
-  κανένας κώδικας δεν το διαβάζει ακόμα.
-- ◻ **Περιεχόμενο `curation.json`** — το γράφει ο Nick.
-- ◻ **ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής** στο τέλος της ενότητας.
+- ✅ **YouTube Data API key** — Cloudflare secret, **χρησιμοποιείται** από το cron
+  endpoint (ποτέ στο request path).
+- ✅ **`curation.json`** — γραμμένο: 16 θέματα, **23 creators για scan** +
+  **4 `excluded_from_scan`** (σύνολο 27, §17), resolved channel ids, global
+  trusted host `@DoctorsToTrust`.
+- ✅ **Οι τέσσερις αποφάσεις αρχιτεκτονικής** — εγκρίθηκαν όπως προτάθηκαν και
+  υλοποιήθηκαν (βλ. το τέλος της ενότητας).
+- ✅ **`SCAN_TOKEN`** — υπάρχει σε production και preview.
+- ◻ **Χρονόμετρο** — το endpoint ζει, αλλά κανείς δεν το καλεί προγραμματισμένα.
+  Το μόνο εκκρεμές του layer.
 
-Ό,τι ακολουθεί είναι **brief + οδηγίες**, όχι υλοποίηση.
+**⚠ `excluded_from_scan` — δεν ξαναμπαίνουν.** Τέσσερα ονόματα του §17 βγήκαν από
+το scan στις 19/08 μετά από dry run, όχι από γούστο: **Dave Mac** (οι τίτλοι του
+είναι ονόματα ανθρώπων, 0/300 matches — δουλεύεται με τις playlists του ανά
+πάθηση), **Amber O'Hearn** (τίτλοι ομιλιών, κανάλι στάσιμο από 04/2025),
+**Coach Carnivore Cam** και **Maria Emmerich** (recipes: «what I eat in a day»,
+0 και 2 οριακά matches). Ο λόγος του καθενός ζει μέσα στο `curation.json` ως
+`excluded_reason`. **Μην τους ξαναβάλεις περιμένοντας διαφορετικό αποτέλεσμα** —
+θέλουν άλλο μηχανισμό, όχι δεύτερη ευκαιρία στον ίδιο.
 
 **Προϋπόθεση:** ο bot v0 είναι **live στο `main`** — worker / prompt / gates /
 embed. Αυτό το layer **δεν τα ξαναγράφει**· αλλάζει μόνο *από πού διαβάζει το
@@ -1144,6 +1166,50 @@ key έχει ήδη δοθεί** ως Cloudflare secret.
    τα θέματα χωρίς KV list· `scan:state:{creator_id}` → `{ lastPublishedAt,
    uploads_playlist_id }` για το incremental.
 
+## Sheet override — το χέρι πάνω από το scan
+
+*Μπήκε 20/08/2026, μαζί με τον Scan Layer. Το scan γεμίζει **κάθε** θέμα ως βάση·
+όποιο θέμα γράψει ο Nick στο Sheet σερβίρεται **ολόκληρο** από εκεί.*
+
+**Ένας ιδιοκτήτης ανά θέμα, ποτέ μείγμα.** Αυτός είναι όλος ο κανόνας. Ένα θέμα
+που δεν υπάρχει στο Sheet δεν καταλαβαίνει ποτέ ότι υπάρχει αυτό το layer· ένα
+θέμα που υπάρχει, παύει να βλέπει το scan. Το ενδιάμεσο — «τα δικά μου πρώτα και
+από κάτω ό,τι βρήκε ο scanner» — απορρίφθηκε: θα ήταν λίστα που κανείς δεν την
+έχει εγκρίνει ολόκληρη.
+
+**Πώς φτάνει εδώ:** public CSV μέσω `/export?format=csv`, **όχι** publish-to-web
+(το Workspace του λογαριασμού μπλοκάρει το publishing, και το `/export` γυρίζει
+την **τρέχουσα** κατάσταση σε κάθε κλήση — γι' αυτό μια αλλαγή φαίνεται χωρίς
+deploy). Το CSV γίνεται cache σε KV (`override:sheet`) για **5 λεπτά** και
+ανανεώνεται στο background, ώστε η αργή κλήση να μην κάθεται πάνω στην ερώτηση.
+Αν το κατέβασμα αποτύχει, **κρατάμε ό,τι είχαμε** — μια πεσμένη Google δεν
+αδειάζει τον bot.
+
+**Δύο κανόνες που δεν ξαναδιαπραγματεύονται εκεί μέσα:**
+
+- **Το URL του Sheet δεν είναι URL.** Βγάζουμε το video id και ξαναχτίζουμε τον
+  σύνδεσμο μόνοι μας, ακριβώς όπως κάνει ο router με το index. Ένα τυπογραφικό
+  στο κελί δεν μπορεί να γίνει link προς αλλού.
+- **Κενό label μένει `null`**, οπότε το γράφει το μοντέλο υπό τους κανόνες του
+  §8. Label που γράφει ο Nick χρησιμοποιείται **αυτούσιο** και νικάει το μοντέλο
+  — εκεί παίρνει ο ίδιος την επιφάνεια ευθύνης, εκεί που τη θέλει.
+
+### Diagnostics — `?debug=1`
+
+Τα `meta.notes` και `meta.sheet_notes` (ποιες γραμμές του Sheet απορρίφθηκαν και
+γιατί, ποια ids ζήτησε το μοντέλο και δεν πήρε) **έφυγαν από το δημόσιο
+response** στις 21/08: είναι χρήσιμα σε εμάς, ακατανόητα στον επισκέπτη, και
+δωρεάν περιγραφή του πώς είναι φτιαγμένος ο μηχανισμός σε όποιον ανοίξει
+devtools.
+
+Επιστρέφουν με `?debug=1` **συν** `Authorization: Bearer <SCAN_TOKEN>` — το ίδιο
+bearer που φυλάει το `/api/scan`. Το flag **μόνο του δεν κάνει τίποτα**: χωρίς
+token αγνοείται σιωπηλά και η απάντηση βγαίνει byte-identical. Ό,τι μένει στο
+default response (`index_status`, `index_source`, `override_topics`,
+`rate_limit`) ονομάζει πηγή χωρίς να περιγράφει μηχανισμό — και το
+`index_source` είναι ο γρήγορος τρόπος να δεις αν το production διαβάζει όντως
+το πλέγμα.
+
 ## Deployment
 
 **Live από 14/08/2026** (ο bot απαντάει από 16/08). Cloudflare Pages, project
@@ -1163,8 +1229,8 @@ auto-deploy — μετρημένα **~20-40 δευτερόλεπτα** μέχρ�
 | Framework preset | None |
 | Build command | *(κενό)* |
 | Build output directory | `/` |
-| Secrets | `MISTRAL_API_KEY` (production **και** preview) · **YouTube Data API key — δοθέν, αχρησιμοποίητο** |
-| KV | namespace + binding `RATE_LIMIT` — ενεργό |
+| Secrets | `MISTRAL_API_KEY` · `YOUTUBE_API_KEY` · `SCAN_TOKEN` — **και τα τρία σε production ΚΑΙ preview** |
+| KV | `RATE_LIMIT` (rate limit) · **`GRID`** → namespace `askcarnivore-grid` (πλέγμα + sheet cache + watermarks) |
 | Pages URL | `askcarnivore.pages.dev` |
 | Custom domains | `askcarnivore.com`, `www.askcarnivore.com` — και τα δύο Active με SSL |
 
@@ -1282,31 +1348,52 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
 > στο landing. Το markup σερβίρεται σωστά και το script είναι συντακτικά έγκυρο —
 > η συμπεριφορά στο κλικ θέλει ανθρώπινο μάτι.
 >
-> **Ο επόμενος κύκλος είναι ο Scan Layer**, και μπλοκάρεται από περιεχόμενο +
-> τέσσερις αποφάσεις, όχι από κώδικα.
+> **Ενημέρωση 21/08/2026:** ο Scan Layer **χτίστηκε και είναι live**, μαζί με
+> το Sheet override και το register toggle. Επαληθεύτηκαν στο production, με
+> HTTP και όχι σε Node: `index_source: kv+sheet`· «πώς ξεκινάω;» → τα τρία του
+> Sheet· «χοληστερίνη» → τέσσερα start και τέσσερα **διαφορετικά** deep, όλα με
+> labels· «να κόψω τη μετφορμίνη;» → `personal-medical`, 0 links, **και καθόλου
+> πεδίο `deep_links`** — το κουμπί δεν μπορεί καν να εμφανιστεί εκεί.
+>
+> **Τι ΔΕΝ έχει επαληθευτεί με browser:** το κλικ του register toggle και τα
+> ελληνικά register chips — ελέγχθηκαν από τον Nick στο preview, όχι από εμένα.
+>
+> **Ο επόμενος κύκλος είναι το χρονόμετρο του scan** (GitHub Actions cron), και
+> δεν μπλοκάρεται από τίποτα πια: endpoint, secrets και KV είναι στη θέση τους.
 
-- [ ] **Scan Layer — το επόμενο πράγμα που χτίζεται.** Το build spec δόθηκε
-      16/08/2026 και είναι καταγεγραμμένο στην ενότητα «Scan Layer — build spec
-      v1» παραπάνω· **καμία γραμμή κώδικα ακόμα**. Cron scan → **προ-υπολογισμένο
-      πλέγμα** `θέμα × register → [ταξινομημένα βίντεο]` (§14.13). Input: ο roster
-      του §17. Το χειροκίνητο `src/index.json` που είναι **live** σήμερα **δεν
-      πετιέται** — γίνεται το *output* αυτού, με το schema να κερδίζει `duration`
-      (υπάρχει ήδη), `views`, `published_at`. Ranking μηχανικό (§14.12).
-      Μπλοκάρεται από τα δύο παρακάτω.
-- [x] ~~**YouTube Data API key** ως Cloudflare secret~~ ✅ **δόθηκε** — και μένει
-      **αχρησιμοποίητο** μέχρι να γραφτεί ο scanner. Κανένας κώδικας δεν το
-      διαβάζει σήμερα.
-- [ ] **`src/curation.json`** — ο roster του §17 ως structured data: creators +
-      `channel_id` + `register_lean` + topics + roles + `trusted_sources` +
-      pins/blocklist. **Ανθρώπινο αρχείο, git-versioned** — δεν το πειράζει ποτέ
-      το cron. **Το περιεχόμενο δεν λείπει πια:** το v3.1 λέει ότι υπάρχει
-      mapping sheet **16 θέματα × 27 creators + channel handles**, γραμμένο από
-      τον Nick. Μένει η *μεταφορά* του σε αρχείο και η εύρεση των `channel_id`
-      από τα handles. Το `trusted_sources` **ορίστηκε** (§14.12b): κανάλι creator
-      + trusted hosts, με `@DoctorsToTrust` global.
-- [ ] **ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής** (recency formula, split rule,
-      cron συχνότητα, KV layout) — προτάσεις έτοιμες στο τέλος του spec· το spec
-      ζητά ρητά έγκριση **πριν** γραφτεί κώδικας.
+- [x] ~~**Scan Layer**~~ ✅ **live 21/08/2026.** Cron-style scan →
+      προ-υπολογισμένο πλέγμα `grid:{topic}:{register}` σε KV (§14.13), με τον
+      ask-worker να διαβάζει από KV και να πέφτει πίσω στο bundled
+      `src/index.json` όταν το πλέγμα λείπει. Ranking μηχανικό (§14.12):
+      recency-weighted views, register από διάρκεια με median split, Shorts
+      έξω, `MAX_PER_CREATOR_PER_BOX = 3` ώστε ένα κουτί να μη γίνεται μονοπώλιο
+      ενός creator. **Καμία κλήση YouTube API στο request path.** Μένει μόνο το
+      εξωτερικό χρονόμετρο (επόμενο item).
+- [ ] **GitHub Actions cron για το `POST /api/scan`** — **το μόνο εκκρεμές του
+      scan.** Το Pages δεν κάνει cron (§ Cron & quota), οπότε το χρονόμετρο ζει
+      έξω. Χρειάζεται **ένα** secret: `SCAN_TOKEN`. **Όχι Cloudflare API token**
+      — το KV write το κάνει ο worker μέσω του `GRID` binding, το Action απλώς
+      κάνει ένα `curl`. Δύο λεπτομέρειες που θα δαγκώσουν αλλιώς: ένα πλήρες
+      πέρασμα μπορεί να μη χωρέσει σε μία invocation (γι' αυτό υπάρχει το
+      `?only=`, οπότε το workflow θέλει **slices σε σειρά**), και το πρώτο
+      προγραμματισμένο run θα είναι **incremental** — τα watermarks γράφτηκαν
+      ήδη, το ακριβό initial ingest έχει πληρωθεί.
+- [x] ~~**YouTube Data API key** ως Cloudflare secret~~ ✅ **δόθηκε και
+      χρησιμοποιείται** από τον scanner — **μόνο** στο `POST /api/scan`, ποτέ
+      στο request path του χρήστη (§14.13).
+- [x] ~~**`src/curation.json`**~~ ✅ **γραμμένο** — 16 θέματα, 23 creators για
+      scan + 4 `excluded_from_scan` (27 συνολικά, §17), channel ids resolved μία
+      φορά με το [tools/resolve-channels.mjs](tools/resolve-channels.mjs),
+      global trusted host `@DoctorsToTrust`. **Ανθρώπινο αρχείο, git-versioned**
+      — το cron δεν το πειράζει ποτέ. Τα `pins` και το `blocklist` υπάρχουν ως
+      πεδία αλλά είναι **άδεια**: το editorial override του §14.12 δεν έχει
+      ασκηθεί ακόμα (π.χ. το παλιό canonical του Lustig).
+- [x] ~~**ΟΚ στις τέσσερις αποφάσεις αρχιτεκτονικής**~~ ✅ **εγκρίθηκαν όπως
+      προτάθηκαν** (18/08) και υλοποιήθηκαν: recency `views / (μήνες + 3)`,
+      median split ανά creator ανά θέμα, εβδομαδιαίο incremental + μηνιαίο
+      link-rot, KV layout `grid:{topic}:{register}` + `grid:_meta` +
+      `scan:state:{creator}` (και `scan:videos:{creator}` που προστέθηκε στην
+      πορεία, για να μη ξαναδιαβάζει μια στενή παρτίδα ό,τι ήδη ξέρει).
 - [x] ~~**Ασυμφωνίες v0 schema ↔ v3 πλέγμα**~~ — **λύθηκαν 16/08/2026, με το
       πρώτο πραγματικό index.** Το `register` enum έγινε `start|deep` παντού
       (δεδομένα, prompt, `chat.js`) και το `flagship` έφυγε από το schema — τη
@@ -1319,23 +1406,27 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
       ανά creator, οπότε δεν χρειάζεται πίνακας για να ξεκινήσει τίποτα. Μένει μόνο
       το **register lean** των γυναικών ως provisional (§14.11) — προτεραιότητα
       creator στη λίστα, όχι προϋπόθεση.
-- [ ] **Curated video core** σε ~5-8 marquee θέματα — **ξεκίνησε, δεν τελείωσε.**
-      Live σήμερα: **2 θέματα, 12 βίντεο** (`getting-started` 6, `cholesterol` 6),
-      χειροκίνητα, με δικά μας link labels. Λείπουν τα υπόλοιπα marquee θέματα
-      (keto flu, insulin, electrolytes, fatty liver…) και το νέο «mental health &
-      nutrition». Ο στόχος **≥4 βίντεο ανά θέμα** (§14.2) καλύπτεται και στα δύο
-      σημερινά. Παράγεται από εδώ και πέρα από τον Scan Layer· **ποτέ**
-      transcripts ή rehost. *Έπαψε να είναι blocker για live.*
-- [ ] **API quota strategy** για το scanning — σχεδιασμός, όχι brute-force (§14.10).
-      Το scan-to-grid το μισολύνει από μόνο του: **καμία κλήση API ανά ερώτηση
-      χρήστη**, μόνο στο cron.
+- [x] ~~**Curated video core** σε ~5-8 marquee θέματα~~ ✅ **ξεπεράστηκε από τον
+      Scan Layer.** Το πλέγμα καλύπτει και τα **16** θέματα του `curation.json`,
+      όχι 5-8, και παράγεται μηχανικά αντί να γράφεται στο χέρι. Τα 12
+      χειροκίνητα βίντεο των 16/08 ζουν ως **fallback** στο `src/index.json`.
+      Ό,τι θέλει ανθρώπινο χέρι πηγαίνει πλέον στο **Sheet**, όχι στο repo.
+      **Ποτέ** transcripts ή rehost — αμετάβλητο.
+- [x] ~~**API quota strategy** για το scanning~~ ✅ **λύθηκε στην πράξη**: καμία
+      κλήση API ανά ερώτηση χρήστη (μόνο στο scan)· incremental watermark ανά
+      creator· cap 300 στο πρώτο ingest· `playlistItems` (50 βίντεο ανά unit)
+      αντί για `search`· batching με `?only=` για να μη σκάει η invocation. Ο
+      scanner σταματά με `429 quota_exceeded` και **κρατάει το παλιό πλέγμα** —
+      μισογραμμένο grid είναι χειρότερο από το χθεσινό ολόκληρο.
 - [x] ~~System prompt: pure-router + framing rule + link-label discipline + ιατρικό
       redirect + **Route A** (§14.7) + «not a ranking, it's a match» (§14.5)~~
       ✅ **live** — [src/prompt.js](src/prompt.js). Το λεξιλόγιο register είναι
-      πλέον `start|deep`. *Θα ξαναπεραστεί όταν μπει το πλέγμα:* το prompt σήμερα
-      περιγράφει το bundled index, όχι τα `grid:{topic}:{register}` κουτιά.
-- [ ] **Register progressive disclosure** — στο branch `register-ui`, **σε
-      preview**. Υλοποιήθηκε ως **μοντέλο Β**, όχι ως δύο κουμπιά δίπλα-δίπλα
+      πλέον `start|deep`. *Ξαναπεράστηκε 21/08:* το prompt περιγράφει πλέον το
+      πλέγμα και ζητά **δύο λίστες** (`video_ids` + `deep_video_ids`), με την
+      προτίμηση register να είναι **οδηγία και όχι φίλτρο** — θέμα με λίγα
+      βίντεο σερβίρει ό,τι έχει αντί να αδειάσει (§14.16).
+- [x] ~~**Register progressive disclosure**~~ ✅ **live 21/08/2026**
+      (merge `73d3077`). Υλοποιήθηκε ως **μοντέλο Β**, όχι ως δύο κουμπιά δίπλα-δίπλα
       πριν την απάντηση: ο bot δείχνει **κατευθείαν** τα start βίντεο και από
       κάτω ένα λεκτικό κουμπί «Θέλω πιο αναλυτικά» / «Show me the deep dive»,
       που **αντικαθιστά** τη λίστα με τα deep (και «Πίσω στα βασικά» για
@@ -1381,8 +1472,11 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
       δικός μας, όχι shared secret. Το `askcarnivores.com` είναι **σκόπιμα εκτός**
       του allow-list του `/api/ask`: το portal μας φτάνει ως iframe, όχι ως client
       (§16). Το portal βάζει το `frame-src` και το chrome από τη δική του μεριά.
-- [ ] **Cron maintenance worker για link rot** — **αναγκαίος**, όχι μελλοντικός:
-      video-level σημαίνει χιλιάδες links που σαπίζουν (§14.10)
+- [x] ~~**Cron maintenance worker για link rot**~~ ✅ **γράφτηκε** — ζει μέσα στο
+      ίδιο `POST /api/scan` (`pruneDeadLinks`), όχι σε ξεχωριστό worker: ρωτάει
+      αν τα βίντεο του πλέγματος είναι ακόμα public και πετάει τα νεκρά.
+      *Προσοχή:* τρέχει σε κάθε μη-dry run, δεν υπάρχει ξεχωριστό «μηνιαίο
+      πλήρες» mode — αν το θέλουμε όπως το spec, θέλει flag ή `?reset=`.
 - [ ] **Το morph να γίνει λειτουργικό σήμα** όταν ζήσει το bot: κύκλος σταθερός = idle
       / σε περιμένω· morph σε εξέλιξη = ψάχνω στο index· σταμάτημα στον κύκλο = έτοιμο.
       Τότε η κίνηση *σημαίνει* κάτι αντί να διακοσμεί, και το landing κρατάει ήδη το
@@ -1455,8 +1549,10 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
       αντί να κάνει redirect στο apex — δύο hostnames με ίδιο content, το οποίο
       διασπά το SEO signal. Θέλει Bulk Redirect ή Redirect Rule: `www` → apex (301).
       Καλύτερα τώρα, πριν μαζέψει links.
-- [ ] Συντήρηση index — link rot· δεν είναι πια «περιοδικός έλεγχος στο χέρι» αλλά
-      cron worker, βλ. τη λίστα του bot παραπάνω
+- [x] ~~Συντήρηση index — link rot~~ ✅ **αυτοματοποιήθηκε** μέσα στο
+      `POST /api/scan` (`pruneDeadLinks`). Θα αρχίσει να τρέχει **μόνο του**
+      όταν μπει το χρονόμετρο· μέχρι τότε συντήρηση σημαίνει «κάποιος καλεί το
+      endpoint».
 - [ ] Legal: disclaimer, privacy policy, terms
 - [ ] Λογότυπο / branding — υπάρχει παλέτα, λείπει mark & γραμματοσειρά
 - [ ] Social links (X, Instagram, κλπ.) — δεν έχουν δοθεί ακόμα
@@ -1650,6 +1746,43 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
     κανόνες UX (λεκτικός launcher, μεγάλα targets, full panel σε mobile).
   - **Sten Ekberg = χειροπράκτης, ποτέ MD** — γραμμένο πλέον ως hard rule στο §17,
     όχι μόνο ως σχόλιο σε μια κάρτα του portal.
+
+- **2026-08-18 → 21/08** — **Ο Scan Layer χτίστηκε και βγήκε live**, και μαζί του
+  δύο πράγματα που δεν ήταν στο spec. Με τη σειρά που έγιναν:
+  - **18/08 — τα θεμέλια.** `curation.json` (16 θέματα × 27 ονόματα), ο scanner
+    σε τέσσερα καθαρά κομμάτια (`match` / `rank` / `youtube` / `scan`), και το
+    `POST /api/scan`. **Το Pages δεν κάνει cron** — επαληθεύτηκε στα docs, όχι
+    υποτέθηκε: τα Cron Triggers είναι feature των Workers, τα Pages Functions
+    τρέχουν μόνο `onRequest*`. Άρα endpoint + εξωτερικό χρονόμετρο.
+  - **19/08 — ό,τι δίδαξε το dry run.** Cap 300 στο πρώτο ingest (ο Dave Mac
+    μόνος του έχει 2.699 uploads), matching **μόνο σε τίτλους**, Shorts έξω,
+    τρία βίντεο ανά creator ανά κουτί, εννιά aliases που τα βρήκαν οι
+    πραγματικοί τίτλοι, και **τέσσερις creators εκτός scan** επειδή οι τίτλοι
+    τους δεν είναι θέματα (βλ. `excluded_from_scan`).
+  - **20/08 — το Sheet override.** Ένα θέμα, ένας ιδιοκτήτης. Δική του ενότητα
+    παραπάνω.
+  - **21/08 — τρία merges στο `main`.** Ο scan layer· το **`?debug=1` gate** για
+    τα diagnostics που έμεναν στο δημόσιο response από το preview review· και το
+    **register toggle**. Επαληθεύτηκαν στο production με HTTP: `kv+sheet`,
+    δύο διαφορετικές λίστες με labels, μηδέν links και **κανένα κουμπί** στο
+    personal-medical.
+  - **Τα branches διαγράφηκαν** (`scan-layer`, `register-ui`), όπως και το
+    `bot-v0` πριν από αυτά. Recovery hashes στην «Τρέχουσα κατάσταση».
+  - **Τι έμεινε ανοιχτό:** το χρονόμετρο. Το scan τρέχει μόνο όταν το καλέσει
+    κάποιος με το χέρι.
+
+- **2026-08-21** — **Το register έγινε προοδευτική αποκάλυψη, όχι ερώτηση.** Το
+  §14.4 έλεγε «ο bot δείχνει [Start here | Go deeper] και ο χρήστης διαλέγει»·
+  υλοποιήθηκε ως **μοντέλο Β**: ο bot δείχνει **κατευθείαν** τα start και από
+  κάτω ένα λεκτικό κουμπί «Θέλω πιο αναλυτικά» που **αντικαθιστά** τη λίστα.
+  Καμία ερώτηση πριν την απάντηση — το «Just Ask» μένει ένα tap, και το κοινό
+  50+ δεν συναντά πύλη. Η ουσία του §14.4 (**ο χρήστης** διαλέγει βάθος, όχι το
+  μοντέλο) μένει ακέραιη· άλλαξε το *πότε* ρωτάμε, όχι το *ποιος* απαντά.
+  Μαζί διορθώθηκε μια ασυνέπεια που ζούσε από την αρχή: τα register chips ήταν
+  αγγλικά ακόμα και κάτω από ελληνική απάντηση. Πλέον **όλο το UI κείμενο
+  ακολουθεί τη γλώσσα της απάντησης** (`data.lang`), ανά turn — όχι το
+  `navigator.language`, γιατί Έλληνας με αγγλικό λειτουργικό είναι ο κανόνας,
+  όχι η εξαίρεση.
 
 > Ολόκληρο το concept, η αγορά **και των δύο** domains και το live Under Construction
 > έγιναν μέσα σε **μία νύχτα** (13→14/08/2026). Ο bot που απαντάει ήρθε δύο μέρες
