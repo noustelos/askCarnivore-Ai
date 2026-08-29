@@ -226,6 +226,37 @@
   .contact:hover,
   .contact:focus-visible { opacity: 1; }
 
+  /* The only navigational link on the page, and so the loudest thing in the
+     footer — it sits above the provider line, which is the foot of the
+     ascending order (this, then Mistral, then the address, then the
+     signature). A header link was the alternative and lost: this page has no
+     nav at all, and putting one up top would put it beside the ask box. */
+  .about {
+    display: block;
+    width: fit-content;
+    margin: 0 auto .55rem;
+    padding: .5rem .45rem;
+    color: var(--fg);
+    font-size: clamp(.7rem, 2.6vw, .8rem);
+    font-weight: 600;
+    letter-spacing: .02em;
+    line-height: 1;
+    text-decoration: underline;
+    text-underline-offset: .22em;
+    text-decoration-color: hsl(20 18% 97% / .4);
+    opacity: .82;
+    transition: opacity .25s ease, text-decoration-color .25s ease;
+  }
+
+  .about:hover,
+  .about:focus-visible { opacity: 1; text-decoration-color: var(--fg); }
+
+  .about:focus-visible {
+    border-radius: .35rem;
+    outline: 2px solid hsl(0 0% 100% / .75);
+    outline-offset: 2px;
+  }
+
   /* Provider attribution: the quietest line of the three, and the only one
      that is not a link — it states a fact, it does not send anyone anywhere.
      Ordering in the footer is ascending weight: this, then the address, then
@@ -442,6 +473,13 @@
   </main>
 
   <footer>
+    <!-- Who built this and why. Same data-el pattern as the status strip:
+         English in the markup so it reads without JavaScript, Greek in the
+         attribute. The script at the foot picks between them — and honours a
+         language already chosen on /about, which is where that preference is
+         set today and where the site's EN/EL toggle will grow from. -->
+    <a class="about" href="/about" data-el="Η ιστορία μου">My Story</a>
+
     <!-- Which model does the routing, and where it is hosted. Plain text, no
          link and no logo: this is disclosure, not a partnership badge, and a
          provider mark would need permission we have not asked for.
@@ -490,24 +528,36 @@
     document.querySelector('.pl').pauseAnimations();
   }
 
-  /* The status strip: Greek copy for a Greek browser, and a × that stays
-     dismissed. localStorage is wrapped because a locked-down browser throws on
-     access rather than returning null — a notice is not worth an exception
-     that stops the rest of this file running. */
+  /* Greek copy for a Greek reader, and a × that stays dismissed.
+     localStorage is wrapped because a locked-down browser throws on access
+     rather than returning null — a notice is not worth an exception that
+     stops the rest of this file running. */
   (function () {
-    var strip = document.getElementById('status');
     var store = function (fn) { try { return fn(localStorage); } catch (e) { return null; } };
+
+    /* One decision, used by everything on this page that speaks. A choice
+       made on /about wins; the browser's language is the fallback. This page
+       has no switch of its own yet — when it grows one, it reads and writes
+       this same key, so the two surfaces cannot disagree. */
+    var saved = store(function (s) { return s.getItem('lang'); });
+    var greek = saved === 'el' || (saved !== 'en' && /^el\b/i.test(navigator.language || ''));
+
+    var swap = function (node) {
+      if (!greek || !node) return;
+      node.lang = 'el';
+      node.textContent = node.dataset.el;
+    };
+
+    swap(document.querySelector('.about'));
+
+    var strip = document.getElementById('status');
 
     if (store(function (s) { return s.getItem('status-dismissed'); }) === '1') {
       strip.remove();
       return;
     }
 
-    if (/^el\b/i.test(navigator.language || '')) {
-      var line = strip.querySelector('p');
-      line.lang = 'el';
-      line.textContent = line.dataset.el;
-    }
+    swap(strip.querySelector('p'));
 
     var close = document.createElement('button');
     close.type = 'button';

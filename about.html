@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Story — Ask Carnivore Ai</title>
+<meta name="description" content="Why Ask Carnivore Ai exists, and the personal story behind it — in English and in Greek.">
+<meta name="theme-color" content="#4a1024">
+<meta property="og:title" content="My Story — Ask Carnivore Ai">
+<meta property="og:description" content="Why Ask Carnivore Ai exists, and the personal story behind it.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://askcarnivore.com/about">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A5%A9%3C/text%3E%3C/svg%3E">
+<style>
+  /* ------------------------------------------------------------------
+     /about — the one page on this site that is read rather than used.
+
+     Deliberately still. The landing cycles through three colours over 27s
+     and morphs its mark every 10.8s; underneath two thousand words of
+     prose that is a distraction, not an identity. So this page keeps the
+     palette and drops the motion, the same trade /embed already makes:
+     one resting colour (--c1, wine), no mark, no vignette.
+
+     Bilingual by duplication, not by templating. Both languages ship in
+     the markup; English is the one that survives with JavaScript off,
+     exactly as the landing's status strip does. The switch at the top is
+     the prototype for the landing's own EN/EL toggle — same regex, same
+     localStorage key ('lang'), so the two will agree when it lands.
+     ------------------------------------------------------------------ */
+
+  *, *::before, *::after {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --c1: hsl(343 72% 34%);          /* wine — the landing's resting colour */
+
+    --fg:       hsl(20 20% 97%);
+    --fg-soft:  hsl(20 18% 97% / .82);
+    --rule:     hsl(20 18% 97% / .18);
+
+    --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
+            Helvetica, Arial, sans-serif;
+
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.2rem);
+  }
+
+  body {
+    min-height: 100svh;
+    padding: 1.5rem 1.25rem 4rem;
+    /* Static. No animation property at all — see the note at the top. */
+    background-color: var(--c1);
+    color: var(--fg);
+    font-family: var(--font);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  /* ---- top bar: the way back, and the way into the other language ---- */
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    max-width: 38rem;
+    margin: 0 auto 2.5rem;
+  }
+
+  .home {
+    padding: .5rem .3rem;
+    color: var(--fg-soft);
+    font-size: clamp(.78rem, 3vw, .88rem);
+    font-weight: 600;
+    letter-spacing: .01em;
+    text-decoration: none;
+    opacity: .78;
+    transition: opacity .25s ease;
+  }
+
+  .home:hover,
+  .home:focus-visible { opacity: 1; }
+
+  /* Words, not a flag and not "EN | EL": the audience skews 50+ and a
+     two-letter code is not a thing you recognise as a control (§16). The
+     button always names the language you would be switching TO. */
+  .lang {
+    flex: none;
+    padding: .6rem 1rem;
+    /* 2.75rem — a comfortable tap target on a phone, per the same rule. */
+    min-height: 2.75rem;
+    border: 1px solid var(--rule);
+    border-radius: .5rem;
+    background: hsl(0 0% 0% / .22);
+    color: var(--fg);
+    font: inherit;
+    font-size: clamp(.78rem, 3vw, .88rem);
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+
+  .lang:hover,
+  .lang:focus-visible { background: hsl(0 0% 0% / .34); border-color: hsl(20 18% 97% / .34); }
+
+  .home:focus-visible,
+  .lang:focus-visible {
+    border-radius: .5rem;
+    outline: 2px solid hsl(0 0% 100% / .75);
+    outline-offset: 2px;
+  }
+
+  /* ---- the reading column ---- */
+
+  article {
+    width: 100%;
+    max-width: 38rem;
+    margin: 0 auto;
+  }
+
+  h1 {
+    margin-bottom: 2rem;
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -.03em;
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+
+  h2 {
+    margin: 3rem 0 1.1rem;
+    font-size: clamp(1.2rem, 4.5vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: -.015em;
+    line-height: 1.2;
+  }
+
+  p { margin-bottom: 1.15rem; }
+
+  p:last-child { margin-bottom: 0; }
+
+  /* The epigraph. The Greek is the source, the English under it a gloss —
+     so the quotation carries both on both versions of the page, and only
+     the attribution line changes language. */
+  blockquote {
+    margin-bottom: 2.5rem;
+    padding-left: 1.1rem;
+    border-left: 2px solid var(--rule);
+    color: var(--fg-soft);
+  }
+
+  blockquote p { margin-bottom: .7rem; font-size: .95em; }
+  blockquote p:last-child { margin-bottom: 0; }
+
+  .cite { font-size: .88em; opacity: .8; }
+  .gloss { font-style: italic; }
+
+  hr {
+    height: 1px;
+    margin: 2.75rem 0;
+    background: var(--rule);
+  }
+
+  /* The sign-off: quieter than the body, and set apart from it. */
+  .sign {
+    margin-top: 2.5rem;
+    color: var(--fg-soft);
+    font-style: italic;
+  }
+
+  .sign p { margin-bottom: .2rem; }
+
+  a:not(.home):not(.lang) {
+    color: var(--fg);
+    text-decoration: underline;
+    text-underline-offset: .18em;
+    text-decoration-color: hsl(20 18% 97% / .45);
+    transition: text-decoration-color .25s ease;
+  }
+
+  a:not(.home):not(.lang):hover,
+  a:not(.home):not(.lang):focus-visible { text-decoration-color: var(--fg); }
+
+  a:not(.home):not(.lang):focus-visible {
+    border-radius: .2rem;
+    outline: 2px solid hsl(0 0% 100% / .75);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+  <nav class="bar">
+    <!-- Not translated, and deliberately so: the label is the wordmark, which
+         is the same in both languages. The arrow carries the "back". -->
+    <a class="home" href="/">← Ask Carnivore Ai</a>
+
+    <!-- Hidden until the script takes it over, so a visitor without
+         JavaScript is never handed a button that does nothing — the same
+         reasoning that makes the landing build its × in script. -->
+    <button class="lang" id="lang" type="button" hidden>Ελληνικά</button>
+  </nav>
+
+  <!-- ================================================================
+       Both languages ship in full. English first and unhidden: it is the
+       fallback when there is no script to make a choice.
+       ================================================================ -->
+
+  <article id="en" lang="en">
+    <h1>My Story</h1>
+
+    <blockquote>
+      <p lang="grc">«Ἐν τροφῇ φαρμακείη ἄριστον, ἐν τροφῇ φαρμακείη φλαῦρον, φλαῦρον καὶ ἄριστον πρός τι.»</p>
+      <p class="cite">— Hippocrates, <em>On Nutriment</em> (§19)</p>
+      <p class="gloss">“In food, healing power is best; in food, healing power is harmful. The harmful and the beneficial depend on the context.”</p>
+    </blockquote>
+
+    <hr>
+
+    <h2>My story so far</h2>
+
+    <p>My name is Nick. As a Greek, I'm lucky: the terms of medicine, biochemistry and the related sciences have ancient Greek roots, so I can follow and understand the lectures of the community's leading creators with ease — even though I have no medical training.</p>
+
+    <p>My personal story began after 2020. During covid I gained 22 kilos (about 48 pounds), and then came the struggle to lose them. I followed all the usual advice — CICO, “exercise more, eat less,” more plant-based — and had very little success. At the same time I was dealing with hair loss and joint pain; to be able to work, I was spending a serious amount every month on massage to relieve my neck and lower back.</p>
+
+    <p>Searching for information on YouTube, I was lucky to find Sten Ekberg and Dr. Robert Lustig first. Then came Dr. Ken Berry, Dr. Anthony Chaffee, Dr. Paul Mason, Dr. Ben Bikman, Dr. Nick Norwitz. A special mention to Professor Bart Kay: with his solid, robust scientific training and experience, he comments on and critiques information in his caustic way, and presents the scientific facts as they are — not as the well-known, baseless “theologies” would have them. He is the person who helped me overcome deep fears around food and health; the indoctrination of the era about what we should and shouldn't eat was firmly rooted in me, having grown up in the 80s and 90s.</p>
+
+    <p>The knowledge these creators gave me first pushed me toward a ketogenic diet. The first results came quickly: I lost weight, felt better, my physical pain eased — though it didn't disappear, as it would later. But when you have a thirst for knowledge, you keep going. Watching a video by the excellent Dr. Ken Berry, who urged us to start a 90-day challenge, I began seriously considering the carnivore diet. Dr. Anthony Chaffee had already set me thinking with his point about the ancestral diet, and Dr. Ken Berry's <em>proper human diet</em> completed the puzzle.</p>
+
+    <p>The next morning, looking into my fridge, I saw I didn't even have the 20 grams of carbs I was keeping to on keto. All I had was (!) meat, eggs and bacon. That was the moment it clicked: <em>I have everything I need for carnivore — let's start.</em></p>
+
+    <p>The thirty days passed quickly. I had no issues with cravings or sugar addiction — keto had already eased and solved all that. And I will never forget, as long as I live, the experience of the thirtieth day. I woke up in a state of shock: rested, zero joint pain, zero pain in my lower back and neck, and with an unfamiliar calm. My brain was broadcasting a <em>“we're okay — you can smile.”</em> Shock. A genuinely unfamiliar feeling. Yes, I knew it would happen — from the thousands of hours of podcasts and videos I'd watched over the previous years. But it was the days that followed, when I noticed this mental calm more deeply, and the appetite to go outside and do things.</p>
+
+    <p>For years I had suffered from varying degrees of depression, ruminating thoughts, panic attacks, wrong decisions on crucial matters, very little composure. Now I'm more optimistic and confident; daily life isn't a burden, and I stay functional without feeling tired for 16-18 hours.</p>
+
+    <p>By now we're in 2025, when — following a pure carnivore diet — I had these first outstanding results. Then came new clothes, some muscle appearing on my arms without much effort, cycling and swimming as routine. The first 90 days passed easily — Dr. Ken Berry would be proud of me for completing the challenge. That was 14 months ago. Along with those months passed the initial resentment and anger over the wrong information I'd been given for decades, and my urge to go out and shout it on every corner: <em>it isn't age that makes you sick — it's the diet.</em></p>
+
+    <p>Reaching today, that thirtieth day feels like a mere prelude to what I experience now. I've moved past the matter of body weight, and the mental calm — combined with mental clarity and incredible levels of energy — has become everyday life, no longer a surprise or a passing phase. I'm 58, and I work six months every summer as a night manager: a nightly shift in a five-star hotel by the sea. The shield that carnivore gives me against the humidity and the wrong rhythms — I sleep by day, work by night — I can't describe more briefly than this: <em>I have the body I had at 20 and the energy of my 30s.</em></p>
+
+    <p>Alongside the night shift, I run my own studio, <strong>Noustelos Studio</strong> — this bot and this site were created there. And one important detail: every day on my shift, while I check spreadsheets and the main courante, I listen to 2-3 interviews / testimonials from Dave Mac's channel. It's the healthiest addiction I've ever had. Dave Mac's contribution to the community is enormous — we all owe him a big thank you for his work. His interviews have given me a lot of courage, and knowledge in fields I didn't expect. So, if Dave Mac asked me, my answer would be: <em>there is no chance I'll ever change this lifestyle, for any reason.</em></p>
+
+    <hr>
+
+    <h2>Why I built it</h2>
+
+    <p>The idea for the AI bot and the site came from a need to give something back to the community and help spread the carnivore lifestyle. Having faced the chaos of the information ocean myself — and precious lost hours until I found the right creators with credible content every time I wanted to learn something, e.g. what exactly the Randle Cycle is — I thought of building a tool that would help people like me, as well as those who don't know where to start.</p>
+
+    <p>So what you have in your hands is a <strong>directory of creators</strong> and an <strong>AI bot</strong> that pulls, on the topic you care about, links from their YouTube channels — and can point you to credible content from people the carnivore community loves and recognizes. Most of them are the very scientists who laid the solid foundations it was built on.</p>
+
+    <p>It wasn't made to pose as the new authority, nor to replace doctors. It's a clean switchboard: it brings you straight to the right video, the right source, the right depth — with no friction and no paywalls.</p>
+
+    <hr>
+
+    <h2>Thanks</h2>
+
+    <p>I want to thank all of you creators — Sten Ekberg, Dr. Robert Lustig, Dr. Ken Berry, Dr. Anthony Chaffee, Dr. Paul Mason, Dr. Ben Bikman, Dr. Nick Norwitz, Professor Bart Kay, Dave Mac, and everyone who spent years sharing this knowledge publicly — for the health I have today and for your invaluable contribution to our carnivore community.</p>
+
+    <!-- email_off, exactly as in the landing's footer: Cloudflare's Email
+         Address Obfuscation (Scrape Shield, on by default) would otherwise
+         rewrite this into a "[email protected]" placeholder and inject a
+         decode script to restore it — a script this page's CSP blocks. -->
+    <p>I'd be glad to hear your feedback at <strong><!--email_off--><a href="mailto:info@askcarnivores.com">info@askcarnivores.com</a><!--/email_off--></strong>.</p>
+
+    <div class="sign">
+      <p>— Nick</p>
+      <p><a href="https://noustelos.gr" target="_blank" rel="noopener">Noustelos Studio</a></p>
+    </div>
+  </article>
+
+  <article id="el" lang="el" hidden>
+    <h1>Η ιστορία μου</h1>
+
+    <blockquote>
+      <p lang="grc">«Ἐν τροφῇ φαρμακείη ἄριστον, ἐν τροφῇ φαρμακείη φλαῦρον, φλαῦρον καὶ ἄριστον πρός τι.»</p>
+      <p class="cite">— Ιπποκράτης, <em>Περί Τροφής</em> (§19)</p>
+      <p class="gloss">«Στην τροφή υπάρχει θεραπευτική δύναμη άριστη· στην τροφή υπάρχει και βλαβερή. Το βλαβερό και το άριστο εξαρτώνται από την περίπτωση.»</p>
+    </blockquote>
+
+    <hr>
+
+    <h2>Η ιστορία μου μέχρι τώρα</h2>
+
+    <p>Με λένε Nick. Σαν Έλληνας είμαι τυχερός: οι όροι της ιατρικής, της βιοχημείας και των συναφών επιστημών έχουν αρχαιοελληνικές ρίζες, έτσι παρακολουθώ και κατανοώ άνετα τις διαλέξεις των επιφανών δημιουργών της κοινότητας — παρότι δεν έχω ιατρική εκπαίδευση.</p>
+
+    <p>Η προσωπική μου ιστορία ξεκίνησε μετά το 2020. Την εποχή του covid πήρα 22 κιλά (περίπου 48 pounds), και μετά άρχισε ο αγώνας να τα χάσω. Ακολούθησα όλα τα γνωστά — CICO, «ασκήσου περισσότερο, φάε λιγότερο», περισσότερο plant-based — και είχα ελάχιστη επιτυχία. Την ίδια στιγμή αντιμετώπιζα τριχόπτωση και πόνους στις αρθρώσεις· για να μπορώ να δουλεύω, ξόδευα κάθε μήνα ένα σοβαρό ποσό σε μασάζ για ανακούφιση στον αυχένα και τη μέση.</p>
+
+    <p>Αναζητώντας πληροφορίες στο YouTube, είχα την τύχη να βρω πρώτους τον Sten Ekberg και τον Dr. Robert Lustig. Ακολούθησαν ο Dr. Ken Berry, ο Dr. Anthony Chaffee, ο Dr. Paul Mason, ο Dr. Ben Bikman, ο Dr. Nick Norwitz. Ειδική μνεία στον καθηγητή Bart Kay: με τη στέρεη, robust επιστημονική κατάρτιση και εμπειρία του, σχολιάζει και κριτικάρει με καυστικό τρόπο τις πληροφορίες και παρουσιάζει τα επιστημονικά γεγονότα όπως είναι — όχι όπως τα θέλουν οι γνωστές, ανυπόστατες «θεολογίες». Είναι ο άνθρωπος που με βοήθησε να ξεπεράσω ισχυρές φοβίες γύρω από τη διατροφή και την υγεία· το indoctrination της εποχής για το τι πρέπει και τι δεν πρέπει να τρώμε ήταν βαθιά ριζωμένο μέσα μου, καθώς μεγάλωσα στα 80s και τα 90s.</p>
+
+    <p>Η γνώση που μου έδωσαν αυτοί οι δημιουργοί με ώθησε αρχικά στην κετογονική διατροφή. Γρήγορα ήρθαν τα πρώτα αποτελέσματα: έχασα κιλά, ένιωσα καλύτερα, μειώθηκαν οι σωματικοί πόνοι — αλλά δεν εξαφανίστηκαν, όπως θα γινόταν αργότερα. Όταν όμως έχεις τη δίψα για γνώση, συνεχίζεις. Παρακολουθώντας ένα βίντεο του εξαιρετικού Dr. Ken Berry, που μας παρότρυνε να ξεκινήσουμε ένα 90-day challenge, άρχισα να σκέφτομαι σοβαρά να ακολουθήσω την carnivore διατροφή. Με είχε ήδη βάλει σε σκέψεις ο Dr. Anthony Chaffee με την επισήμανσή του για την ancestral diet, και η <em>proper human diet</em> του Dr. Ken Berry αλληλοσυμπλήρωσαν το παζλ.</p>
+
+    <p>Την επόμενη μέρα το πρωί, κοιτάζοντας το ψυγείο μου, είδα ότι δεν είχα καν τα 20 γραμμάρια υδατανθράκων που ακολουθούσα στην keto. Είχα μόνο (!) κρέας, αβγά και bacon. Εκείνη τη στιγμή έγινε το κλικ: <em>έχω ό,τι χρειάζομαι για carnivore — ας το ξεκινήσω.</em></p>
+
+    <p>Οι τριάντα μέρες πέρασαν γρήγορα. Δεν είχα θέματα με cravings ή sugar addiction — η keto τα είχε ήδη απαλύνει και λύσει όλα αυτά. Και δεν θα ξεχάσω ποτέ όσο ζω την εμπειρία της τριακοστής ημέρας. Ξύπνησα σε κατάσταση σοκ: ξεκούραστος, μηδέν πόνοι στις αρθρώσεις, μηδέν πόνοι στη μέση και τον αυχένα, και με μια πρωτόγνωρη ηρεμία. Ο εγκέφαλος εξέπεμπε ένα <em>«είμαστε καλά· μπορείς να χαμογελάσεις»</em>. Σοκ. Ένα αληθινά πρωτόγνωρο συναίσθημα. Ναι, το ήξερα ότι θα συμβεί — από τις χιλιάδες ώρες podcasts και βίντεο που είχα παρακολουθήσει τα προηγούμενα χρόνια. Αλλά ήταν οι μέρες που ακολούθησαν, όπου πρόσεξα περισσότερο αυτή την ψυχική ηρεμία και την όρεξη να βγω έξω, να κάνω πράγματα.</p>
+
+    <p>Για χρόνια υπέφερα από διάφορες διαβαθμίσεις κατάθλιψης, ruminating thoughts, κρίσεις πανικού, λάθος αποφάσεις σε καίρια θέματα, ελάχιστη ψυχραιμία. Πλέον είμαι πιο αισιόδοξος και με αυτοπεποίθηση· η καθημερινότητα δεν είναι βάρος, και είμαι λειτουργικός χωρίς να νιώθω κούραση για 16-18 ώρες.</p>
+
+    <p>Βρισκόμαστε πλέον στο 2025, όταν, ακολουθώντας pure carnivore διατροφή, είχα αυτά τα πρώτα εξαιρετικά αποτελέσματα. Ακολούθησαν αγορές νέων ρούχων, κάποιοι μύες στα χέρια που εμφανίστηκαν χωρίς μεγάλη προσπάθεια, ποδήλατο και κολύμπι ως καθημερινότητα. Οι πρώτες 90 ημέρες πέρασαν άνετα — ο Dr. Ken Berry θα ήταν περήφανος για μένα για την επιτυχή εκπλήρωση του challenge. Από τότε πέρασαν 14 μήνες. Μαζί τους πέρασε και η αρχική αγανάκτηση, ο θυμός για τις λάθος πληροφορίες που μου έδιναν όλες αυτές τις δεκαετίες, και η ανάγκη μου να βγω να το φωνάξω σε κάθε γωνιά: <em>δεν είναι η ηλικία που σας κάνει άρρωστους — είναι η διατροφή.</em></p>
+
+    <p>Φτάνοντας στο σήμερα, εκείνη η τριακοστή ημέρα μοιάζει απλό προεόρτιο για όσα βιώνω τώρα. Έχω ξεπεράσει το θέμα του σωματικού βάρους, και η ψυχική ηρεμία — σε συνδυασμό με πνευματική διαύγεια και απίστευτα επίπεδα ενέργειας — έχει γίνει καθημερινότητα, που έπαψε πια να είναι έκπληξη ή περιοδικό φαινόμενο. Είμαι 58 ετών και εργάζομαι έξι μήνες κάθε καλοκαίρι ως night manager: καθημερινή νυχτερινή βάρδια σε πεντάστερο ξενοδοχείο, δίπλα στη θάλασσα. Την ασπίδα της carnivore απέναντι στην υγρασία και στους λάθος βιορυθμούς — κοιμάμαι μέρα, δουλεύω νύχτα — δεν την περιγράφω συντομότερα από αυτή τη φράση: <em>έχω το σώμα που είχα στα 20 και την ενέργεια των 30 μου.</em></p>
+
+    <p>Παράλληλα με τη νυχτερινή βάρδια, τρέχω το προσωπικό μου studio, το <strong>Noustelos Studio</strong> — από εκεί δημιουργήθηκαν αυτό το bot και το site. Και μια σημαντική λεπτομέρεια: καθημερινά στη βάρδια, όταν ελέγχω λογιστικά φύλλα και το main courante, ακούω 2-3 συνεντεύξεις / testimonials από το κανάλι του Dave Mac. Είναι το πιο υγιές addiction που είχα ποτέ στη ζωή μου. Η συνεισφορά του Dave Mac στην κοινότητα είναι τεράστια — του οφείλουμε όλοι ένα μεγάλο ευχαριστώ για το έργο του. Οι συνεντεύξεις του μού έχουν δώσει πολύ κουράγιο, αλλά και γνώσεις σε πεδία που δεν περίμενα. Οπότε, αν ο Dave Mac με ρωτούσε, θα του απαντούσα: <em>δεν υπάρχει περίπτωση να αλλάξω αυτό το lifestyle στο μέλλον, για κανέναν λόγο.</em></p>
+
+    <hr>
+
+    <h2>Γιατί το έφτιαξα</h2>
+
+    <p>Η ιδέα για το AI bot και το site γεννήθηκε από την ανάγκη να προσφέρω κάτι πίσω στην κοινότητα και να βοηθήσω στη διάδοση του carnivore lifestyle. Έχοντας αντιμετωπίσει ο ίδιος το χάος στον ωκεανό της πληροφορίας — και πολύτιμες χαμένες ώρες μέχρι να βρω σωστούς δημιουργούς με έγκυρο περιεχόμενο κάθε φορά που ήθελα να μάθω κάτι, π.χ. τι ακριβώς είναι το Randle Cycle — σκέφτηκα να φτιάξω ένα εργαλείο που θα βοηθήσει ανθρώπους σαν εμένα, αλλά και όσους δεν ξέρουν από πού να ξεκινήσουν.</p>
+
+    <p>Έχετε λοιπόν στα χέρια σας ένα <strong>ευρετήριο δημιουργών</strong> και ένα <strong>AI bot</strong> που αντλεί, σχετικά με το θέμα που σας ενδιαφέρει, links από τα κανάλια τους στο YouTube — και μπορεί να σας κατευθύνει σε έγκυρο περιεχόμενο από ανθρώπους που αγαπάει και αναγνωρίζει η carnivore κοινότητα. Οι περισσότεροι είναι οι ίδιοι οι επιστήμονες που έβαλαν τις γερές βάσεις πάνω στις οποίες αυτή χτίστηκε.</p>
+
+    <p>Δεν φτιάχτηκε για να παραστήσει τη νέα αυθεντία ούτε για να αντικαταστήσει τους γιατρούς. Είναι ένας καθαρός τηλεφωνητής/διανομέας: σας φέρνει κατευθείαν στο σωστό βίντεο, στη σωστή πηγή, στο σωστό επίπεδο βάθους — χωρίς τριβή και χωρίς paywalls.</p>
+
+    <hr>
+
+    <h2>Ευχαριστίες</h2>
+
+    <p>Θέλω να ευχαριστήσω όλους εσάς τους δημιουργούς — τον Sten Ekberg, τον Dr. Robert Lustig, τον Dr. Ken Berry, τον Dr. Anthony Chaffee, τον Dr. Paul Mason, τον Dr. Ben Bikman, τον Dr. Nick Norwitz, τον καθηγητή Bart Kay, τον Dave Mac, και όλους όσους αφιέρωσαν χρόνια για να μοιραστούν αυτή τη γνώση δημόσια — για την υγεία που έχω σήμερα και για τη σημαντικότατη προσφορά σας στην carnivore κοινότητά μας.</p>
+
+    <p>Θα χαρώ πολύ να έχω το feedback σας στο <strong><!--email_off--><a href="mailto:info@askcarnivores.com">info@askcarnivores.com</a><!--/email_off--></strong>.</p>
+
+    <div class="sign">
+      <p>— Nick</p>
+      <p><a href="https://noustelos.gr" target="_blank" rel="noopener">Noustelos Studio</a></p>
+    </div>
+  </article>
+
+<script>
+  /* The language switch.
+
+     Prototype for the landing's own EN/EL toggle, so the pieces it shares
+     with the status strip are shared deliberately: the same /^el\b/i test
+     against navigator.language, and the same try-wrapped localStorage —
+     a locked-down browser throws on access rather than returning null, and
+     a preference is not worth an exception that stops the file running.
+
+     Precedence is: a stored choice first, the browser's language second.
+     Once someone has picked, the browser stops getting a vote. */
+  (function () {
+    var en = document.getElementById('en');
+    var el = document.getElementById('el');
+    var button = document.getElementById('lang');
+
+    var store = function (fn) { try { return fn(localStorage); } catch (e) { return null; } };
+
+    var saved = store(function (s) { return s.getItem('lang'); });
+    var lang = saved === 'el' || saved === 'en'
+      ? saved
+      : (/^el\b/i.test(navigator.language || '') ? 'el' : 'en');
+
+    /* The button always names the language you would switch TO, which is
+       also the language its own label is written in — so it reads to
+       someone who cannot read the page they are currently looking at. */
+    function apply(next) {
+      lang = next;
+      var greek = lang === 'el';
+
+      en.hidden = greek;
+      el.hidden = !greek;
+
+      document.documentElement.lang = lang;
+      document.title = greek
+        ? 'Η ιστορία μου — Ask Carnivore Ai'
+        : 'My Story — Ask Carnivore Ai';
+
+      button.textContent = greek ? 'English' : 'Ελληνικά';
+      button.setAttribute('lang', greek ? 'en' : 'el');
+      button.setAttribute('aria-label', greek ? 'Switch to English' : 'Αλλαγή στα ελληνικά');
+    }
+
+    apply(lang);
+    button.hidden = false;
+
+    button.addEventListener('click', function () {
+      var next = lang === 'el' ? 'en' : 'el';
+      apply(next);
+      store(function (s) { return s.setItem('lang', next); });
+      window.scrollTo({ top: 0 });
+    });
+  })();
+</script>
+</body>
+</html>

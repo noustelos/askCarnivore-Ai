@@ -17,6 +17,16 @@
 /index.html
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 
+# /about is a document, not a surface: nobody frames it, so it says so. Both
+# paths are listed because Pages serves the file under either, and a rule that
+# names only one leaves the other with NO policy at all — there is no /* CSP
+# here to fall back on, by the design described above.
+/about
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+/about.html
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
 # The one embeddable surface. askcarnivores.com only — and only as a frame.
 /embed
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors https://askcarnivores.com https://www.askcarnivores.com
