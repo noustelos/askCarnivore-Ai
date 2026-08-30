@@ -40,7 +40,23 @@
        hues left with the animation rather than lingering as tokens nothing
        uses. Deepened from the original hsl(… 90% 50%) so white text clears
        WCAG AA on it (8.5:1). */
-    --c1: hsl(343 72% 34%);   /* wine */
+    /* Eucalyptus. Chosen 31/08/2026, replacing the wine.
+
+       LANDING ONLY so far. chat.css, embed.html and the Highlights renderer
+       still carry the wine, so the page and the framed panel do not match
+       yet — making them agree is the next pass, not an oversight.
+
+       Picked for contrast as much as for calm. White text on it is 7.24:1 and
+       --fg-soft is 5.50:1, which is where the wine already sat (7.66 / 5.59) —
+       so this is a swap with no accessibility cost. The two shades suggested
+       first were lighter than they looked: #6b7d6a gives 4.09:1 and fails AA
+       outright, #5f7268 gives 4.76:1 and drops --fg-soft to 3.79:1. Depth is
+       what buys the calm here; lightness is what breaks it.
+
+       The two that were also on the shortlist, if this is ever revisited:
+         deeper : hsl(150 10% 26%)  — 8.98 / 6.65, the safest and the quietest
+         lighter: hsl(145 12% 31%)  — 6.74 / 5.16, still passes */
+    --c1: hsl(160 14% 29%);   /* eucalyptus */
 
     --fg:       hsl(20 20% 97%);
     --fg-soft:  hsl(20 18% 97% / .82);
@@ -335,7 +351,13 @@
     font-size: clamp(.58rem, 2.2vw, .68rem);
     letter-spacing: .02em;
     line-height: 1;
-    opacity: .5;
+    /* .7, not .5. This line is small and dim by design — it is disclosure,
+       not a headline — but at .5 it landed on 2.61:1 against the ground,
+       which is under every threshold there is, and it was under them on the
+       old wine too. .7 brings it to 3.60:1: still visibly the quietest line
+       in the footer, now actually readable by someone who needs to read it.
+       Raising it further would start competing with the address above it. */
+    opacity: .7;
   }
 
   .contact:focus-visible {
