@@ -349,7 +349,13 @@
     font-size: clamp(.58rem, 2.2vw, .68rem);
     letter-spacing: .02em;
     line-height: 1;
-    opacity: .5;
+    /* .7, not .5. This line is small and dim by design — it is disclosure,
+       not a headline — but at .5 it landed on 2.61:1 against the ground,
+       which is under every threshold there is, and it was under them on the
+       old wine too. .7 brings it to 3.60:1: still visibly the quietest line
+       in the footer, now actually readable by someone who needs to read it.
+       Raising it further would start competing with the address above it. */
+    opacity: .7;
   }
 
   .contact:focus-visible {
