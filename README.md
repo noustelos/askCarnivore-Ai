@@ -15,7 +15,7 @@ advice, and it does not sell anything. Concept, decisions and open items live in
 ```
 index.html        landing page + the ask box
 about.html        /about — "My Story", bilingual, its own language switch
-embed.html        /embed — the view askcarnivores.com frames (§16)
+embed.html        /embed — the view askcarnivores.com frames (§16), live since 30/08
 chat.css          the chat surface, shared by the landing and /embed
 chat.js           the chat client, shared by the landing and /embed
 _headers          CSP, incl. who may frame us — declared per page
@@ -78,6 +78,22 @@ purpose: two matching rules are merged and the strictest wins, so a blanket
 `frame-ancestors 'none'` would silently veto `/embed`. The cost is that a new
 page with no rule of its own ships with **no CSP at all**. Declare both paths —
 `/name` and `/name.html` — since Pages serves it under either.
+
+## The portal frames /embed — and that is the whole connection
+
+Since 2026-08-30 `askcarnivores.com` opens a panel containing an iframe of
+`/embed`. **Nothing on this side changed for it** and nothing should: the
+`frame-ancestors` in `_headers` was already there, and `askcarnivores.com` stays
+**deliberately out** of the `/api/ask` allow-list. `chat.js` calls a relative
+path, so inside the frame the origin is ours and the check passes — the portal is
+a window onto this bot, never a client of it. The day that allow-list grows a
+portal hostname, someone has coupled the two repos.
+
+One failure mode worth recognising: if the panel ever reports **403 on every
+question**, look for a `sandbox` attribute on the portal's iframe. Without
+`allow-same-origin` the framed page gets an opaque origin, the fetch arrives as
+`Origin: null`, and `originAllowed()` rejects it. The fix is on their side —
+remove the attribute — not a change to the allow-list here.
 
 ## Working alongside the portal
 
