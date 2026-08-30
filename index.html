@@ -19,9 +19,9 @@
      by Jon Kantner (https://codepen.io/jkantner/pen/RNKyWKd) — SCSS
      compiled to plain CSS, retimed to a calm exhale.
 
-     The shape cycle itself runs on SMIL in the markup below (the `d`
-     property is not animatable via CSS in Firefox), so its timings live
-     there, not here: 2.7s hold + 0.9s morph per shape = 10.8s a lap.
+     Both are now static. The shape cycle that ran on SMIL in the markup
+     below, and the colour cycle that ran here, were removed on 2026-08-31:
+     see the note by --c1. What is left of either is its resting state.
      ------------------------------------------------------------------ */
 
   *, *::before, *::after {
@@ -32,19 +32,21 @@
   }
 
   :root {
-    /* Deepened from the original hsl(… 90% 50%) so white text clears WCAG AA
-       on every phase of the cycle (8.5:1 / 5.6:1 / 9.8:1). */
-    --c1: hsl(343 72% 34%);   /* wine    */
-    --c2: hsl(33 85% 32%);    /* sear    */
-    --c3: hsl(223 65% 34%);   /* indigo  */
+    /* One colour, and it stays. The page used to cycle wine -> sear -> indigo;
+       that is gone (2026-08-31) for the same reason /embed never had it: this
+       audience is 50+ and many are managing brain fog, and a background that
+       moves is a small tax paid by everyone who reads slowly. The two other
+       hues left with the animation rather than lingering as tokens nothing
+       uses. Deepened from the original hsl(… 90% 50%) so white text clears
+       WCAG AA on it (8.5:1). */
+    --c1: hsl(343 72% 34%);   /* wine */
 
     --fg:       hsl(20 20% 97%);
     --fg-soft:  hsl(20 18% 97% / .82);
 
-    /* 2.7s, not 2.6s, so 10.8 / 2.7 = 4 — exactly four breaths per shape
-       lap, keeping the two rhythms from drifting against each other. */
-    --pulse-dur: 2.7s;        /* one breath  (was 1s — a fast heartbeat) */
-    --shift-dur: 27s;         /* full colour cycle (was 3s) */
+    /* Both the colour cycle and the shape's own motion are switched off, so
+       the two duration tokens that tuned them are gone with them. The mark is
+       drawn once and holds. */
 
     --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
             Helvetica, Arial, sans-serif;
@@ -64,7 +66,6 @@
     place-items: center;
     padding: 2rem 1.5rem;
     background-color: var(--c1);
-    animation: shift-color var(--shift-dur) linear infinite;
     color: var(--fg);
     font-family: var(--font);
     line-height: 1.5;
@@ -103,8 +104,10 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    /* A dark scrim rather than a fixed colour: the background underneath
-       cycles through three hues, and only a scrim reads on all of them. */
+    /* A dark scrim rather than a fixed colour. It was needed when the
+       background cycled through three hues; it stays because it still reads
+       best on the wine, and because a strip that dims the ground under it is
+       easier to separate from the page than one that tints it. */
     background: hsl(0 0% 0% / .3);
     border-bottom: 1px solid hsl(0 0% 100% / .1);
     color: var(--fg-soft);
@@ -194,6 +197,58 @@
      its placing on this page belongs here. */
   .chat { margin-top: 2rem; }
 
+  /* ---- topic chips ---- */
+
+  /* Eight ways in for someone who would rather not type. Sized for the same
+     hands the rest of this pass is for: 2.75rem tall is a comfortable tap on
+     a phone, and the row wraps rather than scrolling — a horizontal scroller
+     hides half its contents behind a gesture, which is exactly the kind of
+     thing this audience does not discover.
+
+     No transform, no animation, and the hover/active states change colour
+     only. Nothing on this page moves any more; the chips are not an
+     exception to that. */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .5rem;
+    margin-top: 1rem;
+  }
+
+  .chips button {
+    min-height: 2.75rem;
+    padding: .55rem 1rem;
+    border: 1px solid hsl(0 0% 100% / .28);
+    border-radius: 1.5rem;
+    background: hsl(0 0% 100% / .08);
+    color: var(--fg);
+    font-family: inherit;
+    font-size: clamp(.8rem, 2.8vw, .9rem);
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .2s ease, border-color .2s ease;
+  }
+
+  .chips button:hover {
+    background: hsl(0 0% 100% / .16);
+    border-color: hsl(0 0% 100% / .45);
+  }
+
+  .chips button:focus-visible {
+    outline: 2px solid hsl(0 0% 100% / .75);
+    outline-offset: 2px;
+  }
+
+  /* While a question is in flight chat.js disables the input and the send
+     button. The chips are not its to manage, so they say the same thing on
+     their own: still there, visibly not pressable, no layout shift. */
+  .chips button:disabled {
+    opacity: .45;
+    cursor: default;
+  }
+
   /* ---- footer credit ---- */
 
   footer {
@@ -231,10 +286,23 @@
      ascending order (this, then Mistral, then the address, then the
      signature). A header link was the alternative and lost: this page has no
      nav at all, and putting one up top would put it beside the ask box. */
+  /* Three links on one line, wrapping to two on a narrow phone. The row
+     replaces what used to be a single centred "My Story", so the rule below
+     lost its own margin to the row and kept everything else — all three
+     links are the same thing and should look it. */
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .25rem 1.1rem;
+    margin-bottom: .55rem;
+  }
+
+  .footer-nav a,
   .about {
     display: block;
     width: fit-content;
-    margin: 0 auto .55rem;
+    margin: 0;
     padding: .5rem .45rem;
     color: var(--fg);
     font-size: clamp(.7rem, 2.6vw, .8rem);
@@ -248,10 +316,10 @@
     transition: opacity .25s ease, text-decoration-color .25s ease;
   }
 
-  .about:hover,
-  .about:focus-visible { opacity: 1; text-decoration-color: var(--fg); }
+  .footer-nav a:hover,
+  .footer-nav a:focus-visible { opacity: 1; text-decoration-color: var(--fg); }
 
-  .about:focus-visible {
+  .footer-nav a:focus-visible {
     border-radius: .35rem;
     outline: 2px solid hsl(0 0% 100% / .75);
     outline-offset: 2px;
@@ -323,22 +391,15 @@
     to   { opacity: 1; transform: none; }
   }
 
-  /* Percentages below are the compiled form of the original SCSS
-     interpolations (31/180, 60/180, 91/180, 120/180, 151/180). */
-  @keyframes shift-color {
-    0%, 17.222%, 100%   { background-color: var(--c1); }
-    33.333%, 50.556%    { background-color: var(--c2); }
-    66.667%, 83.889%    { background-color: var(--c3); }
-  }
-
-  /* Covers the CSS animations only — SMIL ignores `animation: none`, so the
-     shape cycle is frozen from the script at the foot of the document. */
+  /* Nothing on this page loops any more — the colour cycle and the shape
+     animation are both gone — so this covers what is left: the one-shot rise
+     on load and the handful of transitions. There is no SMIL to freeze from
+     script now, which is why that script is gone too. */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation: none !important;
       transition: none !important;
     }
-    body { background-color: var(--c1); }
   }
 </style>
 </head>
@@ -373,76 +434,30 @@
          ================================================================ -->
     <svg class="pl" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
       <defs>
+        <!-- The mark is drawn once and holds. It used to morph circle ->
+             triangle -> square on a 10.8s lap, with a breath and an echo on
+             top; all of it came out on 2026-08-31. The reason is the one
+             behind every other choice on this page: the audience is 50+ and
+             many are managing brain fog, and something that moves in the
+             corner of the eye is a cost paid by everyone who reads slowly.
+             The shape below is that cycle's resting state. -->
         <path id="acShape" d="M 31.82 -31.82
                               C 49.39 -14.25, 49.39 14.25, 31.82 31.82
                               C 14.25 49.39, -14.25 49.39, -31.82 31.82
                               C -49.39 14.25, -49.39 -14.25, -31.82 -31.82
-                              C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z">
-          <animate
-            attributeName="d"
-            dur="10.8s"
-            repeatCount="indefinite"
-            calcMode="spline"
-            keyTimes="0;0.25;0.3333;0.5833;0.6667;0.9167;1"
-            keySplines="0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1"
-            values="
-              M 31.82 -31.82 C 49.39 -14.25, 49.39 14.25, 31.82 31.82 C 14.25 49.39, -14.25 49.39, -31.82 31.82 C -49.39 14.25, -49.39 -14.25, -31.82 -31.82 C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z;
-              M 31.82 -31.82 C 49.39 -14.25, 49.39 14.25, 31.82 31.82 C 14.25 49.39, -14.25 49.39, -31.82 31.82 C -49.39 14.25, -49.39 -14.25, -31.82 -31.82 C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z;
-              M 0 -52 C 15.01 -26, 30.02 0, 45.03 26 C 15.01 26, -15.01 26, -45.03 26 C -30.02 0, -15.01 -26, 0 -52 C 0 -52, 0 -52, 0 -52 Z;
-              M 0 -52 C 15.01 -26, 30.02 0, 45.03 26 C 15.01 26, -15.01 26, -45.03 26 C -30.02 0, -15.01 -26, 0 -52 C 0 -52, 0 -52, 0 -52 Z;
-              M 39 -39 C 39 -13, 39 13, 39 39 C 13 39, -13 39, -39 39 C -39 13, -39 -13, -39 -39 C -13 -39, 13 -39, 39 -39 Z;
-              M 39 -39 C 39 -13, 39 13, 39 39 C 13 39, -13 39, -39 39 C -39 13, -39 -13, -39 -39 C -13 -39, 13 -39, 39 -39 Z;
-              M 31.82 -31.82 C 49.39 -14.25, 49.39 14.25, 31.82 31.82 C 14.25 49.39, -14.25 49.39, -31.82 31.82 C -49.39 14.25, -49.39 -14.25, -31.82 -31.82 C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z" />
-        </path>
+                              C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z"/>
       </defs>
 
       <g transform="translate(60,60)" fill="none" stroke="currentcolor"
          stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
 
-        <!-- The mark turns as it changes form. Each stop lands on an angle of
-             the shape's own symmetry so triangle and square sit level:
-             0° → 120° (3-fold) → 270° (4-fold) → 390°. At 390° we are back
-             to a circle, so the loop's jump to 0° is invisible. -->
-        <g>
-          <animateTransform
-            attributeName="transform" type="rotate"
-            dur="10.8s" repeatCount="indefinite" calcMode="spline"
-            keyTimes="0;0.25;0.3333;0.5833;0.6667;0.9167;1"
-            keySplines="0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1;0 0 1 1;.65 0 .35 1"
-            values="0;0;120;120;270;270;390" />
-
-          <!-- Echo — a faint ping outward. Same shape, same beat as the
-               breath, so it reads as one gesture rather than two. -->
-          <use class="pl__echo" href="#acShape" stroke-width="6" opacity="0">
-            <animateTransform attributeName="transform" type="scale"
-              dur="2.7s" repeatCount="indefinite" calcMode="spline"
-              keyTimes="0;1" keySplines=".22 .61 .36 1" values="1;1.3" />
-            <animate attributeName="opacity"
-              dur="2.7s" repeatCount="indefinite"
-              keyTimes="0;0.18;1" values="0;.3;0" />
-          </use>
-
-          <!-- The breath. Original amplitude and easing, moved off the
-               <circle>'s r (which does not exist on a <path>) and onto
-               scale + stroke-width. Four breaths per shape lap. -->
-          <use class="pl__ring" href="#acShape">
-            <animateTransform attributeName="transform" type="scale"
-              dur="2.7s" repeatCount="indefinite" calcMode="spline"
-              keyTimes="0;0.48;0.74;1"
-              keySplines=".37 0 .63 1;.37 0 .63 1;.37 0 .63 1"
-              values="1;1;1.05;1" />
-            <animate attributeName="stroke-width"
-              dur="2.7s" repeatCount="indefinite" calcMode="spline"
-              keyTimes="0;0.48;0.74;1"
-              keySplines=".37 0 .63 1;.37 0 .63 1;.37 0 .63 1"
-              values="10;10;13;10" />
-            <animate attributeName="opacity"
-              dur="2.7s" repeatCount="indefinite" calcMode="spline"
-              keyTimes="0;0.48;0.74;1"
-              keySplines=".37 0 .63 1;.37 0 .63 1;.37 0 .63 1"
-              values="1;1;.72;1" />
-          </use>
-        </g>
+        <!-- The rotation went with the morph: it existed to keep the
+             triangle and the square sitting level as the shape turned, and
+             there is no longer a triangle or a square. The echo went too — it
+             was a ping timed to the breath, and it rested at opacity 0, so
+             without its animation it was an invisible node. What is left is
+             the ring, at rest. -->
+        <use class="pl__ring" href="#acShape" />
       </g>
     </svg>
 
@@ -457,10 +472,43 @@
 
       <form class="chat__form" id="ask-form">
         <label class="visually-hidden" for="q">Ask about the carnivore diet</label>
+        <!-- Deliberately generic. The examples live in the chips below, and
+             saying them twice would make the box look like it only takes
+             those. data-el-placeholder rather than data-el because a
+             placeholder is an attribute, and the swap writes textContent. -->
         <input class="chat__input" id="q" name="q" type="text" autocomplete="off"
-               enterkeyhint="send" maxlength="500" placeholder="Ask a question…" required>
+               enterkeyhint="send" maxlength="500" placeholder="Ask a question…"
+               data-el-placeholder="Ρώτησε μια ερώτηση…" required>
         <button class="chat__send" id="send" type="submit">Ask</button>
       </form>
+
+      <!-- Eight ways in, for someone who would rather not type. A chip puts
+           its own words in the box and submits the form, so the bot receives
+           exactly what it would have received from the keyboard — same flow,
+           same history, same answer. See the handler at the foot.
+
+           The words are chosen to match the index: each one is an alias of a
+           real topic in curation.json, checked before they were written here.
+           "fat loss" was in the first draft and came out — the nearest topic
+           is fat-loss-stall, which is deliberately about a plateau, and a chip
+           that asks a wider question than the topic answers is a chip that
+           disappoints. Bloodwork took its place.
+
+           They stay on screen after the first question: the second and third
+           question deserve the shortcut as much as the first did.
+
+           Static. No scroll, no carousel, no motion — the whole point of this
+           pass is that nothing on this page moves. -->
+      <div class="chips" id="chips">
+        <button type="button" data-el="χοληστερίνη">cholesterol</button>
+        <button type="button" data-el="ινσουλίνη">insulin</button>
+        <button type="button" data-el="πώς ξεκινάω">how do i start</button>
+        <button type="button" data-el="νηστεία">fasting</button>
+        <button type="button" data-el="διαβήτης">diabetes</button>
+        <button type="button" data-el="σπορέλαια">seed oils</button>
+        <button type="button" data-el="ψυχική υγεία">mental health</button>
+        <button type="button" data-el="εξετάσεις αίματος">bloodwork</button>
+      </div>
 
       <!-- The framing rule is the accuracy disclaimer; the medical line sits on
            top of it. Both are visible before the first question is asked. -->
@@ -478,7 +526,19 @@
          attribute. The script at the foot picks between them — and honours a
          language already chosen on /about, which is where that preference is
          set today and where the site's EN/EL toggle will grow from. -->
-    <a class="about" href="/about" data-el="Η ιστορία μου">My Story</a>
+    <!-- Three links, and no nav at the top: the ask box is the page, and a
+         menu above it would compete with it. Down here they are found by
+         someone who has finished asking, which is when they are wanted.
+
+         AskCarnivores is the plural domain — the directory of people. It is a
+         public hyperlink and nothing more; the two projects share no code,
+         no tokens and no analytics (siloing rule). -->
+    <nav class="footer-nav" aria-label="Elsewhere">
+      <a class="about" href="/about" data-el="Η ιστορία μου">My Story</a>
+      <a href="/highlights" data-el="Επιλογές">Highlights</a>
+      <a href="https://askcarnivores.com" target="_blank" rel="noopener"
+         data-el="AskCarnivores">AskCarnivores</a>
+    </nav>
 
     <!-- Which model does the routing, and where it is hosted. Plain text, no
          link and no logo: this is disclosure, not a partnership badge, and a
@@ -522,12 +582,6 @@
   </footer>
 
 <script>
-  /* SMIL does not honour the reduced-motion media query the way CSS does,
-     so freeze the shape cycle explicitly — at t=0, i.e. on the circle. */
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    document.querySelector('.pl').pauseAnimations();
-  }
-
   /* Greek copy for a Greek reader, and a × that stays dismissed.
      localStorage is wrapped because a locked-down browser throws on access
      rather than returning null — a notice is not worth an exception that
@@ -548,7 +602,19 @@
       node.textContent = node.dataset.el;
     };
 
-    swap(document.querySelector('.about'));
+    /* Everything that carries a Greek half, in one pass. It used to be two
+       named calls; the chips made that a list that would go stale, so the
+       page now finds them itself and anything added later is bilingual for
+       free — the only requirement is the attribute. */
+    document.querySelectorAll('[data-el]').forEach(swap);
+
+    /* A placeholder is an attribute, not text, so it needs its own line —
+       swap() writes textContent and would do nothing here. */
+    if (greek) {
+      document.querySelectorAll('[data-el-placeholder]').forEach(function (node) {
+        node.placeholder = node.dataset.elPlaceholder;
+      });
+    }
 
     var strip = document.getElementById('status');
 
@@ -556,8 +622,6 @@
       strip.remove();
       return;
     }
-
-    swap(strip.querySelector('p'));
 
     var close = document.createElement('button');
     close.type = 'button';
@@ -572,5 +636,48 @@
   })();
 </script>
 <script src="chat.js"></script>
+
+<script>
+  /* Chips -> the ask box -> the existing flow.
+
+     AFTER chat.js on purpose, and this is the whole reason the tag sits here
+     rather than in the block above: requestSubmit() fires a real submit
+     event, and chat.js is what listens for it. If a chip were clicked before
+     that listener existed, the form would submit for real and navigate the
+     page to ?q=… — a broken-looking reload instead of an answer.
+
+     Nothing here knows anything about asking. It types into the box and
+     presses the button, so the chip's question travels the same path as a
+     typed one: same history, same busy state, same rendering, same errors.
+     chat.js is untouched. */
+  (function () {
+    var chips = document.getElementById('chips');
+    var form = document.getElementById('ask-form');
+    var input = document.getElementById('q');
+    if (!chips || !form || !input) return;
+
+    chips.addEventListener('click', function (event) {
+      var chip = event.target.closest('button[data-el]');
+      if (!chip || input.disabled) return;
+      // textContent, not the attribute: the swap above has already put this
+      // chip in the reader's language, and the answer's language follows the
+      // language of the question.
+      input.value = chip.textContent;
+      form.requestSubmit();
+    });
+
+    /* While a question is in flight chat.js disables the input and the send
+       button. The chips are ours, so they follow — otherwise they sit there
+       looking pressable and do nothing, which for this audience reads as a
+       broken button rather than a busy one.
+
+       Watched rather than told: chat.js owns that state and this file does
+       not touch it, so the input's disabled attribute IS the signal. */
+    new MutationObserver(function () {
+      var buttons = chips.querySelectorAll('button');
+      for (var i = 0; i < buttons.length; i += 1) buttons[i].disabled = input.disabled;
+    }).observe(input, { attributes: true, attributeFilter: ['disabled'] });
+  })();
+</script>
 </body>
 </html>
