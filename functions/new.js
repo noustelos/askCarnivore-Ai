@@ -116,10 +116,19 @@ export async function onRequestGet(context) {
   return new Response(html, { status: 200, headers: securityHeaders() });
 }
 
-/* Anything but GET. A page is a page. */
+/* HEAD is the same response without the body. Uptime monitors, link checkers
+   and some crawlers ask with HEAD, and a public page that answers 405 to them
+   looks down when it is not — the method-specific handlers mean HEAD would
+   otherwise fall through to the 405 below. */
+export async function onRequestHead(context) {
+  const response = await onRequestGet(context);
+  return new Response(null, { status: response.status, headers: response.headers });
+}
+
+/* Anything else. A page is a page. */
 export function onRequest() {
   return new Response('Method not allowed', {
     status: 405,
-    headers: { allow: 'GET', 'content-type': 'text/plain; charset=utf-8' },
+    headers: { allow: 'GET, HEAD', 'content-type': 'text/plain; charset=utf-8' },
   });
 }
