@@ -1671,15 +1671,15 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
 - [ ] Tools — **αναβλήθηκαν** από τον Nick (14/08/2026)· πρώτο όταν ξαναρχίσουν:
       **Get Started (7 μέρες)**. Μέχρι τότε το portal δεν έχει κανένα income path,
       άρα το Μοντέλο Α δεν έχει ακόμα ταμείο να επιδοτήσει τον bot.
-- [x] ~~What's New (`/new`)~~ — **έγινε 30/08/2026.** Δεύτερη ανάγνωση του ΙΔΙΟΥ
-      sheet, μέσω `src/blog.js` + `functions/new.js`. Δύο διακόπτες που δεν
+- [x] ~~Highlights (`/highlights`)~~ — **έγινε 30/08/2026.** Δεύτερη ανάγνωση του ΙΔΙΟΥ
+      sheet, μέσω `src/blog.js` + `functions/highlights.js`. Δύο διακόπτες που δεν
       μιλάνε μεταξύ τους: `active` ελέγχει τι σερβίρει ο bot, `blog` ελέγχει τι
       δείχνει η σελίδα. Το `src/sheet.js` και το `/api/ask` **δεν άλλαξαν** —
       δικό του KV key (`blog:sheet`), δικό του φίλτρο.
       ⚠ **Ο πρώτος route που είναι Function και όχι αρχείο, και αυτό αλλάζει
       κανόνα:** το Cloudflare **δεν** εφαρμόζει το `_headers` σε responses από
       Pages Functions — ούτε τους per-page κανόνες, ούτε το `/*` block. Το
-      `/new` βάζει μόνο του όλα τα security headers, στο `securityHeaders()`.
+      `/highlights` βάζει μόνο του όλα τα security headers, στο `securityHeaders()`.
       Αν λείψουν, η αποτυχία είναι αθόρυβη και προς τη λάθος κατεύθυνση:
       απουσία `frame-ancestors` σημαίνει **οποιοσδήποτε** μπορεί να το κάνει
       frame, οπότε το iframe του portal δουλεύει μια χαρά ενώ ο περιορισμός

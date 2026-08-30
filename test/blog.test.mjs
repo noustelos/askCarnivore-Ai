@@ -7,7 +7,7 @@
       written as the mistake a hand makes: a row that predates the feature, a
       date typo, a channel link pasted where a video link belongs.
 
-   2. `/new` is served by a Pages Function, and Cloudflare does NOT apply
+   2. `/highlights` is served by a Pages Function, and Cloudflare does NOT apply
       `_headers` to Function responses. Every other page here gets its CSP from
       that file; this one carries its own in code. If someone deletes those
       headers, nothing breaks visibly — the portal's frame keeps working and so
@@ -161,18 +161,18 @@ test('a pasted title with markup reaches the page escaped', () => {
 
 test('the response carries a CSP, because _headers does not reach a Function', () => {
   const csp = securityHeaders()['content-security-policy'];
-  assert.ok(csp, 'no CSP at all on /new');
+  assert.ok(csp, 'no CSP at all on /highlights');
   assert.ok(csp.includes("default-src 'self'"));
 });
 
-test('askcarnivores.com may frame /new, and the policy is not "anyone"', () => {
+test('askcarnivores.com may frame /highlights, and the policy is not "anyone"', () => {
   const csp = securityHeaders()['content-security-policy'];
   assert.match(csp, /frame-ancestors [^;]*https:\/\/askcarnivores\.com/);
   assert.match(csp, /frame-ancestors [^;]*https:\/\/www\.askcarnivores\.com/);
   assert.ok(!/frame-ancestors[^;]*\*/.test(csp), 'frame-ancestors must not be a wildcard');
 });
 
-test('/new carries the headers the /* block gives every other page', () => {
+test('/highlights carries the headers the /* block gives every other page', () => {
   const headers = securityHeaders();
   assert.equal(headers['x-content-type-options'], 'nosniff');
   assert.equal(headers['referrer-policy'], 'strict-origin-when-cross-origin');
@@ -191,4 +191,20 @@ test('no rows renders a line rather than an empty list', () => {
   const html = renderPage({ items: [], topics: [] });
   assert.ok(html.includes('Nothing here yet'));
   assert.ok(!html.includes('<ul class="cards">'));
+});
+
+/* ---------- the date orders the page and never appears on it ---------- */
+
+test('the date is a sort key, not content — no card shows one', () => {
+  const { items } = parseWhatsNew(csv(ROW({ date: '2026-08-20' })));
+  const html = renderPage({ items, topics: [] });
+  assert.equal(items[0].date, '2026-08-20', 'the sort still needs it');
+  assert.ok(!html.includes('2026-08-20'), 'the ISO date must not reach the page');
+  assert.ok(!html.includes('20 Aug'), 'and neither must a formatted one');
+});
+
+test('the card carries creator and duration, and nothing else in its meta line', () => {
+  const { items } = parseWhatsNew(csv(ROW({ creator: 'Dr. Ken Berry', duration: '22:23' })));
+  const html = renderPage({ items, topics: [] });
+  assert.ok(html.includes('<p class="card__meta">Dr. Ken Berry · 22:23</p>'));
 });
