@@ -1671,9 +1671,19 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
 - [ ] Tools — **αναβλήθηκαν** από τον Nick (14/08/2026)· πρώτο όταν ξαναρχίσουν:
       **Get Started (7 μέρες)**. Μέχρι τότε το portal δεν έχει κανένα income path,
       άρα το Μοντέλο Α δεν έχει ακόμα ταμείο να επιδοτήσει τον bot.
-- [ ] Bot panel (§16) — **ξεμπλόκαρε**: ο bot ζει και το `/embed` σερβίρεται με
-      `frame-ancestors` για το `askcarnivores.com`. Δική τους η υλοποίηση —
-      component γύρω από iframe, ποτέ `fetch` στον worker μας.
+- [x] ~~Bot panel (§16)~~ — **έγινε στο portal 30/08/2026.** Launcher με λέξεις,
+      panel, iframe του `/embed` μας, με `assets/ask.v1.js` (~60 γραμμές, το
+      πρώτο JS εκείνου του site). Η δική μας πλευρά ήταν ήδη έτοιμη και **δεν
+      άλλαξε τίποτα εδώ**: ούτε worker, ούτε `frame-ancestors`, ούτε allow-list.
+      Το `askcarnivores.com` μένει σκόπιμα εκτός του allow-list του `/api/ask` —
+      το `chat.js` καλεί σχετικό path, άρα μέσα στο iframe το origin είναι το
+      δικό μας και περνάει· το portal είναι παράθυρο, όχι client.
+      *Μία παγίδα που βρήκε εκείνο το build και μας αφορά:* το iframe τους **δεν
+      έχει `sandbox`**. Χωρίς `allow-same-origin` η σελίδα στο frame παίρνει
+      opaque origin, το `fetch` στο `/api/ask` φτάνει με `Origin: null`, το
+      `originAllowed()` το κόβει, και το panel δείχνει άψογο chat που απαντάει
+      **403 σε κάθε ερώτηση**. Αν ποτέ αναφερθεί τέτοιο 403, αυτό είναι το πρώτο
+      που κοιτάς — δεν είναι δικό μας bug.
 - [x] ~~Mistral credit στο portal~~ — **μπήκε 16/08 και αφαιρέθηκε 17/08.** Το
       portal δεν κάνει routing, οπότε ο ισχυρισμός ήταν ανακριβής εκεί. Μην το
       ξαναβάλεις «για συμμετρία» με τον bot.
