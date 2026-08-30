@@ -14,14 +14,15 @@
 <link rel="stylesheet" href="chat.css">
 <style>
   /* ------------------------------------------------------------------
-     Morphing ring: circle → triangle → square → circle, breathing
-     throughout. The breath descends from "Heartbeating Ring Preloader"
-     by Jon Kantner (https://codepen.io/jkantner/pen/RNKyWKd) — SCSS
-     compiled to plain CSS, retimed to a calm exhale.
+     The landing page's own styles. The chat surface it shares with /embed
+     is in chat.css; nothing here belongs to that.
 
-     Both are now static. The shape cycle that ran on SMIL in the markup
-     below, and the colour cycle that ran here, were removed on 2026-08-31:
-     see the note by --c1. What is left of either is its resting state.
+     This page used to carry a morphing ring — circle → triangle → square,
+     breathing, over a background that cycled through three hues. All of it
+     came out on 2026-08-31: the animation first, then the mark itself. The
+     audience is 50+ and many are managing brain fog, and a page that moves
+     while it is being read is a cost paid by everyone who reads slowly.
+     Nothing on this page loops now. Keep it that way.
      ------------------------------------------------------------------ */
 
   *, *::before, *::after {
@@ -155,16 +156,6 @@
 
   /* ---- the mark ---- */
 
-  .pl {
-    display: block;
-    width: clamp(5.5rem, 22vw, 7.5rem);
-    height: auto;
-    margin: 0 auto 2.5rem;
-    filter: drop-shadow(0 0 1.75rem hsl(0 0% 0% / .3));
-    transition: width .6s cubic-bezier(.16, 1, .3, 1),
-                margin .6s cubic-bezier(.16, 1, .3, 1);
-  }
-
   /* Once a conversation starts, the masthead steps back and gives the room to
      the answers. The mark stays — it is the one thing that carries over into
      the working state. */
@@ -175,6 +166,11 @@
   /* ---- type ---- */
 
   h1 {
+    /* The mark used to carry 2.5rem of space under it and the title sat in
+       its shadow. With the mark gone the title is the top of the page, so it
+       takes that breathing room itself rather than starting hard against the
+       status strip. */
+    margin-top: clamp(1rem, 4vw, 2rem);
     font-size: clamp(2rem, 8vw, 3.1rem);
     font-weight: 700;
     letter-spacing: -.035em;
@@ -256,6 +252,15 @@
     position: relative;
     z-index: 1;
     margin-top: 2.5rem;
+    /* The same three lines <main> has, and the reason this was crooked: the
+       footer is centred as a grid ITEM, so its box hugs its widest child —
+       but nothing centred the children inside that box. The short lines
+       (.powered) and the inline-block credit (.by) therefore sat left while
+       the ask box above them was centred. Matching main's max-width keeps the
+       two columns the same width as well as the same axis. */
+    width: 100%;
+    max-width: 34rem;
+    text-align: center;
     animation: rise 1s cubic-bezier(.16, 1, .3, 1) .25s both;
   }
 
@@ -281,11 +286,6 @@
   .contact:hover,
   .contact:focus-visible { opacity: 1; }
 
-  /* The only navigational link on the page, and so the loudest thing in the
-     footer — it sits above the provider line, which is the foot of the
-     ascending order (this, then Mistral, then the address, then the
-     signature). A header link was the alternative and lost: this page has no
-     nav at all, and putting one up top would put it beside the ask box. */
   /* Three links on one line, wrapping to two on a narrow phone. The row
      replaces what used to be a single centred "My Story", so the rule below
      lost its own margin to the row and kept everything else — all three
@@ -417,49 +417,12 @@
   </aside>
 
   <main>
-    <!-- ================================================================
-         One ring, three forms: circle → triangle → square → circle.
-
-         All three are the SAME path — 4 cubic Bézier segments, same count,
-         same order — which is what lets them interpolate cleanly:
-           · circle   = 4 arcs (k = 0.5523·r), turned 45° so the anchors
-                        land on the square's corners
-           · square   = 4 straight runs (controls at 1/3 and 2/3)
-           · triangle = 3 sides + 1 degenerate segment at the apex, i.e.
-                        the two top corners collapse into one point
-
-         Coordinates are relative to the centre; translate(60,60) on the
-         <g> places them. Every rotate/scale therefore pivots around (0,0)
-         = the centre, with no reliance on transform-box/transform-origin.
-         ================================================================ -->
-    <svg class="pl" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
-      <defs>
-        <!-- The mark is drawn once and holds. It used to morph circle ->
-             triangle -> square on a 10.8s lap, with a breath and an echo on
-             top; all of it came out on 2026-08-31. The reason is the one
-             behind every other choice on this page: the audience is 50+ and
-             many are managing brain fog, and something that moves in the
-             corner of the eye is a cost paid by everyone who reads slowly.
-             The shape below is that cycle's resting state. -->
-        <path id="acShape" d="M 31.82 -31.82
-                              C 49.39 -14.25, 49.39 14.25, 31.82 31.82
-                              C 14.25 49.39, -14.25 49.39, -31.82 31.82
-                              C -49.39 14.25, -49.39 -14.25, -31.82 -31.82
-                              C -14.25 -49.39, 14.25 -49.39, 31.82 -31.82 Z"/>
-      </defs>
-
-      <g transform="translate(60,60)" fill="none" stroke="currentcolor"
-         stroke-width="10" stroke-linejoin="round" stroke-linecap="round">
-
-        <!-- The rotation went with the morph: it existed to keep the
-             triangle and the square sitting level as the shape turned, and
-             there is no longer a triangle or a square. The echo went too — it
-             was a ping timed to the breath, and it rested at opacity 0, so
-             without its animation it was an invisible node. What is left is
-             the ring, at rest. -->
-        <use class="pl__ring" href="#acShape" />
-      </g>
-    </svg>
+    <!-- The mark that used to stand here is gone (31/08/2026). It was a
+         placeholder from the first day of the project — a circle that morphed
+         to a triangle and a square — and once it stopped moving there was
+         nothing left for it to say. The <h1> below does the job it was
+         standing in for. Its paths are in the git history if they are ever
+         wanted again; they do not need redrawing. -->
 
     <h1>Ask Carnivore Ai</h1>
 
