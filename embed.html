@@ -80,6 +80,28 @@
   .chat__thread { flex: 1; min-height: 0; max-height: none; }
   .head { flex: none; }
 
+  /* Panel overrides for the chips. chat.css holds the shared rule; these three
+     lines are what a small, fixed-height surface needs on top of it.
+
+     `flex: none` is the important one: without it the chips would take their
+     share of the space the thread is scrolling in, and grow at its expense as
+     they wrap. Fixed, the cost is paid once and the thread absorbs it.
+
+     The padding and the type shrink; the 2.75rem min-height does NOT. On a
+     360px phone the six wrap to three rows and still leave the thread room to
+     scroll, which is the trade this page makes: a smaller window on the
+     conversation in exchange for knowing there is something to ask. */
+  .chips {
+    flex: none;
+    margin-top: .75rem;
+    gap: .4rem;
+  }
+
+  .chips button {
+    padding: .5rem .8rem;
+    font-size: .85rem;
+  }
+
   /* Provider disclosure, carried here as well as on the landing page: framed
      inside the portal this is the only surface a person sees, so it is the
      only place the credit can appear for them. `flex: none` so the one line
@@ -114,6 +136,23 @@
       <button class="chat__send" id="send" type="submit">Ask</button>
     </form>
 
+    <!-- The same six the landing carries, and here they do a second job: this
+         panel opens with an empty thread and no page around it, so without
+         them a person is looking at a box and a cursor with no sign of what
+         the thing knows. Mirror any change into index.html.
+
+         English, like the rest of this page. Styling is chat.css; the sizing
+         overrides for a panel are in the <style> above; the behaviour is
+         chips.js, loaded after chat.js at the foot. -->
+    <div class="chips" id="chips">
+      <button type="button">cholesterol</button>
+      <button type="button">insulin</button>
+      <button type="button">how do i start</button>
+      <button type="button">fasting</button>
+      <button type="button">diabetes</button>
+      <button type="button">mental health</button>
+    </div>
+
     <p class="chat__note">
       This points you at what people in this community say — positions, not
       settled fact, and not medical advice. For anything about your own health,
@@ -126,5 +165,9 @@
   <p class="powered">Routing powered by Mistral · EU-based AI</p>
 
 <script src="chat.js"></script>
+<!-- After chat.js, never before: requestSubmit() fires a real submit event and
+     chat.js is what listens for it. Load this first and a chip press navigates
+     the page to ?q=… instead of asking. Same rule on the landing. -->
+<script src="chips.js"></script>
 </body>
 </html>

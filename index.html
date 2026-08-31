@@ -210,58 +210,6 @@
      its placing on this page belongs here. */
   .chat { margin-top: 2rem; }
 
-  /* ---- topic chips ---- */
-
-  /* Eight ways in for someone who would rather not type. Sized for the same
-     hands the rest of this pass is for: 2.75rem tall is a comfortable tap on
-     a phone, and the row wraps rather than scrolling — a horizontal scroller
-     hides half its contents behind a gesture, which is exactly the kind of
-     thing this audience does not discover.
-
-     No transform, no animation, and the hover/active states change colour
-     only. Nothing on this page moves any more; the chips are not an
-     exception to that. */
-  .chips {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: .5rem;
-    margin-top: 1rem;
-  }
-
-  .chips button {
-    min-height: 2.75rem;
-    padding: .55rem 1rem;
-    border: 1px solid hsl(0 0% 100% / .28);
-    border-radius: 1.5rem;
-    background: hsl(0 0% 100% / .08);
-    color: var(--fg);
-    font-family: inherit;
-    font-size: clamp(.8rem, 2.8vw, .9rem);
-    font-weight: 600;
-    line-height: 1;
-    cursor: pointer;
-    transition: background-color .2s ease, border-color .2s ease;
-  }
-
-  .chips button:hover {
-    background: hsl(0 0% 100% / .16);
-    border-color: hsl(0 0% 100% / .45);
-  }
-
-  .chips button:focus-visible {
-    outline: 2px solid hsl(0 0% 100% / .75);
-    outline-offset: 2px;
-  }
-
-  /* While a question is in flight chat.js disables the input and the send
-     button. The chips are not its to manage, so they say the same thing on
-     their own: still there, visibly not pressable, no layout shift. */
-  .chips button:disabled {
-    opacity: .45;
-    cursor: default;
-  }
-
   /* ---- footer credit ---- */
 
   footer {
@@ -468,32 +416,33 @@
         <button class="chat__send" id="send" type="submit">Ask</button>
       </form>
 
-      <!-- Eight ways in, for someone who would rather not type. A chip puts
-           its own words in the box and submits the form, so the bot receives
+      <!-- Six ways in, for someone who would rather not type. A chip puts its
+           own words in the box and submits the form, so the bot receives
            exactly what it would have received from the keyboard — same flow,
-           same history, same answer. See the handler at the foot.
+           same gates, same answer. The behaviour is in chips.js.
 
-           The words are chosen to match the index: each one is an alias of a
-           real topic in curation.json, checked before they were written here.
-           "fat loss" was in the first draft and came out — the nearest topic
-           is fat-loss-stall, which is deliberately about a plateau, and a chip
-           that asks a wider question than the topic answers is a chip that
-           disappoints. Bloodwork took its place.
+           English, and that is the whole rule now (2026-09-01). These used to
+           carry Greek in data-el; /embed has no language swap at all, so the
+           same attributes would have sat inert there with nothing to report
+           it. One language on both surfaces beats a hidden difference.
+
+           Each word is an alias of a real topic in curation.json, checked
+           before it was written here — a chip that lands on nothing is worse
+           than no chip. "fat loss" was tried and dropped: the nearest topic is
+           fat-loss-stall, which is deliberately about a plateau, so the chip
+           would have asked something wider than the topic answers.
 
            They stay on screen after the first question: the second and third
            question deserve the shortcut as much as the first did.
 
-           Static. No scroll, no carousel, no motion — the whole point of this
-           pass is that nothing on this page moves. -->
+           Mirror any change into embed.html, which carries the same six. -->
       <div class="chips" id="chips">
-        <button type="button" data-el="χοληστερίνη">cholesterol</button>
-        <button type="button" data-el="ινσουλίνη">insulin</button>
-        <button type="button" data-el="πώς ξεκινάω">how do i start</button>
-        <button type="button" data-el="νηστεία">fasting</button>
-        <button type="button" data-el="διαβήτης">diabetes</button>
-        <button type="button" data-el="σπορέλαια">seed oils</button>
-        <button type="button" data-el="ψυχική υγεία">mental health</button>
-        <button type="button" data-el="εξετάσεις αίματος">bloodwork</button>
+        <button type="button">cholesterol</button>
+        <button type="button">insulin</button>
+        <button type="button">how do i start</button>
+        <button type="button">fasting</button>
+        <button type="button">diabetes</button>
+        <button type="button">mental health</button>
       </div>
 
       <!-- The framing rule is the accuracy disclaimer; the medical line sits on
@@ -588,10 +537,13 @@
       node.textContent = node.dataset.el;
     };
 
-    /* Everything that carries a Greek half, in one pass. It used to be two
-       named calls; the chips made that a list that would go stale, so the
-       page now finds them itself and anything added later is bilingual for
-       free — the only requirement is the attribute. */
+    /* Everything that carries a Greek half, in one pass, rather than a list of
+       named nodes that goes stale. Anything given the attribute later is
+       bilingual for free.
+
+       The chips are NOT in this set any more and that is deliberate: they are
+       English on both surfaces, because /embed has no swap of its own and a
+       data-el there would sit inert with nothing to report it. */
     document.querySelectorAll('[data-el]').forEach(swap);
 
     /* A placeholder is an attribute, not text, so it needs its own line —
@@ -623,47 +575,6 @@
 </script>
 <script src="chat.js"></script>
 
-<script>
-  /* Chips -> the ask box -> the existing flow.
-
-     AFTER chat.js on purpose, and this is the whole reason the tag sits here
-     rather than in the block above: requestSubmit() fires a real submit
-     event, and chat.js is what listens for it. If a chip were clicked before
-     that listener existed, the form would submit for real and navigate the
-     page to ?q=… — a broken-looking reload instead of an answer.
-
-     Nothing here knows anything about asking. It types into the box and
-     presses the button, so the chip's question travels the same path as a
-     typed one: same history, same busy state, same rendering, same errors.
-     chat.js is untouched. */
-  (function () {
-    var chips = document.getElementById('chips');
-    var form = document.getElementById('ask-form');
-    var input = document.getElementById('q');
-    if (!chips || !form || !input) return;
-
-    chips.addEventListener('click', function (event) {
-      var chip = event.target.closest('button[data-el]');
-      if (!chip || input.disabled) return;
-      // textContent, not the attribute: the swap above has already put this
-      // chip in the reader's language, and the answer's language follows the
-      // language of the question.
-      input.value = chip.textContent;
-      form.requestSubmit();
-    });
-
-    /* While a question is in flight chat.js disables the input and the send
-       button. The chips are ours, so they follow — otherwise they sit there
-       looking pressable and do nothing, which for this audience reads as a
-       broken button rather than a busy one.
-
-       Watched rather than told: chat.js owns that state and this file does
-       not touch it, so the input's disabled attribute IS the signal. */
-    new MutationObserver(function () {
-      var buttons = chips.querySelectorAll('button');
-      for (var i = 0; i < buttons.length; i += 1) buttons[i].disabled = input.disabled;
-    }).observe(input, { attributes: true, attributeFilter: ['disabled'] });
-  })();
-</script>
+<script src="chips.js"></script>
 </body>
 </html>
