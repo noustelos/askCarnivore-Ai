@@ -250,13 +250,25 @@ export function renderPage({ items = [], topics = [] } = {}) {
      this and nothing else — there is no script-src at all. */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* Eucalyptus, one step darker than the landing and the panel (31/08/2026).
+     Same hue, lower light: this page is a list, and the cards have to lift off
+     the ground rather than float on it. The wine palette this replaces was
+     built the same way — a deep ground, a card a few points above it — so the
+     relationships are carried over rather than re-invented:
+
+       fg on card   11.15    soft on card  7.01
+       fg on pill    7.73    card vs bg    1.26  (was 1.15 — a touch clearer)
+       accent/card   5.43
+
+     --fg and --fg-soft stay neutral warm greys on purpose. Tinting the text
+     to match the ground is what makes a dark palette read as murky. */
   :root {
-    --bg: hsl(343 40% 12%);
-    --card: hsl(343 30% 17%);
+    --bg: hsl(160 16% 14%);
+    --card: hsl(160 14% 20%);
     --fg: hsl(20 20% 97%);
     --fg-soft: hsl(20 12% 78%);
-    --accent: hsl(343 72% 62%);
-    --rule: hsl(343 20% 26%);
+    --accent: hsl(160 40% 58%);
+    --rule: hsl(160 12% 28%);
     --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Inter,
             Helvetica, Arial, sans-serif;
   }
@@ -311,7 +323,7 @@ export function renderPage({ items = [], topics = [] } = {}) {
 
   /* Two pills, two meanings, two looks — topic is what it is about, format is
      what it is. They must never read as one list. */
-  .pill--topic { background: hsl(343 60% 30%); color: var(--fg); }
+  .pill--topic { background: hsl(160 30% 26%); color: var(--fg); }
   .pill--format { background: transparent; color: var(--fg-soft); border: 1px solid var(--rule); }
 
   .empty { color: var(--fg-soft); }

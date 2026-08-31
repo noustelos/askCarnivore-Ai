@@ -195,7 +195,12 @@
   padding: .55rem 1.2rem;
   border-radius: 999px;
   background: var(--fg, #fff);
-  color: hsl(343 40% 16%);
+  /* The only colour in this file that is not a white or black alpha over
+     whatever ground the host page sets — and so the only line here that had
+     to move when the ground went from wine to eucalyptus. Everything else
+     followed on its own, which is why the panel and the landing never
+     disagreed before now. Dark enough to read on the white pill: 14.7:1. */
+  color: hsl(160 20% 14%);
   font: inherit;
   font-size: .85rem;
   font-weight: 700;
