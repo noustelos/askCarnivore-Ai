@@ -59,6 +59,42 @@ different filter, `src/sheet.js` unchanged.
 existed have empty cells, which is not `yes`, so nothing appears on the page
 until someone opts it in.
 
+## Colour says what a surface is for
+
+Two grounds, and the split is deliberate:
+
+| | Where | Why |
+| --- | --- | --- |
+| **eucalyptus** `hsl(160 14% 29%)` | the landing, `/embed` (the portal's panel), `/highlights` at `hsl(160 16% 14%)` | working surfaces — asking a question, scanning video links. Cool and calm, built to be looked *through*. |
+| **dark wine** `hsl(343 40% 12%)` | `/about` only | the narrative surface — a personal story read start to finish. Warm: *you are reading here, not searching.* |
+
+`/about` is not a page that was missed when everything else moved to
+eucalyptus on 2026-08-31. Someone arriving from the ask box should feel the
+room change; if every surface matched, the story would read as one more panel
+of the tool rather than the thing behind it. Both `--c1` comments say so, and
+neither should be "corrected" for consistency.
+
+White text on the dark wine is 16.34:1 — the most readable ground in either
+repo, which is what the longest read on the site should have.
+
+**The portal's own My Story page is not this colour and is not meant to be.**
+It lives in that site's light bone palette with its own header, menu and
+footer. The two pages mirror their **copy**; they have never mirrored their
+chrome, and making them match would mean giving one site a page that belongs
+to the other.
+
+## Things that live in more than one place
+
+Change one, change all of them — there is no shared source for any of these:
+
+| Thing | Where |
+| --- | --- |
+| Dave Mac's count, "2K" | portal: both cards **and** both Stories paragraphs — four lines |
+| The About copy | here (`about.html`, both languages) **and** the portal's `/about/` + `/gr/about/` |
+| The studio credit, the contact address | every footer in both repos |
+| The chip words | `index.html` **and** `embed.html` here — six buttons, twice |
+| eucalyptus `--c1` | `index.html`, `embed.html`, `src/blog.js`, one line in `chat.css` |
+
 ## Two rules that are not refactorable
 
 1. **The model never emits a URL.** It is shown ids and titles, it returns ids,
