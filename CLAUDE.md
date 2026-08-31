@@ -1622,12 +1622,30 @@ test/sheet.test.mjs` (το `node --test test/` δεν δουλεύει σε αυ
       αν τα βίντεο του πλέγματος είναι ακόμα public και πετάει τα νεκρά.
       *Προσοχή:* τρέχει σε κάθε μη-dry run, δεν υπάρχει ξεχωριστό «μηνιαίο
       πλήρες» mode — αν το θέλουμε όπως το spec, θέλει flag ή `?reset=`.
+- [x] ~~Chips και στο `/embed` (01/09/2026)~~ — **έξι** chips (cholesterol,
+      insulin, how do i start, fasting, diabetes, mental health), **αγγλικά και
+      στις δύο επιφάνειες**, κοινός κώδικας:
+      `chat.css` το styling (κοινή επιφάνεια), **νέο `chips.js`** η συμπεριφορά,
+      markup διπλό ανά σελίδα όπως ήδη το markup του chat. Το `chat.js` **δεν
+      αγγίχτηκε**.
+      ⚠ **Το `chips.js` φορτώνεται ΜΕΤΑ το `chat.js`, και στις δύο σελίδες.**
+      Το `requestSubmit()` θέλει τον listener του `chat.js`· αν λείπει, η φόρμα
+      κάνει navigation στο `?q=…`.
+      *Γιατί αγγλικά:* τα chips ήταν δίγλωσσα στο landing με `data-el`, αλλά το
+      `/embed` **δεν έχει κανένα γλωσσικό script** — τα ίδια attributes εκεί θα
+      κάθονταν αδρανή χωρίς κανένα σφάλμα. Μία γλώσσα και στις δύο επιφάνειες
+      αντί για κρυφή διαφορά. Τα υπόλοιπα `data-el` (status strip, footer nav,
+      placeholder) **παραμένουν δίγλωσσα** στο landing.
+      *Χώρος στο panel:* `flex: none` στο block ώστε η απώλεια να πηγαίνει στο
+      thread και όχι στη φόρμα· μικρότερο padding και type· **το min-height
+      2.75rem μένει** — είναι κατώφλι στόχου αφής, όχι προτίμηση.
+      **Μηδέν αλλαγή στο portal repo** — το panel του παίρνει τα chips μόνο του.
 - [x] ~~Landing polish, πέρασμα 1 (31/08/2026)~~ — τέσσερα πράγματα, **ένα
       αρχείο** (`index.html`), μηδέν αλλαγή σε `chat.js` / `chat.css` / `/embed`:
       **σταθερό background** (έφυγε το `shift-color`, και μαζί τα `--c2`/`--c3`
       που δεν χρησίμευαν αλλού)· **παγωμένο mark** (έφυγαν όλα τα SMIL, το echo
       και το `pauseAnimations()` που δεν είχε πια τι να παγώσει)· **γενικό
-      placeholder** και στις δύο γλώσσες· **οκτώ clickable chips**.
+      placeholder** και στις δύο γλώσσες· **clickable chips**.
       *Η σύνδεση των chips με το ask flow:* γράφουν στο input και καλούν
       `form.requestSubmit()`, οπότε η ερώτηση ταξιδεύει το ίδιο μονοπάτι με μια
       πληκτρολογημένη — ίδιο history, ίδιο rendering, ίδια σφάλματα. Το

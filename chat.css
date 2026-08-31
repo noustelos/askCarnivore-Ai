@@ -255,6 +255,62 @@
   outline-offset: 2px;
 }
 
+/* ---- topic chips ---- */
+
+/* Six ways in for someone who would rather not type — and, on /embed, the
+   only prompt a person gets that there is anything to ask about at all.
+
+   Here rather than in either page's own <style> because both surfaces use
+   them and this file is the chat surface both surfaces share. The behaviour
+   is chips.js, loaded after chat.js on each page. /embed adds a few
+   panel-sized overrides of its own; the base below is the landing's.
+
+   No transform and no animation. Hover and focus change colour only —
+   nothing on these surfaces moves, and the chips are not an exception. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+.chips button {
+  /* 2.75rem is a comfortable tap on a phone and it is a floor, not a
+     preference — the readers this surface is built for need the target more
+     than the page needs the pixels. /embed shrinks the padding and the type
+     to fit a panel; it does not shrink this. */
+  min-height: 2.75rem;
+  padding: .55rem 1rem;
+  border: 1px solid hsl(0 0% 100% / .28);
+  border-radius: 1.5rem;
+  background: hsl(0 0% 100% / .08);
+  color: var(--fg, #fff);
+  font-family: inherit;
+  font-size: clamp(.8rem, 2.8vw, .9rem);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .2s ease, border-color .2s ease;
+}
+
+.chips button:hover:not(:disabled) {
+  background: hsl(0 0% 100% / .16);
+  border-color: hsl(0 0% 100% / .45);
+}
+
+.chips button:focus-visible {
+  outline: 2px solid hsl(0 0% 100% / .75);
+  outline-offset: 2px;
+}
+
+/* chips.js mirrors chat.js's busy state onto these, so a chip pressed while
+   an answer is in flight looks busy rather than broken. */
+.chips button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
 /* ---- notes: disclaimer, waiting state, warnings ---- */
 
 .chat__note {
