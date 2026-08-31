@@ -36,7 +36,35 @@
   }
 
   :root {
-    --c1: hsl(343 72% 34%);          /* wine — the landing's resting colour */
+    /* Dark wine, and the ONLY page here that is still any kind of wine. That
+       is a deliberate split, not a page that got missed when the rest moved to
+       eucalyptus (31/08/2026) — do not "fix" it for consistency.
+
+       The rule: colour marks what the surface is FOR.
+
+         eucalyptus  the working surfaces — the landing, /embed inside the
+                     portal's panel, /highlights. Places where a person is
+                     asking a question or scanning video links. Calm, cool,
+                     built to be looked THROUGH.
+         wine        the narrative surface — this page, and only this page.
+                     A personal story, read start to finish. Warm, and it says
+                     "you are reading here, not searching."
+
+       Someone arriving from the ask box should feel the room change. If every
+       surface were the same colour, the story would read as one more panel of
+       the tool instead of the thing behind it.
+
+       Dark rather than the old bright hsl(343 72% 34%): this page is the
+       longest read on the site, and the bright wine was chosen as a landing
+       backdrop with three or four lines of text on it, not as something to
+       hold two thousand words. White text on this is 16.34:1, --fg-soft at
+       .82 is 11.24:1 — the most readable ground anywhere in either repo,
+       which is what a long read should have.
+
+       The portal's own My Story page is NOT this colour and is not meant to
+       be: it lives in that site's light bone palette, with its own header,
+       footer and menu. The two pages mirror their COPY, never their chrome. */
+    --c1: hsl(343 40% 12%);          /* dark wine — the narrative surface */
 
     --fg:       hsl(20 20% 97%);
     --fg-soft:  hsl(20 18% 97% / .82);
