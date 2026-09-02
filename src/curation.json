@@ -32,6 +32,9 @@
     "    δοκιμάστηκαν σε 5.240 πραγματικούς τίτλους και έδωσαν ΜΗΔΕΝ.",
     "    weight loss / lose weight — 126 τίτλοι, αλλά ΣΚΟΠΙΜΑ εκτός: το",
     "    fat-loss-stall είναι «κόλλησα», όχι «θέλω να αδυνατίσω». Άλλο κοινό.",
+    "    bp — 0 σε 5.240 τίτλους και διφορούμενο (03/09/2026).",
+    "    constipation — σύμπτωμα, όχι φυτικές ίνες· λάθος βίντεο.",
+    "    sugar addiction — μηδέν οριακό κέρδος, το «sugar» τα πιάνει ήδη.",
     "",
     "Rules that outlive this file: link-out only, never rehost, never transcripts."
   ],
@@ -181,7 +184,6 @@
         "σάκχαρο",
         "γλυκόζη",
         "προδιαβήτης",
-        "sugar",
         "diabetic",
         "glucose"
       ]
@@ -328,6 +330,59 @@
         "επεξεργασμένα τρόφιμα",
         "βιομηχανικά τρόφιμα"
       ]
+    },
+    {
+      "id": "sugar",
+      "label": "Sugar / ζάχαρη (η ουσία, ο εθισμός, οι επιπτώσεις)",
+      "$comment": [
+        "Η ΟΥΣΙΑ, όχι το μεταβολικό. Το «blood sugar» ανήκει στο diabetes και",
+        "έμεινε εκεί· το σκέτο «sugar» ΒΓΗΚΕ από το diabetes στις 03/09/2026",
+        "ώστε ο διαχωρισμός να είναι πραγματικός και όχι διακήρυξη — αλλιώς",
+        "κάθε τίτλος με «sugar» θα έπεφτε και στα δύο κουτιά.",
+        "«sugar addiction» ΔΕΝ είναι alias: κάθε τέτοιος τίτλος περιέχει ήδη",
+        "«sugar», οπότε το κέρδος του μετρήθηκε και ήταν μηδέν."
+      ],
+      "aliases": [
+        "sugar",
+        "ζάχαρη",
+        "fructose",
+        "sweetener"
+      ]
+    },
+    {
+      "id": "blood-pressure",
+      "label": "Blood pressure / πίεση",
+      "$comment": [
+        "Το «bp» δοκιμάστηκε και κόπηκε: μηδέν σε 5.240 τίτλους, και",
+        "διφορούμενο. Λεπτό θέμα (11 τίτλοι στο corpus της 19/08) — το",
+        "mirroring του §14.16 θα δουλεύει συχνά εδώ, και σωστά.",
+        "ΠΡΟΣΟΧΗ: γειτονεύει με το personal-medical όριο. «carnivore και",
+        "πίεση» είναι θέμα· «να κόψω τα χάπια πίεσης;» είναι γιατρός. Ο",
+        "διαχωρισμός ζει στο prompt (intent) και επιβάλλεται στον worker."
+      ],
+      "aliases": [
+        "blood pressure",
+        "hypertension",
+        "πίεση",
+        "υπέρταση",
+        "αρτηριακή πίεση"
+      ]
+    },
+    {
+      "id": "fibre",
+      "label": "Fibre / φυτικές ίνες",
+      "$comment": [
+        "Και οι δύο ορθογραφίες: «fiber» είναι η πραγματική λέξη στο corpus",
+        "(30 τίτλοι, 11 creators), το «fibre» σχεδόν ανύπαρκτο αλλά δωρεάν.",
+        "«constipation» ΔΕΝ είναι alias: σύμπτωμα, όχι φυτικές ίνες — θα",
+        "τραβούσε λάθος βίντεο σε ένα θέμα που είναι για τη θεωρία."
+      ],
+      "aliases": [
+        "fibre",
+        "fiber",
+        "φυτικές ίνες",
+        "ίνες"
+      ]
     }
   ],
   "creators": [
@@ -342,7 +397,9 @@
         "cholesterol",
         "bloodwork-panic",
         "seed-oils",
-        "upfs"
+        "upfs",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UUzoRyR_nlesKZuOlEjWRXQQ"
     },
@@ -356,7 +413,9 @@
         "cholesterol",
         "exercise",
         "seed-oils",
-        "upfs"
+        "upfs",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UUhi5M3k_K4yuRpWAp00xBQA"
     },
@@ -369,7 +428,9 @@
       "topics": [
         "insulin",
         "diabetes",
-        "fasting"
+        "fasting",
+        "sugar",
+        "blood-pressure"
       ],
       "uploads_playlist_id": "UUblbxPFG0XAsQA2LwzT6xDQ"
     },
@@ -382,7 +443,9 @@
       "topics": [
         "getting-started",
         "electrolytes",
-        "food-list"
+        "food-list",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UULoe46vokIWT50lOoqcr5kg"
     },
@@ -396,7 +459,9 @@
         "electrolytes",
         "fat-loss-stall",
         "bloodwork-panic",
-        "exercise"
+        "exercise",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UUHVQSc3rHY3EaeAhHxC6XBQ"
     },
@@ -421,7 +486,8 @@
       "topics": [
         "diabetes",
         "seed-oils",
-        "upfs"
+        "upfs",
+        "sugar"
       ],
       "uploads_playlist_id": "UUq-YFCkwsKtHkzlz1lk0ndw"
     },
@@ -449,7 +515,8 @@
         "food-list",
         "fasting",
         "autoimmune",
-        "women"
+        "women",
+        "sugar"
       ],
       "uploads_playlist_id": "UUgXrNUokx_Zgprns3z6zqSg"
     },
@@ -461,7 +528,8 @@
       "channel_id": "UCaKl8Lth6h6GWreFyeO1keA",
       "topics": [
         "getting-started",
-        "fat-loss-stall"
+        "fat-loss-stall",
+        "sugar"
       ],
       "uploads_playlist_id": "UUaKl8Lth6h6GWreFyeO1keA",
       "note": "Το κανάλι λέγεται «myzerocarblife», όχι «Kelly Hogan» — γι' αυτό ο resolver το σήμανε και ΔΕΝ το έγραψε μόνος του. Εγκρίθηκε από τον Nick 18/08/2026: η περιγραφή του καναλιού λέει «every episode is made and edited by Kelly Hogan», και το live βίντεο uScdcxgeMoM του index είναι ανεβασμένο από εκεί."
@@ -478,7 +546,9 @@
         "food-list",
         "diabetes",
         "bloodwork-panic",
-        "seed-oils"
+        "seed-oils",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UUIma2WOQs1Mz2AuOt6wRSUw"
     },
@@ -491,7 +561,9 @@
       "topics": [
         "getting-started",
         "fat-loss-stall",
-        "food-list"
+        "food-list",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UUBT6FNxVkQFgudbJXomqveA"
     },
@@ -504,7 +576,8 @@
       "topics": [
         "getting-started",
         "fat-loss-stall",
-        "food-list"
+        "food-list",
+        "sugar"
       ],
       "uploads_playlist_id": "UUklE8NA93P7aU3bxM2BJlOg"
     },
@@ -517,7 +590,9 @@
       "topics": [
         "cholesterol",
         "insulin",
-        "bloodwork-panic"
+        "bloodwork-panic",
+        "blood-pressure",
+        "fibre"
       ],
       "uploads_playlist_id": "UU3vzrYZcGqpgchc5sYM5Ybw"
     },
@@ -531,7 +606,9 @@
         "cholesterol",
         "insulin",
         "diabetes",
-        "bloodwork-panic"
+        "bloodwork-panic",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UUu8xppo0Y7mJz4uqkc7o7TQ"
     },
@@ -545,7 +622,8 @@
         "fat-loss-stall",
         "insulin",
         "diabetes",
-        "exercise"
+        "exercise",
+        "sugar"
       ],
       "uploads_playlist_id": "UUD0szaevd4EkDx1A31kUfCQ"
     },
@@ -558,7 +636,8 @@
       "topics": [
         "fasting",
         "fertility",
-        "women"
+        "women",
+        "sugar"
       ],
       "uploads_playlist_id": "UUogDXio0z4rbQP9vTh2i8qg"
     },
@@ -586,7 +665,10 @@
       "topics": [
         "fat-loss-stall",
         "bloodwork-panic",
-        "exercise"
+        "exercise",
+        "sugar",
+        "blood-pressure",
+        "fibre"
       ],
       "uploads_playlist_id": "UUM1Va_ObWwANw1lrnUSQ6bw"
     },
@@ -600,7 +682,9 @@
         "getting-started",
         "food-list",
         "autoimmune",
-        "exercise"
+        "exercise",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UU5apkKkeZQXRSDbqSalG8CQ"
     },
@@ -619,7 +703,9 @@
         "fasting",
         "exercise",
         "seed-oils",
-        "upfs"
+        "upfs",
+        "sugar",
+        "blood-pressure"
       ],
       "note": "DC (chiropractor), ΟΧΙ MD — keto/wellness generalist. Καμία επιφάνειά μας δεν τον περιγράφει ως γιατρό (§17).",
       "uploads_playlist_id": "UUIe2pR6PE0dae9BunJ38F7w"
@@ -637,7 +723,9 @@
         "diabetes",
         "fasting",
         "seed-oils",
-        "upfs"
+        "upfs",
+        "sugar",
+        "fibre"
       ],
       "uploads_playlist_id": "UUoyL4iGArWn5Hu0V_sAhK2w"
     },
@@ -652,7 +740,10 @@
         "cholesterol",
         "insulin",
         "bloodwork-panic",
-        "fasting"
+        "fasting",
+        "sugar",
+        "blood-pressure",
+        "fibre"
       ],
       "uploads_playlist_id": "UULTZUJSEulehPtF_ytFiU_A"
     }

@@ -39,7 +39,10 @@ test('curation.json is coherent: closed list, known topics, a handle each', () =
   for (const excluded of curation.excluded_from_scan) {
     assert.match(excluded.excluded_reason, /ΕΚΤΟΣ SCAN/, `${excluded.id} has no reason`);
   }
-  assert.equal(curation.topics.length, 16);
+  // 16 until 03/09/2026, then sugar / blood-pressure / fibre. The number is
+  // asserted rather than derived on purpose: a topic appearing or vanishing
+  // silently is exactly the kind of change that should have to be typed twice.
+  assert.equal(curation.topics.length, 19);
 
   const topicIds = new Set(curation.topics.map((t) => t.id));
   for (const creator of curation.creators) {
