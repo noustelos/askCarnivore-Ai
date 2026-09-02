@@ -257,8 +257,15 @@
 
 /* ---- topic chips ---- */
 
-/* Six ways in for someone who would rather not type — and, on /embed, the
-   only prompt a person gets that there is anything to ask about at all.
+/* Ways in for someone who would rather not type — and, on /embed, the only
+   prompt a person gets that there is anything to ask about at all. The two
+   surfaces carry different counts on purpose: eight on the landing, six in
+   the panel, which has less room to spend.
+
+   Layout is NOT here. This rule wraps them in a centred flex row, which is
+   what the panel wants; the landing overrides it with a fixed-column grid in
+   its own <style>, because eight chips of uneven width wrapping freely leave
+   a short last row.
 
    Here rather than in either page's own <style> because both surfaces use
    them and this file is the chat surface both surfaces share. The behaviour
