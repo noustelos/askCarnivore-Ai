@@ -184,16 +184,49 @@
      the working state. */
   .is-active .pl { width: clamp(3rem, 12vw, 4rem); margin-bottom: 1.1rem; }
   .is-active h1  { font-size: clamp(1.35rem, 5vw, 1.7rem); }
-  .is-active .tagline { display: none; }
+  /* Both lines of the masthead's explanation go once a conversation is on
+     screen: they are for the person who has not asked yet. The kicker stays —
+     one small line, and it is what still says where you are next to the
+     shrunken title. */
+  .is-active .tagline,
+  .is-active .explainer { display: none; }
 
   /* ---- type ---- */
 
+  /* ---- kicker ----
+     Copied by hand from askcarnivores.com (.eyebrow in its style.v5.css):
+     0.75rem, .14em tracking, uppercase, weight 600, quiet colour. Same class
+     name, same metrics, deliberately — it is the one line that says the two
+     domains are one project, and it should be recognisable as such.
+
+     The siloing rule applies as it does to the contact line and the studio
+     credit: this is a COPY, not an import. If the portal's eyebrow ever
+     changes, change it here by hand too.
+
+     One deviation, the same one the studio credit makes: the portal paints it
+     --ink-faint, which is tuned for its bone-coloured ground and would vanish
+     on this one. It keeps the ROLE (quieter than everything under it) with
+     --fg-soft, which is 5.50:1 here — small text, so it needs to clear 4.5:1
+     and does.
+
+     Sentence case in the markup, uppercased in CSS, exactly as the portal
+     does it: the words stay readable if the stylesheet never arrives.
+
+     It also takes the top-of-page breathing room the <h1> used to hold, since
+     it now stands above it. */
+  .eyebrow {
+    margin: clamp(1rem, 4vw, 2rem) 0 .75rem;
+    color: var(--fg-soft);
+    font-size: clamp(.65rem, 2.4vw, .75rem);
+    font-weight: 600;
+    letter-spacing: .14em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
   h1 {
-    /* The mark used to carry 2.5rem of space under it and the title sat in
-       its shadow. With the mark gone the title is the top of the page, so it
-       takes that breathing room itself rather than starting hard against the
-       status strip. */
-    margin-top: clamp(1rem, 4vw, 2rem);
+    /* No top margin of its own any more — the kicker above carries it. */
+    margin-top: 0;
     font-size: clamp(2rem, 8vw, 3.1rem);
     font-weight: 700;
     letter-spacing: -.035em;
@@ -210,11 +243,70 @@
     text-wrap: balance;
   }
 
+  /* The quiet explanation. Someone arriving here for the first time has no
+     way of knowing this is not another chatbot that will tell them what to
+     eat — this line says what the thing actually does, in the first person,
+     before they type anything.
+
+     Deliberately secondary: smaller than the tagline and in --fg-soft, so
+     "Just Ask." keeps the weight and this reads as an aside rather than a
+     second headline. Not dimmed any further with opacity — --fg-soft is
+     5.50:1 on this ground and there is no room under that.
+
+     English only. It is the one line on the page with no Greek half, which is
+     a gap, not a decision — when the landing grows its own EN/EL switch this
+     wants a data-el like everything else around it. */
+  .explainer {
+    max-width: 30rem;
+    margin: .6rem auto 0;
+    color: var(--fg-soft);
+    font-size: clamp(.82rem, 3vw, .92rem);
+    font-weight: 400;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
   /* ---- the ask box ---- */
 
   /* The chat surface itself is styled in chat.css, shared with /embed. Only
      its placing on this page belongs here. */
   .chat { margin-top: 2rem; }
+
+  /* ---- chips, laid out ----
+     The chips themselves — border, radius, colour, the 2.75rem tap floor —
+     are in chat.css, shared with /embed. What is here is only how the landing
+     ARRANGES them, and it exists because eight of them in chat.css's centred
+     flex-wrap would not sit symmetrically: the chips are different widths
+     ("insulin" against "how do i start"), so the row breaks wherever the
+     widths happen to run out and the last row is left short. That is exactly
+     what the six looked like — five and an orphan.
+
+     A grid fixes the count instead of hoping for it. Four columns and eight
+     chips is two full rows at any width above the breakpoint, and two columns
+     below it is four full rows on a phone. Equal columns also mean equal
+     targets, which is worth something on its own here.
+
+     The breakpoint is 42rem rather than the 34rem the column is capped at:
+     at 34rem the four columns are ~120px and "how do i start" needs ~125px,
+     so it would wrap inside its own chip. At 42rem there is ~15px of room per
+     column, and it only grows from there.
+
+     Scoped to this page's markup on purpose — /embed carries the shared flex
+     rule and six chips, because a panel that tall would spend four rows on
+     them and take it out of the thread. */
+  #chips {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 42rem) {
+    #chips { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  }
+
+  /* Narrower side padding than the shared rule: the grid decides the width
+     now, and the padding only has to keep the words off the border. The
+     min-height is untouched — it is a tap-target floor, not a preference. */
+  #chips button { padding-inline: .6rem; }
 
   /* ---- footer credit ---- */
 
@@ -401,9 +493,23 @@
          standing in for. Its paths are in the git history if they are ever
          wanted again; they do not need redrawing. -->
 
+    <!-- The same words the portal's hero opens with, in the same treatment —
+         a hand-made copy, not a shared asset (siloing). It is the first thing
+         someone reads, and it names the thing this is: a switchboard the
+         community runs. Never "bot", "AI" or "chatbot" here — those words set
+         the wrong expectation for a surface that answers with other people's
+         videos. -->
+    <p class="eyebrow">Community switchboard</p>
+
     <h1>Ask Carnivore Ai</h1>
 
     <p class="tagline">No app. No sign-up. Just Ask.</p>
+
+    <!-- Said plainly, once, before anyone types: this does not answer, it
+         points. It is the pure-router promise in the visitor's own words
+         rather than ours, and it is here because someone landing cold has
+         otherwise no way to tell this from every other box that talks back. -->
+    <p class="explainer">I don't answer myself — I point you to the videos where the doctors and creators in this community already covered your question.</p>
 
     <!-- The same chat surface the portal frames at /embed — one markup
          contract, one stylesheet, one client (chat.css / chat.js). -->
@@ -422,7 +528,7 @@
         <button class="chat__send" id="send" type="submit">Ask</button>
       </form>
 
-      <!-- Six ways in, for someone who would rather not type. A chip puts its
+      <!-- Eight ways in, for someone who would rather not type. A chip puts its
            own words in the box and submits the form, so the bot receives
            exactly what it would have received from the keyboard — same flow,
            same gates, same answer. The behaviour is in chips.js.
@@ -441,14 +547,27 @@
            They stay on screen after the first question: the second and third
            question deserve the shortcut as much as the first did.
 
-           Mirror any change into embed.html, which carries the same six. -->
+           Eight, not six, since 02/09/2026, and the count is the point: six
+           in a centred wrap broke as five and an orphan, which looks like a
+           mistake. Eight fill two rows of four (the grid that guarantees it
+           is in this page's own <style>), and the two that came back —
+           seed oils, bloodwork — are the two topics people arrive already
+           worried about. Every word is still an alias of a real topic in
+           curation.json; both were checked again here.
+
+           /embed deliberately keeps SIX. It is a panel, not a page: eight
+           there wrap to four rows and take the space out of the thread that
+           is scrolling above them. Different surface, different budget — not
+           a mirror that was forgotten. -->
       <div class="chips" id="chips">
         <button type="button">cholesterol</button>
         <button type="button">insulin</button>
         <button type="button">how do i start</button>
         <button type="button">fasting</button>
         <button type="button">diabetes</button>
+        <button type="button">seed oils</button>
         <button type="button">mental health</button>
+        <button type="button">bloodwork</button>
       </div>
 
       <!-- The framing rule is the accuracy disclaimer; the medical line sits on
