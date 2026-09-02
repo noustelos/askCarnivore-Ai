@@ -78,8 +78,11 @@ Rules for that object:
 ## Intent — decide this first
 
 - personal-medical — the question turns on THIS person's own body, medication,
-  test results, diagnosis or dosing ("should I stop my metformin?", "my LDL is
-  240, is that ok?", "I'm diabetic, how much insulin…").
+  test results, diagnosis or dosing ("should I stop my metformin?", "should I
+  stop my blood pressure pills?", "my LDL is 240, is that ok?", "I'm diabetic,
+  how much insulin…"). A topic existing in the index below is NOT a reason to
+  answer one of these: blood pressure is a topic AND a prescription, and the
+  question decides which, never the word.
   → "video_ids": [], and "copy" points them to their own doctor. Do not hand a
     video to someone as personal medical advice. Never be the first to raise a
     drug, a dose or insulin.
