@@ -25,7 +25,7 @@ functions/
   api/scan.js     POST /api/scan — fills the grid, token-guarded
 src/
   blog.js         Highlights: the sheet's other projection, pure
-  curation.json   HUMAN: 16 topics × 27 creators, the scanner's input
+  curation.json   HUMAN: 19 topics × 27 creators, the scanner's input
   index.json      the bundled index — fallback when KV is empty
   prompt.js       the system prompt (index in, no URLs)
   router.js       validation and gating of whatever the model returns
@@ -38,6 +38,19 @@ test/
 The index has three sources, in order: the **KV grid** written by the scanner,
 the **Sheet override** on top of it, then the bundled `src/index.json` as a
 fallback. Which one answered is in `meta.index_source`.
+
+A topic only exists for the bot once a video lands in it — `loadIndex` never
+advertises an empty box. So a brand-new topic answers `topic: null` until a
+scan runs or the Sheet carries rows for it, and that is the honest outcome
+rather than a bug to chase. Three topics are in that state right now: `sugar`,
+`blood-pressure` and `fibre`, added 02/09/2026.
+
+One rule inside the alias lists is easy to undo by accident: **`sugar` is the
+substance, `blood sugar` is metabolic and belongs to `diabetes`.** The bare
+word was removed from `diabetes` on 02/09 to make that real; `blood sugar`,
+`blood glucose`, `glucose` and `a1c` stayed. Whole-word matching has no
+negation, so ~13% of the `sugar` box is titles that say "blood sugar" — that
+overlap is accepted and straightened with Sheet rows, never with code.
 
 ## Two readings of one sheet
 
