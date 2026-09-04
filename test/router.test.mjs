@@ -295,3 +295,116 @@ test('the deep list obeys the link cap on its own', () => {
   assert.equal(result.deepLinks.length, MAX_LINKS);
   assert.ok(result.notes.some((note) => note.startsWith('over-cap-deep:')));
 });
+
+/* ---------------------------------------------------------------------------
+   Creator-scoped queries (04/09/2026). The rule being defended is that a name
+   NARROWS an answer and never unlocks one — the filter runs after both gates,
+   on links they already approved.
+   --------------------------------------------------------------------------- */
+
+const sheetIndex = loadIndex({
+  status: 'CURATED',
+  topics: [{ id: 'insulin', aliases: ['ινσουλίνη'] }],
+  videos: [
+    { id: 'sheet-mason', topic: 'insulin', url: 'https://www.youtube.com/watch?v=sheet-mason',
+      title: 'Insulin explained', creator: 'Dr Paul Mason & Dr Chaffee', register: 'start',
+      lang: 'en', source: 'sheet' },
+    { id: 'sheet-berry', topic: 'insulin', url: 'https://www.youtube.com/watch?v=sheet-berry',
+      title: 'Insulin basics', creator: 'Dr. Ken Berry, Ben Bikman', register: 'start',
+      lang: 'en', source: 'sheet' },
+    { id: 'grid-mason', topic: 'insulin', url: 'https://www.youtube.com/watch?v=grid-mason',
+      title: 'Insulin from the scan', creator: 'Dr Paul Mason', register: 'deep',
+      lang: 'en', source: 'own' },
+  ],
+});
+
+test('naming a creator narrows the list to their sheet rows', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: {
+      intent: 'conceptual', topic: 'insulin', answer_lang: 'en', creator: 'Mason',
+      video_ids: ['sheet-mason', 'sheet-berry', 'grid-mason'],
+      copy: 'Here you go.',
+    },
+  });
+
+  assert.deepEqual(result.links.map((l) => l.id), ['sheet-mason']);
+  assert.deepEqual(result.creatorScope, { name: 'Mason', matched: true });
+});
+
+test('an interview answers for every name credited on it', () => {
+  for (const asked of ['Berry', 'Bikman', 'Dr. Ken Berry']) {
+    const result = resolveModelOutput({
+      index: sheetIndex,
+      raw: { intent: 'conceptual', topic: 'insulin', answer_lang: 'en', creator: asked,
+             video_ids: ['sheet-mason', 'sheet-berry'], copy: '' },
+    });
+    assert.deepEqual(result.links.map((l) => l.id), ['sheet-berry'], `asked: ${asked}`);
+  }
+});
+
+test('the scan grid never answers "by X" — sheet rows only', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: { intent: 'conceptual', topic: 'insulin', answer_lang: 'en', creator: 'Mason',
+           video_ids: ['grid-mason'], copy: '' },
+  });
+
+  // grid-mason IS Paul Mason, but it came from the scan, so it cannot be served
+  // as a creator-scoped answer. The miss keeps the unfiltered list instead.
+  assert.equal(result.creatorScope.matched, false);
+  assert.deepEqual(result.links.map((l) => l.id), ['grid-mason']);
+});
+
+test('a creator miss keeps the topic list and says so, never empty hands', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: { intent: 'conceptual', topic: 'insulin', answer_lang: 'en', creator: 'Georgia Ede',
+           video_ids: ['sheet-mason', 'sheet-berry'], copy: '' },
+  });
+
+  assert.deepEqual(result.creatorScope, { name: 'Georgia Ede', matched: false });
+  assert.deepEqual(result.links.map((l) => l.id), ['sheet-mason', 'sheet-berry']);
+  assert.equal(result.fallback, null, 'the topic answered, so no directory fallback');
+});
+
+test('⚠ a creator name does NOT open the medical gate', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: {
+      intent: 'personal-medical',
+      topic: 'insulin',
+      answer_lang: 'en',
+      creator: 'Paul Mason', // "should I stop my meds, according to Mason?"
+      video_ids: ['sheet-mason', 'sheet-berry'],
+      deep_video_ids: ['sheet-mason'],
+      copy: 'Ask your doctor.',
+    },
+  });
+
+  assert.deepEqual(result.links, [], 'the gate closes before the name is read');
+  assert.deepEqual(result.deepLinks, []);
+  assert.equal(result.creatorScope, null, 'a medical turn is not creator-scoped');
+});
+
+test('no creator named leaves everything exactly as it was', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: { intent: 'conceptual', topic: 'insulin', answer_lang: 'en',
+           video_ids: ['sheet-mason', 'sheet-berry'], copy: '' },
+  });
+
+  assert.equal(result.creatorScope, null);
+  assert.equal(result.links.length, 2);
+});
+
+test('a blank creator string is not a creator query', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: { intent: 'conceptual', topic: 'insulin', answer_lang: 'en', creator: '   ',
+           video_ids: ['sheet-mason'], copy: '' },
+  });
+
+  assert.equal(result.creatorScope, null);
+  assert.deepEqual(result.links.map((l) => l.id), ['sheet-mason']);
+});

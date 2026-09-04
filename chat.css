@@ -52,6 +52,19 @@
   text-wrap: pretty;
 }
 
+/* The creator-scoped miss: "nothing from them on this, here is the topic".
+   Softer than the copy above it and sitting just clear of the list, because it
+   is a caveat about what follows, not the answer itself. Same size, though —
+   this is the sentence that stops the list being read as that person's work,
+   and the audience is 50+ (§16). */
+.turn__note {
+  font-size: .95rem;
+  line-height: 1.55;
+  color: var(--fg-soft, hsl(0 0% 100% / .72));
+  margin-top: .5rem;
+  text-wrap: pretty;
+}
+
 /* ---- the links: the actual product ---- */
 
 .results {

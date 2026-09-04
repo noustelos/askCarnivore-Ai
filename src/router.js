@@ -14,7 +14,14 @@
      2. intent === "personal-medical" returns ZERO links, no matter what the
         model asked for. The redirect-to-a-doctor rule does not rest on the
         model obeying it.
+     3. A creator name NARROWS an answer, it never unlocks one. The filter runs
+        AFTER both gates above, on links they already approved, so "should I
+        stop my meds, according to Mason" is a medical question that happens to
+        name someone — it returns before the name is ever looked at. Moving the
+        filter earlier would make a name a way around the gate.
    --------------------------------------------------------------------------- */
+
+import { filterByCreator } from './creator.js';
 
 /** 3–4 links, per spec §1. The ceiling is on what we render, not what we ask. */
 export const MAX_LINKS = 4;
@@ -162,6 +169,9 @@ export function resolveModelOutput({ raw, index }) {
       // around it — the rule does not have a second door.
       deepLinks: [],
       fallback: null, // a doctor is the answer here; not the directory
+      // Named or not, a medical question is not a creator-scoped one. Saying
+      // "no videos from Mason" here would be answering the question sideways.
+      creatorScope: null,
       notes,
     };
   }
@@ -211,8 +221,39 @@ export function resolveModelOutput({ raw, index }) {
     return links;
   };
 
-  const links = resolve(raw?.video_ids, '');
-  const deepLinks = keepIfDistinct(links, resolve(raw?.deep_video_ids, '-deep'));
+  let links = resolve(raw?.video_ids, '');
+  let deepLinks = keepIfDistinct(links, resolve(raw?.deep_video_ids, '-deep'));
+
+  // ---- gate 3: a creator name narrows, it never unlocks ---------------------
+  // The model is asked NOT to pre-filter by creator: it returns the topic's
+  // normal lists plus the name it heard. That is what makes the honest miss
+  // possible — the unfiltered lists are still in hand here, so "I have nothing
+  // from X on this, but here is the topic" costs nothing and invents nothing.
+  //
+  // Sheet rows only (src/creator.js). A creator-scoped answer drawn from the
+  // scan grid would be crediting a channel name rather than an attribution
+  // Nick wrote, and "by X" is a promise about who is speaking.
+  const askedCreator = typeof raw?.creator === 'string' ? raw.creator.trim() : '';
+  let creatorScope = null;
+
+  if (askedCreator) {
+    const scoped = filterByCreator(links, askedCreator, index.byId);
+    const scopedDeep = filterByCreator(deepLinks, askedCreator, index.byId);
+
+    if (scoped.length || scopedDeep.length) {
+      links = scoped;
+      // Recomputed rather than reused: once both sides are narrowed to one
+      // person they are often the same two videos, and the deep button has to
+      // disappear on the same rule as everywhere else (§14.16).
+      deepLinks = keepIfDistinct(scoped, scopedDeep);
+      creatorScope = { name: askedCreator, matched: true };
+    } else {
+      // Not an error and not an empty answer: the topic list stays exactly as
+      // it was, and the client says whose videos are missing from it.
+      creatorScope = { name: askedCreator, matched: false };
+      notes.push(`creator-miss:${askedCreator.slice(0, 40)}`);
+    }
+  }
 
   const topic = index.topics.has(raw?.topic) ? raw.topic : null;
 
@@ -223,6 +264,7 @@ export function resolveModelOutput({ raw, index }) {
     copy,
     links,
     deepLinks,
+    creatorScope,
     // Honest unmatched: no invented source, one real place to go next.
     fallback: links.length
       ? null

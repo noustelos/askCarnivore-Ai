@@ -39,6 +39,10 @@
       basics: 'Back to basics',
       inGreek: 'in Greek',
       inEnglish: 'in English',
+      // Written here rather than asked of the model: a miss has to read the
+      // same way every time, and it has to be true. `%s` is the name the
+      // person used, echoed back so they can see they were understood.
+      noCreator: (name) => `I don't have videos from ${name} on this yet — here is what the topic holds.`,
     },
     el: {
       register: {
@@ -50,6 +54,7 @@
       basics: 'Πίσω στα βασικά',
       inGreek: 'στα ελληνικά',
       inEnglish: 'στα αγγλικά',
+      noCreator: (name) => `Δεν έχω ακόμα βίντεο του/της ${name} για αυτό — να τι έχω για το θέμα.`,
     },
   };
 
@@ -151,6 +156,12 @@
     warnPlaceholder(data.meta?.index_status);
 
     if (data.copy) turn.append(el('p', 'turn__copy', data.copy));
+
+    // They named someone we have nothing from on this topic. Said before the
+    // list, so nobody reads the ordinary topic answer as that person's work.
+    if (data.creator_scope && data.creator_scope.matched === false) {
+      turn.append(el('p', 'turn__note', t.noCreator(data.creator_scope.name)));
+    }
 
     if (data.links?.length) {
       const list = el('ul', 'results');
