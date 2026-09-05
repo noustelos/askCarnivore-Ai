@@ -368,6 +368,46 @@ test('a creator miss keeps the topic list and says so, never empty hands', () =>
   assert.equal(result.fallback, null, 'the topic answered, so no directory fallback');
 });
 
+test('a creator miss replaces the model copy, in the answer language', () => {
+  for (const [lang, expected] of [
+    ['en', "I don't have videos from Georgia Ede on this yet — here's what the topic holds:"],
+    ['el', 'Δεν έχω βίντεο του/της Georgia Ede γι\' αυτό το θέμα ακόμα — να τι έχει το θέμα:'],
+  ]) {
+    const result = resolveModelOutput({
+      index: sheetIndex,
+      raw: { intent: 'conceptual', topic: 'insulin', answer_lang: lang, creator: 'Georgia Ede',
+             video_ids: ['sheet-mason', 'sheet-berry'],
+             // What the live model actually wrote on a miss, twice, on 05/09.
+             copy: 'Here is what Dr. Georgia Ede says about insulin.' },
+    });
+
+    assert.equal(result.copy, expected, lang);
+    assert.equal(result.links.length, 2, 'the topic list is untouched');
+  }
+});
+
+test('a creator miss with nothing to show does not promise a list', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: { intent: 'conceptual', topic: 'insulin', answer_lang: 'en', creator: 'Georgia Ede',
+           video_ids: [], copy: 'Here is what she says.' },
+  });
+
+  assert.equal(result.copy, "I don't have videos from Georgia Ede on this yet.");
+  assert.match(result.copy, /yet\.$/, 'no colon: there is no list under it');
+  assert.ok(result.fallback, 'nothing of ours, so the directory is offered');
+});
+
+test('a creator MATCH leaves the model copy alone', () => {
+  const result = resolveModelOutput({
+    index: sheetIndex,
+    raw: { intent: 'conceptual', topic: 'insulin', answer_lang: 'en', creator: 'Mason',
+           video_ids: ['sheet-mason'], copy: 'Two takes from Dr. Mason.' },
+  });
+
+  assert.equal(result.copy, 'Two takes from Dr. Mason.');
+});
+
 test('⚠ a creator name does NOT open the medical gate', () => {
   const result = resolveModelOutput({
     index: sheetIndex,

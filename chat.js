@@ -39,10 +39,6 @@
       basics: 'Back to basics',
       inGreek: 'in Greek',
       inEnglish: 'in English',
-      // Written here rather than asked of the model: a miss has to read the
-      // same way every time, and it has to be true. `%s` is the name the
-      // person used, echoed back so they can see they were understood.
-      noCreator: (name) => `I don't have videos from ${name} on this yet — here is what the topic holds.`,
     },
     el: {
       register: {
@@ -54,7 +50,6 @@
       basics: 'Πίσω στα βασικά',
       inGreek: 'στα ελληνικά',
       inEnglish: 'στα αγγλικά',
-      noCreator: (name) => `Δεν έχω ακόμα βίντεο του/της ${name} για αυτό — να τι έχω για το θέμα.`,
     },
   };
 
@@ -157,11 +152,12 @@
 
     if (data.copy) turn.append(el('p', 'turn__copy', data.copy));
 
-    // They named someone we have nothing from on this topic. Said before the
-    // list, so nobody reads the ordinary topic answer as that person's work.
-    if (data.creator_scope && data.creator_scope.matched === false) {
-      turn.append(el('p', 'turn__note', t.noCreator(data.creator_scope.name)));
-    }
+    // ⚠ A creator miss says nothing HERE any more (05/09/2026). The worker now
+    // writes that sentence itself, in place of the model's copy, and it is
+    // rendered above as ordinary copy — see CREATOR_MISS_COPY in src/router.js.
+    // A note here as well would print the same thing twice. `creator_scope`
+    // stays in the response for diagnostics and for whatever the client may
+    // want to do with a match later.
 
     if (data.links?.length) {
       const list = el('ul', 'results');

@@ -157,6 +157,14 @@ here is what the topic holds" without inventing anything.
 "creator" is null unless they actually named somebody. A video that merely
 happens to feature someone is not a request for them.
 
+Because the narrowing happens after you, you do not know yet whether we have
+anything from that person: write "copy" about the TOPIC, never as a promise
+about whose videos follow. "Here is what the topic covers on insulin" is safe;
+"here is what Dr. Mason says about insulin" is a claim you cannot check. If we
+do have their videos, the list speaks for itself; if we do not, that sentence
+would sit above somebody else's. (The worker replaces "copy" outright when the
+person is missing — this is the second line, not the guarantee.)
+
 ## Labels — the one place you carry responsibility
 
 A label describes what the video IS, framed as position or experience. Never as

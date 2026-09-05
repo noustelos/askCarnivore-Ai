@@ -44,6 +44,35 @@ export const DIRECTORY = {
   },
 };
 
+/**
+ * The sentence a creator miss gets, in place of whatever the model wrote.
+ *
+ * ⚠ THIS IS A GUARANTEE IN CODE, NOT AN INSTRUCTION IN THE PROMPT — same shape
+ * as the medical gate above it. The model cannot know it missed: it hands over
+ * a name and gate 3 below decides, long after the copy was written. Live
+ * probes (05/09/2026) had it opening with "Here is what Dr. Paul Mason says
+ * about insulin" over a list of Ken Berry videos, twice, in two different
+ * phrasings. A wrong first sentence corrected by a second line is worse than
+ * one true sentence, especially for readers with brain fog (§16).
+ *
+ * The no-links variant exists because the colon is a promise: "here is what the
+ * topic holds:" above nothing at all would be a second false claim, smaller.
+ */
+export const CREATOR_MISS_COPY = {
+  en: (name, hasLinks) =>
+    hasLinks
+      ? `I don't have videos from ${name} on this yet — here's what the topic holds:`
+      : `I don't have videos from ${name} on this yet.`,
+  el: (name, hasLinks) =>
+    hasLinks
+      ? `Δεν έχω βίντεο του/της ${name} γι' αυτό το θέμα ακόμα — να τι έχει το θέμα:`
+      : `Δεν έχω βίντεο του/της ${name} γι' αυτό το θέμα ακόμα.`,
+};
+
+/** A name is free text a stranger typed. It is rendered as text, never as
+    markup, but it still goes in a sentence — so it is cut to a name's length. */
+const MAX_CREATOR_NAME = 80;
+
 const MAX_COPY_CHARS = 1200;
 const MAX_LABEL_CHARS = 160;
 
@@ -151,7 +180,7 @@ export function resolveModelOutput({ raw, index }) {
   }
 
   const answerLang = normalizeLang(raw?.answer_lang);
-  const copy = clean(raw?.copy, MAX_COPY_CHARS);
+  let copy = clean(raw?.copy, MAX_COPY_CHARS);
 
   // ---- gate 1: personal-medical never carries links -----------------------
   if (intent === 'personal-medical') {
@@ -233,7 +262,8 @@ export function resolveModelOutput({ raw, index }) {
   // Sheet rows only (src/creator.js). A creator-scoped answer drawn from the
   // scan grid would be crediting a channel name rather than an attribution
   // Nick wrote, and "by X" is a promise about who is speaking.
-  const askedCreator = typeof raw?.creator === 'string' ? raw.creator.trim() : '';
+  const askedCreator =
+    typeof raw?.creator === 'string' ? raw.creator.trim().slice(0, MAX_CREATOR_NAME) : '';
   let creatorScope = null;
 
   if (askedCreator) {
@@ -249,8 +279,11 @@ export function resolveModelOutput({ raw, index }) {
       creatorScope = { name: askedCreator, matched: true };
     } else {
       // Not an error and not an empty answer: the topic list stays exactly as
-      // it was, and the client says whose videos are missing from it.
+      // it was, and the copy above it is replaced with the one sentence that is
+      // true of what follows. The client renders it like any other copy — it no
+      // longer adds a correcting line, because there is nothing to correct.
       creatorScope = { name: askedCreator, matched: false };
+      copy = CREATOR_MISS_COPY[answerLang](askedCreator, links.length > 0);
       notes.push(`creator-miss:${askedCreator.slice(0, 40)}`);
     }
   }
