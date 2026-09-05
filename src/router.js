@@ -14,7 +14,14 @@
      2. intent === "personal-medical" returns ZERO links, no matter what the
         model asked for. The redirect-to-a-doctor rule does not rest on the
         model obeying it.
+     3. A creator name NARROWS an answer, it never unlocks one. The filter runs
+        AFTER both gates above, on links they already approved, so "should I
+        stop my meds, according to Mason" is a medical question that happens to
+        name someone — it returns before the name is ever looked at. Moving the
+        filter earlier would make a name a way around the gate.
    --------------------------------------------------------------------------- */
+
+import { filterByCreator } from './creator.js';
 
 /** 3–4 links, per spec §1. The ceiling is on what we render, not what we ask. */
 export const MAX_LINKS = 4;
@@ -36,6 +43,35 @@ export const DIRECTORY = {
     el: 'Δες τον κατάλογο γιατρών & creators',
   },
 };
+
+/**
+ * The sentence a creator miss gets, in place of whatever the model wrote.
+ *
+ * ⚠ THIS IS A GUARANTEE IN CODE, NOT AN INSTRUCTION IN THE PROMPT — same shape
+ * as the medical gate above it. The model cannot know it missed: it hands over
+ * a name and gate 3 below decides, long after the copy was written. Live
+ * probes (05/09/2026) had it opening with "Here is what Dr. Paul Mason says
+ * about insulin" over a list of Ken Berry videos, twice, in two different
+ * phrasings. A wrong first sentence corrected by a second line is worse than
+ * one true sentence, especially for readers with brain fog (§16).
+ *
+ * The no-links variant exists because the colon is a promise: "here is what the
+ * topic holds:" above nothing at all would be a second false claim, smaller.
+ */
+export const CREATOR_MISS_COPY = {
+  en: (name, hasLinks) =>
+    hasLinks
+      ? `I don't have videos from ${name} on this yet — here's what the topic holds:`
+      : `I don't have videos from ${name} on this yet.`,
+  el: (name, hasLinks) =>
+    hasLinks
+      ? `Δεν έχω βίντεο του/της ${name} γι' αυτό το θέμα ακόμα — να τι έχει το θέμα:`
+      : `Δεν έχω βίντεο του/της ${name} γι' αυτό το θέμα ακόμα.`,
+};
+
+/** A name is free text a stranger typed. It is rendered as text, never as
+    markup, but it still goes in a sentence — so it is cut to a name's length. */
+const MAX_CREATOR_NAME = 80;
 
 const MAX_COPY_CHARS = 1200;
 const MAX_LABEL_CHARS = 160;
@@ -144,7 +180,7 @@ export function resolveModelOutput({ raw, index }) {
   }
 
   const answerLang = normalizeLang(raw?.answer_lang);
-  const copy = clean(raw?.copy, MAX_COPY_CHARS);
+  let copy = clean(raw?.copy, MAX_COPY_CHARS);
 
   // ---- gate 1: personal-medical never carries links -----------------------
   if (intent === 'personal-medical') {
@@ -162,6 +198,9 @@ export function resolveModelOutput({ raw, index }) {
       // around it — the rule does not have a second door.
       deepLinks: [],
       fallback: null, // a doctor is the answer here; not the directory
+      // Named or not, a medical question is not a creator-scoped one. Saying
+      // "no videos from Mason" here would be answering the question sideways.
+      creatorScope: null,
       notes,
     };
   }
@@ -211,8 +250,43 @@ export function resolveModelOutput({ raw, index }) {
     return links;
   };
 
-  const links = resolve(raw?.video_ids, '');
-  const deepLinks = keepIfDistinct(links, resolve(raw?.deep_video_ids, '-deep'));
+  let links = resolve(raw?.video_ids, '');
+  let deepLinks = keepIfDistinct(links, resolve(raw?.deep_video_ids, '-deep'));
+
+  // ---- gate 3: a creator name narrows, it never unlocks ---------------------
+  // The model is asked NOT to pre-filter by creator: it returns the topic's
+  // normal lists plus the name it heard. That is what makes the honest miss
+  // possible — the unfiltered lists are still in hand here, so "I have nothing
+  // from X on this, but here is the topic" costs nothing and invents nothing.
+  //
+  // Sheet rows only (src/creator.js). A creator-scoped answer drawn from the
+  // scan grid would be crediting a channel name rather than an attribution
+  // Nick wrote, and "by X" is a promise about who is speaking.
+  const askedCreator =
+    typeof raw?.creator === 'string' ? raw.creator.trim().slice(0, MAX_CREATOR_NAME) : '';
+  let creatorScope = null;
+
+  if (askedCreator) {
+    const scoped = filterByCreator(links, askedCreator, index.byId);
+    const scopedDeep = filterByCreator(deepLinks, askedCreator, index.byId);
+
+    if (scoped.length || scopedDeep.length) {
+      links = scoped;
+      // Recomputed rather than reused: once both sides are narrowed to one
+      // person they are often the same two videos, and the deep button has to
+      // disappear on the same rule as everywhere else (§14.16).
+      deepLinks = keepIfDistinct(scoped, scopedDeep);
+      creatorScope = { name: askedCreator, matched: true };
+    } else {
+      // Not an error and not an empty answer: the topic list stays exactly as
+      // it was, and the copy above it is replaced with the one sentence that is
+      // true of what follows. The client renders it like any other copy — it no
+      // longer adds a correcting line, because there is nothing to correct.
+      creatorScope = { name: askedCreator, matched: false };
+      copy = CREATOR_MISS_COPY[answerLang](askedCreator, links.length > 0);
+      notes.push(`creator-miss:${askedCreator.slice(0, 40)}`);
+    }
+  }
 
   const topic = index.topics.has(raw?.topic) ? raw.topic : null;
 
@@ -223,6 +297,7 @@ export function resolveModelOutput({ raw, index }) {
     copy,
     links,
     deepLinks,
+    creatorScope,
     // Honest unmatched: no invented source, one real place to go next.
     fallback: links.length
       ? null

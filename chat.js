@@ -152,6 +152,13 @@
 
     if (data.copy) turn.append(el('p', 'turn__copy', data.copy));
 
+    // ⚠ A creator miss says nothing HERE any more (05/09/2026). The worker now
+    // writes that sentence itself, in place of the model's copy, and it is
+    // rendered above as ordinary copy — see CREATOR_MISS_COPY in src/router.js.
+    // A note here as well would print the same thing twice. `creator_scope`
+    // stays in the response for diagnostics and for whatever the client may
+    // want to do with a match later.
+
     if (data.links?.length) {
       const list = el('ul', 'results');
       for (const link of data.links) list.append(renderLink(link, t));

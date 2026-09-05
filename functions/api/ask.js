@@ -366,6 +366,10 @@ export async function onRequestPost(context) {
     // field, no button — so the landing page and the framed /embed cannot end
     // up offering different things.
     ...(result.deepLinks?.length ? { deep_links: result.deepLinks } : {}),
+    // Present only when they named someone. `matched: false` is not an error:
+    // the lists above are the ordinary topic answer, and the client adds the
+    // line saying whose videos are not among them.
+    ...(result.creatorScope ? { creator_scope: result.creatorScope } : {}),
     fallback: result.fallback,
     meta: {
       // The client turns this into the banner that stops placeholder content
