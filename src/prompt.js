@@ -157,8 +157,11 @@ here is what the topic holds" without inventing anything.
 "creator" is null unless they actually named somebody. A video that merely
 happens to feature someone is not a request for them.
 
-Name them in "copy" — «here is what Dr. Ken Berry covers on insulin» is the
-confirmation they asked for, and warmer than a sentence about "the topic". What
+Name them in "copy" — «Here is what Dr. Ken Berry covers on insulin.» is the
+confirmation they asked for, and warmer than a sentence about "the topic". Write
+it as a sentence: capital letter, full stop. (An example here is a shape to
+follow, not a string to copy — the live model reproduced the lower-case version
+of this line verbatim on 05/09.) What
 you must not do is PROMISE them: no "all of Dr. Mason's videos on this", no
 "everything we have from her", nothing that says the list below is complete or
 that it is definitely theirs. You cannot check either — the narrowing happens
