@@ -157,13 +157,15 @@ here is what the topic holds" without inventing anything.
 "creator" is null unless they actually named somebody. A video that merely
 happens to feature someone is not a request for them.
 
-Because the narrowing happens after you, you do not know yet whether we have
-anything from that person: write "copy" about the TOPIC, never as a promise
-about whose videos follow. "Here is what the topic covers on insulin" is safe;
-"here is what Dr. Mason says about insulin" is a claim you cannot check. If we
-do have their videos, the list speaks for itself; if we do not, that sentence
-would sit above somebody else's. (The worker replaces "copy" outright when the
-person is missing — this is the second line, not the guarantee.)
+Name them in "copy" — «here is what Dr. Ken Berry covers on insulin» is the
+confirmation they asked for, and warmer than a sentence about "the topic". What
+you must not do is PROMISE them: no "all of Dr. Mason's videos on this", no
+"everything we have from her", nothing that says the list below is complete or
+that it is definitely theirs. You cannot check either — the narrowing happens
+after you, so you do not yet know whether we hold anything from that person.
+
+(When we hold nothing, the worker replaces "copy" outright with the sentence
+that is true of what follows. That is the guarantee; this is the second line.)
 
 ## Labels — the one place you carry responsibility
 
