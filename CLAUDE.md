@@ -725,13 +725,14 @@ directory. Οι buckets όμως μένουν **δικοί μας** — το por
 σερβίρει πια χειροκίνητο index: διαβάζει το **προ-υπολογισμένο πλέγμα από KV**,
 με το **Sheet override** από πάνω, και ο χρήστης διαλέγει βάθος με **κουμπί**.
 **Δεν υπάρχει κανένα branch** — ούτε `bot-v0`, ούτε `scan-layer`, ούτε
-`register-ui`, ούτε `about-page`· όλα merged και διαγραμμένα. Ό,τι γράφεται,
+`register-ui`, ούτε `about-page`, ούτε `creator-scoped`· όλα merged και
+διαγραμμένα. Ό,τι γράφεται,
 γράφεται πάνω στο **live `main`**, με ό,τι προσοχή συνεπάγεται αυτό.
 
 *Recovery hashes, αν ποτέ χρειαστεί ένα από αυτά πίσω:*
 `git branch bot-v0 49efece` · `git branch scan-layer 9617888` ·
 `git branch register-ui f0427fb` · `git branch randle-alias 9255c9f` ·
-`git branch about-page 3eca60e`.
+`git branch about-page 3eca60e` · `git branch creator-scoped 0532110`.
 
 **Από 29/08/2026 το site έχει δύο σελίδες**, όχι μία: το landing (`/`) και το
 **`/about`** — «My Story / Η ιστορία μου», η προσωπική ιστορία του Nick και το
@@ -1435,7 +1436,8 @@ Sugar**» περιέχει τη λέξη «sugar» ολόκληρη. Ο matcher 
 
 ## Creator-scoped queries — «insulin by Paul Mason» (04-05/09/2026)
 
-*Χτισμένο στο branch `creator-scoped`. **Sheet-only feature.** Ο σχεδιασμός
+***LIVE στο `main` από 05/09/2026*** (merge `0168e9a`· recovery:
+`git branch creator-scoped 0532110`). **Sheet-only feature.** Ο σχεδιασμός
 γράφεται εδώ γιατί οι αποφάσεις του δεν φαίνονται από τον κώδικα — και μία από
 αυτές κρατάει το medical gate ασφαλές.*
 
@@ -1727,16 +1729,15 @@ test/scan.test.mjs test/sheet.test.mjs test/blog.test.mjs` (το
       πέρα από τη σελίδα: το κοινό `localStorage['lang']` (το landing το
       διαβάζει ήδη) και τον κανόνα ότι **κάθε νέα σελίδα δηλώνει δικό της CSP
       ζευγάρι** στο `_headers`. Βλ. § `/about`.
-- [ ] **Creator-scoped queries** — **χτίστηκε και επαληθεύτηκε στο preview
-      (05/09/2026), ΔΕΝ έχει γίνει merge.** Branch `creator-scoped`, commits
-      `f48eee4` (feature) + `907ac65` (miss copy στον worker), 103/103 tests.
-      Πλήρης σχεδιασμός: § «Creator-scoped queries» παραπάνω — εκεί ζουν οι
-      τρεις κανόνες που δεν φαίνονται από τον κώδικα (**πεδίο και όχι έκτο
-      intent**, surname-anchored matching, miss copy σε κώδικα). Το «ένα βίντεο
-      με δύο creators μετράει και για τους δύο» **υλοποιήθηκε** όπως
-      προβλεπόταν. Προσοχή στο §14.5, όπως γράφτηκε τότε: «τι έχεις από τον X»
-      είναι *πρόσβαση κατά πρόσωπο*, όχι κατάταξη προσώπων.
-      **Μένει μόνο ο λόγος του Nick για merge.**
+- [x] ~~**Creator-scoped queries**~~ ✅ **live 05/09/2026** (merge `0168e9a`)
+      — «insulin by Paul Mason», «χοληστερίνη από τον Berry». Πλήρης
+      σχεδιασμός: § «Creator-scoped queries» παραπάνω, όπου ζουν οι τρεις
+      κανόνες που δεν φαίνονται από τον κώδικα (**πεδίο και όχι έκτο intent**,
+      surname-anchored matching, miss copy σε κώδικα). Το «ένα βίντεο με δύο
+      creators μετράει και για τους δύο» υλοποιήθηκε όπως προβλεπόταν, και το
+      §14.5 τηρήθηκε: «τι έχεις από τον X» είναι *πρόσβαση κατά πρόσωπο*, όχι
+      κατάταξη προσώπων. Επαληθεύτηκε **στο production** μετά το deploy:
+      θερμό match, καθαρό miss, gate με όνομα → **0 links**.
 - [x] ~~**Τρία νέα θέματα: `sugar`, `blood-pressure`, `fibre`**~~ ✅ **live
       02/09/2026** (merge `d238fa4`) — **19 θέματα** πλέον, όχι 16. Aliases
       **μετρημένα σε 5.240 πραγματικούς τίτλους**, όχι μαντεμένα, όπως και στο
@@ -2461,9 +2462,10 @@ test/scan.test.mjs test/sheet.test.mjs test/blog.test.mjs` (το
 
 - **2026-09-04 → 05/09** — **Creator-scoped queries: «insulin by Paul Mason».**
   Ο bot ματσάριζε μόνο θέμα· η ερώτηση «κατά πρόσωπο» δεν είχε μονοπάτι. Τώρα
-  έχει, **Sheet-only**, στο branch `creator-scoped` — **επαληθευμένο στο
-  preview με ζωντανό μοντέλο, χωρίς merge**. Ο σχεδιασμός ολόκληρος σε δική του
-  ενότητα παραπάνω· εδώ τα τρία που θα «διορθώνονταν» πίσω αν δεν γράφονταν:
+  έχει, **Sheet-only**, **live στο `main`** (merge `0168e9a`) — επαληθευμένο
+  πρώτα στο preview με ζωντανό μοντέλο και ξανά στο production μετά το deploy.
+  Ο σχεδιασμός ολόκληρος σε δική του ενότητα παραπάνω· εδώ τα τρία που θα
+  «διορθώνονταν» πίσω αν δεν γράφονταν:
   - **Το `creator` έγινε ΠΕΔΙΟ, όχι έκτο intent.** Ένα έκτο intent θα έβαζε το
     μοντέλο να διαλέξει ανάμεσα σε `personal-medical` και `creator-scoped` για
     ερωτήσεις που μοιάζουν και με τα δύο («να κόψω τα φάρμακά μου σύμφωνα με
